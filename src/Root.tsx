@@ -4,32 +4,38 @@ import { Composition } from 'remotion';
 export const Root: React.FC = () => {
 	return (
 		<Composition
-			id="MulhouseAutomobileMuseum"
-			component={MulhouseComposition}
-			durationInFrames={300}
+			id="MulhouseTest"
+			component={MulhouseTest}
+			durationInFrames={150}
 			fps={30}
 			width={1920}
 			height={1080}
-			defaultProps={{}}
 		/>
 	);
 };
 
-const MulhouseComposition: React.FC = () => {
+const MulhouseTest: React.FC = () => {
 	return (
 		<div
 			style={{
-				flex: 1,
-				backgroundColor: '#000',
+				width: '100%',
+				height: '100%',
+				backgroundColor: '#1a1a1a',
 				display: 'flex',
+				flexDirection: 'column',
 				justifyContent: 'center',
 				alignItems: 'center',
-				color: '#fff',
-				fontSize: '48px',
-				fontFamily: 'sans-serif',
+				color: '#ffffff',
+				fontFamily: 'Arial, sans-serif',
+				gap: '40px',
 			}}
 		>
-			Mulhouse Automobile Museum
+			<div style={{ fontSize: '72px', fontWeight: 'bold' }}>
+				TASAN MEDIA Trips
+			</div>
+			<div style={{ fontSize: '48px', color: '#cccccc' }}>
+				Mulhouse Automobile Museum
+			</div>
 		</div>
 	);
 };
