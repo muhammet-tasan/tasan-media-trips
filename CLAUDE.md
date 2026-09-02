@@ -2,6 +2,8 @@
 
 This project creates YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and Remotion-powered motion graphics.
 
+**Editing workflow:** CapCut is the primary video editor — footage editing, voice-over sync, and final assembly/export all happen there. Remotion is used narrowly: it builds only specific B-roll clips, maps, titles, or motion graphics for gaps identified while editing in CapCut, then those renders are imported back into CapCut. Remotion does not organize raw footage or assemble the full video.
+
 ## How to Work with This Project
 
 ### Session Management
@@ -14,7 +16,7 @@ Each session should follow a clear start → work → checkpoint cycle:
 ### Key Files
 - **PROJECT_STATUS.md** – Persistent project memory; updated at session end
 - **.claude/commands/** – Workflow commands for project management
-- **src/** – Remotion compositions (React + TypeScript)
+- **src/** – Remotion compositions (React + TypeScript) for targeted B-roll/graphics only, not full video assembly
 - **public/** – Static assets and video files
 
 ### Principles
