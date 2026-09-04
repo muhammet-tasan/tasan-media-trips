@@ -7,15 +7,16 @@
     "build": "remotion render src/index.ts --codec=h264"
   },
   "dependencies": {
+    "maplibre-gl": "^6.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remotion": "latest"
   },
   "devDependencies": {
+    "@remotion/cli": "latest",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "typescript": "^5.3.0",
-    "@remotion/cli": "latest"
+    "typescript": "^5.3.0"
   },
   "engines": {
     "node": ">=18"

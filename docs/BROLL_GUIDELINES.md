@@ -1,0 +1,230 @@
+# TASAN MEDIA Trips — B-roll Guidelines
+
+**Reference implementation:** `src/MulhouseRouteCheck.tsx` is the current reference implementation for geographic Route Check B-rolls. Consult it alongside this document before building a new one of the same type.
+
+## 1. General workflow
+
+Before coding a new B-roll, define:
+
+- purpose / viewer question
+- exact information to communicate
+- planned voice-over content
+- approximate narration duration
+- start state
+- final static frame
+- animation sequence
+- mobile readability requirements
+- required data and sources
+- assets
+- visual hierarchy
+
+Do NOT start implementation from a vague visual idea.
+
+Target:
+first usable implementation + maximum one normal correction pass.
+
+## 2. Duration follows narration
+
+Never assume a fixed B-roll duration such as 8 seconds.
+
+Estimate duration from:
+- planned voice-over
+- amount of information
+- reading time
+- animation complexity
+
+Information-heavy graphics should have a generous final static hold.
+
+For reference:
+MulhouseRouteCheck uses approximately 16 seconds because it contains
+geographic orientation, four origins, driving times, parking and public
+transport information.
+
+This is a reference, NOT a universal duration.
+
+## 3. Geographic Route Check template
+
+For geographic route graphics:
+
+- use a real geographic basemap when geographic orientation matters
+- never invent or manually approximate country borders
+- use real geographic boundary data
+- show relevant country context
+- international borders must be clearly distinguishable from roads,
+  rivers and regional boundaries
+- borders must NOT dominate the composition
+
+Visual hierarchy should generally be:
+
+destination / primary message
+>
+routes + important labels
+>
+title / practical information
+>
+international borders + country labels
+>
+basemap details
+
+Country borders:
+- clearly visible
+- continuous
+- subtle light/cool-gray treatment
+- enough contrast to understand countries immediately
+- lower prominence than primary routes and text
+- never bright enough to interfere with label readability
+
+Large country labels:
+- secondary orientation only
+- low opacity
+- must not compete with cities or routes
+
+## 4. Route lines
+
+Routes must remain clearly visible over the basemap.
+
+Use:
+- sufficient line thickness
+- strong separation from map roads/rivers
+- subtle casing/shadow where useful
+- primary origin may be slightly more prominent
+
+Do not use thin route lines that disappear into the basemap.
+
+Do not make routes neon.
+
+If a real basemap is used, route geometry should either:
+- roughly follow the real travel corridor, or
+- be clearly designed as an abstract connection
+
+Never accidentally imply an inaccurate turn-by-turn route.
+
+## 5. Transport modes
+
+Do not assume every visitor arrives by car.
+
+For destination B-rolls consider:
+- car
+- train
+- tram/public transport
+- walking where relevant
+
+Only show transport modes that provide useful decision-making value.
+
+Avoid showing every transport mode for every city if this overloads the map.
+
+Prefer a clear primary comparison plus concise secondary access information.
+
+## 6. Mobile-first readability
+
+All important information must remain readable on a phone.
+
+Avoid:
+- tiny metadata-style labels
+- excessive abbreviations
+- text directly over busy borders/routes
+- low-contrast practical information
+
+Move labels into clean map space where necessary.
+
+Secondary information can be smaller, but still readable at normal
+YouTube mobile size.
+
+## 7. Information hierarchy
+
+Do not display everything with equal visual weight.
+
+Primary:
+destination / core decision information
+
+Secondary:
+travel times / price / practical access
+
+Tertiary:
+country labels / contextual geography / supporting details
+
+The viewer should understand the main message within approximately
+1–2 seconds even without reading every label.
+
+## 8. Animation
+
+Avoid PowerPoint-like:
+point → line → text → point → line → text
+
+Prefer calm cinematic sequencing.
+
+Typical structure:
+- establish context
+- establish destination
+- progressively reveal important information
+- reveal practical details
+- finish with a completely static reading hold
+
+Animations should support narration rather than race against it.
+
+Do not animate simply because something can be animated.
+
+## 9. Final-frame-first design
+
+Before implementation, define what the final fully populated frame
+should look like.
+
+Verify:
+- no label collisions
+- hierarchy works
+- borders remain secondary
+- routes remain visible
+- practical information is readable
+- attribution is visible when required
+
+Only then design the reveal animation.
+
+## 10. Map attribution / licensing
+
+When using OpenFreeMap / OpenMapTiles / OpenStreetMap data,
+preserve the required attribution.
+
+Never remove required attribution for aesthetic reasons.
+
+Do not use map providers or tiles in ways that violate their terms.
+
+## 11. Reuse vs adaptation
+
+MulhouseRouteCheck is a REFERENCE IMPLEMENTATION, not a component that
+must be copied blindly.
+
+Reuse its proven:
+- hierarchy
+- map styling principles
+- border treatment
+- route visibility logic
+- typography logic
+- animation philosophy
+- attribution handling
+- mobile readability principles
+
+But adapt:
+- duration
+- number of origins
+- transport modes
+- zoom level
+- information density
+- final layout
+
+to the actual destination and narration.
+
+## 12. Pre-build checklist
+
+Before writing code for a new B-roll, report back with a short spec:
+
+PURPOSE
+VOICE-OVER / MESSAGE
+DATA
+DURATION
+FINAL FRAME
+ANIMATION PHASES
+MOBILE READABILITY
+ASSETS / SOURCES
+REFERENCE TEMPLATE
+
+Wait for approval if major creative decisions are still unresolved.
