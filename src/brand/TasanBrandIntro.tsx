@@ -24,7 +24,11 @@ import { AbsoluteFill, Audio, Easing, Video, interpolate, staticFile, useCurrent
  *    the ring's own radius over time directly off stills of the source
  *    (see RING MEASUREMENTS below): it shrinks continuously once formed,
  *    so the crop only needs to stay safely inside its radius for as long
- *    as this composition actually plays.
+ *    as this composition actually plays. A soft elliptical alpha mask
+ *    feathers the window's own outer edge into the canvas background (see
+ *    FEATHER below) — true transparency, not a painted overlay, so the
+ *    glint's blue glow dims into the background rather than getting cut or
+ *    covered.
  *
  * 2. FADE OUT, once the source's own glint has visibly begun fading back
  *    down (matching the "ring safely small enough" window from the
@@ -89,15 +93,45 @@ const CANVAS_H = 2160;
 // Content bounds (letters 448-1466 horizontally, 366 top; underline/glint
 // visibly fade out well before y=770, so the bottom is trimmed in from 770
 // to 730 — still clear of the glint's visible reach, just less empty space
-// below it) plus a small margin.
-const CROP_X0 = 433;
-const CROP_X1 = 1481;
-const CROP_Y0 = 356;
-const CROP_Y1 = 730;
+// below it) plus a small margin. This is the zone that must stay 100%
+// opaque — see FEATHER below for why it can't be much larger.
+const CONTENT_X0 = 433;
+const CONTENT_X1 = 1481;
+const CONTENT_Y0 = 356;
+const CONTENT_Y1 = 730;
+
+// Feather width, in native-source pixels, added OUTSIDE the content bounds
+// on every side. The requested 200-300px (4K) feather is not reachable
+// here: the ring's measured radius at FADE_END (~595px from its center,
+// 960,540, in native-source pixels — see RING MEASUREMENTS above) sets a
+// hard ceiling on how far this window can extend before the ring itself
+// would be sampled, however faintly masked. Letters alone need a 509px
+// half-width, leaving only ~86px of native-pixel budget before the ring's
+// radius — solved exactly (worst corner distance == ring radius) gives a
+// maximum uniform feather of ~27px native pixels; 20px is used here for a
+// safety margin against measurement noise. That's ~40px at 4K, well under
+// the requested 200-300px — a hard geometric ceiling, not a rounding
+// choice, given the fade timing and crop concept were both off-limits this
+// round. A larger feather is possible only by trading off one of those.
+const FEATHER = 20;
+
+const TOTAL_X0 = CONTENT_X0 - FEATHER;
+const TOTAL_X1 = CONTENT_X1 + FEATHER;
+const TOTAL_Y0 = CONTENT_Y0 - FEATHER;
+const TOTAL_Y1 = CONTENT_Y1 + FEATHER;
 
 const SCALE = CANVAS_W / SOURCE_W; // 2 — uniform upscale of the native source to the 4K canvas
-const CROP_W_4K = (CROP_X1 - CROP_X0) * SCALE;
-const CROP_H_4K = (CROP_Y1 - CROP_Y0) * SCALE;
+const CROP_W_4K = (TOTAL_X1 - TOTAL_X0) * SCALE;
+const CROP_H_4K = (TOTAL_Y1 - TOTAL_Y0) * SCALE;
+
+// Feather as a fraction of the crop box's own width/height, for the linear
+// mask gradients below (one per axis, combined with mask-composite:
+// intersect — a two-length radial-gradient mask was tried first but
+// rendered with a consistent, unexplained left-side offset in this
+// pipeline; independent horizontal/vertical linear gradients render
+// correctly and are equivalent for a rectangular feather).
+const FEATHER_FRACTION_X = (FEATHER * SCALE) / CROP_W_4K;
+const FEATHER_FRACTION_Y = (FEATHER * SCALE) / CROP_H_4K;
 
 // The crop window's on-screen position: centered on the canvas, then
 // nudged down by a constant amount (applied identically from frame 0) so
@@ -106,13 +140,27 @@ const VERTICAL_NUDGE = 100;
 const CROP_LEFT_ON_CANVAS = (CANVAS_W - CROP_W_4K) / 2;
 const CROP_TOP_ON_CANVAS = (CANVAS_H - CROP_H_4K) / 2 + VERTICAL_NUDGE;
 
-const BACKGROUND_COLOR = '#05090E';
+const BACKGROUND_COLOR = '#030509';
 
 export const TasanBrandIntro: React.FC = () => {
 	const frame = useCurrentFrame();
 
 	const opacity = interpolate(frame, [FADE_START, FADE_END], [1, 0], { ...CLAMP, easing: EASE });
 	const volume = interpolate(frame, [FADE_START, FADE_END], [1, 0], { ...CLAMP, easing: EASE });
+
+	// A true alpha mask (not a painted overlay) so the canvas background
+	// shows through where the video fades out — needed for the glint's
+	// blue glow to visibly dim into the background rather than being
+	// covered by an opaque shadow. Two linear gradients (one per axis)
+	// combined with mask-composite:intersect, so a pixel is only opaque
+	// where BOTH agree — a rectangular feather. Each is a symmetric
+	// transparent-black-black-transparent ramp along its own axis.
+	const hFade = FEATHER_FRACTION_X * 100;
+	const vFade = FEATHER_FRACTION_Y * 100;
+	const maskImage = [
+		`linear-gradient(to right, transparent 0%, black ${hFade}%, black ${100 - hFade}%, transparent 100%)`,
+		`linear-gradient(to bottom, transparent 0%, black ${vFade}%, black ${100 - vFade}%, transparent 100%)`,
+	].join(', ');
 
 	return (
 		<AbsoluteFill style={{ backgroundColor: BACKGROUND_COLOR }}>
@@ -125,6 +173,10 @@ export const TasanBrandIntro: React.FC = () => {
 					height: CROP_H_4K,
 					overflow: 'hidden',
 					opacity,
+					maskImage,
+					WebkitMaskImage: maskImage,
+					maskComposite: 'intersect',
+					WebkitMaskComposite: 'source-in',
 				}}
 			>
 				<Video
@@ -132,16 +184,24 @@ export const TasanBrandIntro: React.FC = () => {
 					muted
 					style={{
 						position: 'absolute',
-						left: -CROP_X0 * SCALE,
-						top: -CROP_Y0 * SCALE,
+						left: -TOTAL_X0 * SCALE,
+						top: -TOTAL_Y0 * SCALE,
 						width: CANVAS_W,
 						height: CANVAS_H,
+						objectFit: 'fill',
+						// Restrained contrast lift: the video's own dark background
+						// (measured ~30-50 RGB near the logo, not pure black) is
+						// meaningfully brighter than the new #030509 canvas, and the
+						// feather is too thin (ring-safety ceiling, see FEATHER above)
+						// to hide that gap on its own. Contrast pushes values away
+						// from mid-gray, so it crushes the dark background toward
+						// black while leaving the already-near-white letters and
+						// glint core untouched (they're already at the clamp
+						// ceiling) — only the glint's faintest outer bloom dims
+						// slightly, not its core or visible rays.
+						filter: 'contrast(160%)',
 					}}
 				/>
-				{/* Very subtle feather so the crop edge blends into the canvas
-				    background rather than reading as a hard rectangle — well
-				    clear of TASAN/underline, which sit deep in the interior. */}
-				<div style={{ position: 'absolute', inset: 0, boxShadow: `inset 0 0 60px 24px ${BACKGROUND_COLOR}`, pointerEvents: 'none' }} />
 			</div>
 
 			<Audio src={staticFile(KLING_VIDEO_FILE)} volume={volume} />
