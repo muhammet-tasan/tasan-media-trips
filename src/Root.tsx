@@ -1,7 +1,8 @@
 import React from 'react';
 import { Composition } from 'remotion';
-import { MulhouseRouteCheck } from './MulhouseRouteCheck';
-import { MulhouseTripScore, MULHOUSE_TRIP_SCORE_DURATION } from './MulhouseTripScore';
+import { MulhouseRouteCheck } from './mulhouse-automobile-museum/MulhouseRouteCheck';
+import { MulhouseTripScore, MULHOUSE_TRIP_SCORE_DURATION } from './mulhouse-automobile-museum/MulhouseTripScore';
+import { TasanBrandIntro, INTRO_DURATION } from './brand/TasanBrandIntro';
 
 export const Root: React.FC = () => {
 	return (
@@ -29,6 +30,14 @@ export const Root: React.FC = () => {
 				fps={30}
 				width={1920}
 				height={1080}
+			/>
+			<Composition
+				id="TasanBrandIntro"
+				component={TasanBrandIntro}
+				durationInFrames={INTRO_DURATION}
+				fps={30}
+				width={3840}
+				height={2160}
 			/>
 		</>
 	);

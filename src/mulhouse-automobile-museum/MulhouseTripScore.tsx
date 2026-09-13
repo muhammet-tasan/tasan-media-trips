@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { fade } from '@remotion/transitions/fade';
 
@@ -49,7 +49,7 @@ const FINAL_CATEGORIES = [
 	{ label: 'Preis-Leistung', score: 8, max: 15 },
 	{ label: 'Familienfaktor', score: 7, max: 15 },
 	{ label: 'Aufwand & Stress', score: 8, max: 10 },
-	{ label: 'Zeitwert', score: 7, max: 10 },
+	{ label: 'Abwechslung', score: 7, max: 10 },
 	{ label: 'Komfort & Infrastruktur', score: 6, max: 10 },
 	{ label: 'Wetter & Planbarkeit', score: 8, max: 10 },
 	{ label: 'Wiederholungswert', score: 4, max: 10 },
@@ -65,6 +65,21 @@ const QUOTE_LINES = [
 	'der Oldtimer, Bugatti oder Formel 1',
 	'wirklich liebt.“',
 ];
+
+// Real photographs from our own museum visit. All EXIF-rotated (verified
+// Remotion's <Img> respects orientation correctly); staticFile() resolves
+// them from the canonical per-project asset folder.
+const IMG_DIR = 'images/mulhouse-automobile-museum/';
+const IMAGES = {
+	classicCarsRow: IMG_DIR + 'classic-cars-row.png',
+	lamborghiniBlack: IMG_DIR + 'lamborghini-black.png',
+	ferrariF1: IMG_DIR + 'ferrari-f1-2007.jpg',
+	kidsElectric: IMG_DIR + 'kids-electric-cars.png',
+	benzVictoria: IMG_DIR + 'benz-victoria-1893.jpg',
+	kidsVintage: IMG_DIR + 'kids-vintage-cars.png',
+	formula1Cars: IMG_DIR + 'formula1-gallery-cars.png',
+	formula1Wide: IMG_DIR + 'formula1-gallery-wide.png',
+} as const;
 
 // --- Timing primitives ----------------------------------------------------
 const FPS = 30;
@@ -94,17 +109,26 @@ const AUDIENCE_STRONG_HOLD = S(4.2); // "Familien / Nur bedingt" caveat: a touch
 const QUOTE_ENTER = S(3.33); // 4 staggered lines + attribution, slow reveal
 const QUOTE_HOLD = S(8.0); // personal quote: >=7.0s, one of the slowest moments
 
-const ENTER_CAT = S(1.0); // category name + bar animate in
-const HOLD_CAT = S(2.3); // >=2.0s AFTER the score/bar has fully animated in
-const DOCK_CAT = S(0.5); // cross-dissolve into the accumulating list
-const CATEGORY_ADVANCE = ENTER_CAT + HOLD_CAT; // next category's enter starts here
-const CATEGORY_TOTAL = CATEGORY_ADVANCE + DOCK_CAT;
+// Score overview: all 8 categories shown together (see "UNSERE BEWERTUNG"
+// below), not built up one at a time — a deliberate, explicitly-approved
+// restructure of this section only. OVERVIEW_ENTER is the single block
+// fade/rise (category names, all together — no per-row stagger for the
+// text). After that, a separate star-fill wave (see STAR_ROW_STAGGER /
+// STAR_ROW_FILL_DURATION below) reveals each row's gold rating left-to-
+// right. Only once that wave finishes does OVERVIEW_HOLD begin — a
+// genuine, completely static ~5s pause so an interested viewer can pause
+// and read every row. This scene no longer shows the 63/100 total — that
+// reveal now belongs solely to the following FinalScene, so the score
+// never appears twice in a row.
+const OVERVIEW_ENTER = S(1.8);
+const OVERVIEW_HOLD = S(5.2); // >=5.0s genuine hold, required minimum + small buffer
+const OVERVIEW_EXIT = EXIT_T;
 
-const SCORE_TOTAL_ENTER = S(1.5); // "GESAMT" label + count-up reveal
-const SCORE_TOTAL_HOLD = S(5.5); // full 8-row breakdown + total: >=5.0s
-const SCORE_TOTAL_EXIT = EXIT_T;
+// Star gold-fill wave: starts once the text block has fully appeared, runs
+// as one calm overlapping wave (not row-by-row waiting), total span ~1.5s.
+const STAR_ROW_STAGGER = S(0.1); // ~100ms between each row's fill starting
+const STAR_ROW_FILL_DURATION = S(0.8); // one row's own gold reveal, ~0.8s
 
-const FINAL_ENTER = S(2.2); // score count-up + staggered verdict/sub reveal
 const FINAL_HOLD = S(4.5); // final TASAN score: >=4.0s completely static
 
 // --- Beat layout system ----------------------------------------------------
@@ -185,6 +209,309 @@ const TextBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
 			{w.subtitle && (
 				<div style={{ fontSize: w.subtitleSize ?? 48, fontWeight: 500, color: MUTED, marginTop: 30 }}>{w.subtitle}</div>
 			)}
+		</AbsoluteFill>
+	);
+};
+
+// --- Photo beats -----------------------------------------------------------
+// Same enter/hold/exit timing contract as TextBeat/HeaderBeat (driven by the
+// identical BeatWindow), but with a photograph integrated into the layout
+// instead of centered text. Text sizes match what TextBeat already used for
+// the same message elsewhere in the piece — repositioned, never shrunk.
+
+const kenBurnsScale = (frame: number, w: BeatWindow, growth = 0.04) =>
+	interpolate(frame - w.start, [0, w.end - w.start], [1, 1 + growth], CLAMP);
+
+// A) "BEEINDRUCKENDE SAMMLUNG" — near-full-bleed photo, text moved into a
+// protected gradient area at the bottom instead of dead-center.
+const SammlungBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
+	const frame = useCurrentFrame();
+	if (frame < w.start || frame > w.end) return null;
+	const { opacity } = beatStyle(frame, w);
+	const scale = kenBurnsScale(frame, w, 0.035);
+	return (
+		<AbsoluteFill style={{ opacity, fontFamily: FONT }}>
+			<AbsoluteFill style={{ overflow: 'hidden' }}>
+				<Img
+					src={staticFile(IMAGES.classicCarsRow)}
+					style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})` }}
+				/>
+			</AbsoluteFill>
+			<AbsoluteFill
+				style={{
+					background:
+						'linear-gradient(180deg, rgba(8,10,15,0.1) 0%, rgba(8,10,15,0.22) 42%, rgba(8,10,15,0.9) 100%)',
+				}}
+			/>
+			<AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center', textAlign: 'center', paddingBottom: 100 }}>
+				<div style={{ fontSize: 88, fontWeight: 700, color: '#ffffff', lineHeight: 1.15, textShadow: '0 4px 26px rgba(0,0,0,0.55)' }}>
+					BEEINDRUCKENDE SAMMLUNG
+				</div>
+				<div style={{ fontSize: 48, fontWeight: 500, color: MUTED, marginTop: 30, textShadow: '0 2px 16px rgba(0,0,0,0.55)' }}>
+					Oldtimer · Bugatti · Automobilgeschichte
+				</div>
+			</AbsoluteFill>
+		</AbsoluteFill>
+	);
+};
+
+// B) "UNSERE HIGHLIGHTS" — text column left (~38%), dominant photo hero
+// right (~62%), slow crossfade between the two priority hero images
+// (lamborghini-black.png then ferrari-f1-2007.jpg — the third candidate,
+// mercedes-f1-hamilton-front.jpg, would only get ~1.7s each if all three
+// were used inside this beat's existing window, under the ~2.5s comfortable
+// minimum, so it's left out here rather than speeding up the cycle).
+const HighlightsBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
+	const frame = useCurrentFrame();
+	if (frame < w.start || frame > w.end) return null;
+	const { opacity, rise } = beatStyle(frame, w);
+	const local = frame - w.start;
+	const scale = kenBurnsScale(frame, w, 0.04);
+	const crossStart = 60;
+	const crossEnd = 96;
+	const imgAOpacity = interpolate(local, [crossStart, crossEnd], [1, 0], CLAMP);
+	const imgBOpacity = interpolate(local, [crossStart, crossEnd], [0, 1], CLAMP);
+	return (
+		<AbsoluteFill style={{ opacity, fontFamily: FONT }}>
+			<div
+				style={{
+					position: 'absolute',
+					left: 0,
+					top: 0,
+					width: '38%',
+					height: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+					paddingLeft: 110,
+					paddingRight: 40,
+					transform: `translateY(${rise}px)`,
+				}}
+			>
+				<div style={{ fontSize: 88, fontWeight: 700, color: '#ffffff', lineHeight: 1.1 }}>UNSERE HIGHLIGHTS</div>
+				<div style={{ fontSize: 48, fontWeight: 500, color: MUTED, marginTop: 28 }}>Lamborghini &amp; Formel 1</div>
+			</div>
+			<div style={{ position: 'absolute', right: 0, top: 0, width: '62%', height: '100%', overflow: 'hidden' }}>
+				<div style={{ position: 'absolute', inset: 0, transform: `scale(${scale})` }}>
+					<Img
+						src={staticFile(IMAGES.lamborghiniBlack)}
+						style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: imgAOpacity }}
+					/>
+					<Img
+						src={staticFile(IMAGES.ferrariF1)}
+						style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: imgBOpacity }}
+					/>
+				</div>
+				<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,12,18,0.85) 0%, rgba(10,12,18,0) 14%)' }} />
+			</div>
+		</AbsoluteFill>
+	);
+};
+
+// D) "VIELE EXTRAS KOSTEN ZUSÄTZLICH" — image left, text right; the two
+// supporting lines reveal progressively inside the existing 4.0s hold
+// (not simultaneously as tiny text), framed explicitly as our own visit
+// experience rather than a universal guarantee.
+const EXTRAS_LINE1_START = 15;
+const EXTRAS_LINE1_FADE = 20;
+const EXTRAS_LINE2_START = 55;
+const EXTRAS_LINE2_FADE = 20;
+
+const ExtrasBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
+	const frame = useCurrentFrame();
+	if (frame < w.start || frame > w.end) return null;
+	const { opacity, rise } = beatStyle(frame, w);
+	const scale = kenBurnsScale(frame, w, 0.04);
+	const holdLocal = frame - w.fullyVisibleStart;
+	const line1Opacity = interpolate(holdLocal, [EXTRAS_LINE1_START, EXTRAS_LINE1_START + EXTRAS_LINE1_FADE], [0, 1], CLAMP);
+	const line2Opacity = interpolate(holdLocal, [EXTRAS_LINE2_START, EXTRAS_LINE2_START + EXTRAS_LINE2_FADE], [0, 1], CLAMP);
+	return (
+		<AbsoluteFill style={{ opacity, fontFamily: FONT }}>
+			<div style={{ position: 'absolute', left: 0, top: 0, width: '42%', height: '100%', overflow: 'hidden' }}>
+				<Img
+					src={staticFile(IMAGES.kidsElectric)}
+					style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})` }}
+				/>
+				<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(270deg, rgba(10,12,18,0.9) 0%, rgba(10,12,18,0) 16%)' }} />
+			</div>
+			<div
+				style={{
+					position: 'absolute',
+					right: 0,
+					top: 0,
+					width: '58%',
+					height: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+					paddingLeft: 70,
+					paddingRight: 110,
+					transform: `translateY(${rise}px)`,
+				}}
+			>
+				<div style={{ fontSize: 76, fontWeight: 700, color: '#ffffff', lineHeight: 1.14 }}>
+					VIELE EXTRAS
+					<br />
+					KOSTEN ZUSÄTZLICH
+				</div>
+				<div style={{ fontSize: 32, fontWeight: 500, color: MUTED, marginTop: 32, lineHeight: 1.4, opacity: line1Opacity }}>
+					Kinder-Elektroautos &amp; Fahr-/Rennangebote
+					<br />
+					teilweise gegen Aufpreis
+				</div>
+				<div style={{ fontSize: 32, fontWeight: 500, color: MUTED, marginTop: 22, lineHeight: 1.4, opacity: line2Opacity }}>
+					Wenige Plätze — bei unserem Besuch
+					<br />
+					teilweise Wartezeit
+				</div>
+			</div>
+		</AbsoluteFill>
+	);
+};
+
+// E) "KAUM INTERAKTION" — text on one side, a true portrait panel on the
+// other (630×840 = the photo's own EXIF-corrected 3:4 aspect ratio, so
+// `cover` needs zero crop — never distorted, never stretched to 16:9).
+const InteraktionBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
+	const frame = useCurrentFrame();
+	if (frame < w.start || frame > w.end) return null;
+	const { opacity, rise } = beatStyle(frame, w);
+	const scale = kenBurnsScale(frame, w, 0.03);
+	return (
+		<AbsoluteFill style={{ opacity, fontFamily: FONT }}>
+			<div
+				style={{
+					position: 'absolute',
+					left: 0,
+					top: 0,
+					width: '50%',
+					height: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+					alignItems: 'center',
+					textAlign: 'center',
+					padding: '0 50px',
+					transform: `translateY(${rise}px)`,
+				}}
+			>
+				<div style={{ fontSize: 104, fontWeight: 700, color: '#ffffff', lineHeight: 1.08 }}>
+					KAUM
+					<br />
+					INTERAKTION
+				</div>
+				<div style={{ fontSize: 40, fontWeight: 500, color: MUTED, marginTop: 28, lineHeight: 1.35 }}>
+					Einsteigen &amp; Anfassen
+					<br />
+					fast nicht möglich
+				</div>
+			</div>
+			<div
+				style={{
+					position: 'absolute',
+					right: 140,
+					top: '50%',
+					transform: 'translateY(-50%)',
+					width: 630,
+					height: 840,
+					overflow: 'hidden',
+					borderRadius: 6,
+					boxShadow: '0 30px 90px rgba(0,0,0,0.5)',
+				}}
+			>
+				<Img
+					src={staticFile(IMAGES.benzVictoria)}
+					style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})` }}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						inset: 0,
+						background: 'linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.22) 100%)',
+					}}
+				/>
+			</div>
+		</AbsoluteFill>
+	);
+};
+
+// F) "FAMILIENFAKTOR" — photo right, text left, plus one small supporting
+// line (not a shrink of the main statement, an addition below it).
+const FamilienBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
+	const frame = useCurrentFrame();
+	if (frame < w.start || frame > w.end) return null;
+	const { opacity, rise } = beatStyle(frame, w);
+	const scale = kenBurnsScale(frame, w, 0.04);
+	return (
+		<AbsoluteFill style={{ opacity, fontFamily: FONT }}>
+			<div style={{ position: 'absolute', right: 0, top: 0, width: '44%', height: '100%', overflow: 'hidden' }}>
+				<Img
+					src={staticFile(IMAGES.kidsVintage)}
+					style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})` }}
+				/>
+				<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,12,18,0.9) 0%, rgba(10,12,18,0) 16%)' }} />
+			</div>
+			<div
+				style={{
+					position: 'absolute',
+					left: 0,
+					top: 0,
+					width: '56%',
+					height: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+					paddingLeft: 110,
+					transform: `translateY(${rise}px)`,
+				}}
+			>
+				<div style={{ fontSize: 88, fontWeight: 700, color: '#ffffff' }}>FAMILIENFAKTOR</div>
+				<div style={{ fontSize: 48, fontWeight: 500, color: MUTED, marginTop: 30 }}>Für uns nur mittelmäßig</div>
+				<div style={{ fontSize: 28, fontWeight: 500, color: 'rgba(224,224,228,0.45)', marginTop: 22 }}>Kinderangebote vorhanden</div>
+			</div>
+		</AbsoluteFill>
+	);
+};
+
+// G) "FORMEL 1 & RENNSPORT" audience-fit beat — text left, photo right.
+// "OLDTIMER & BUGATTI FANS" and "FAMILIEN" stay plain TextBeat: none of
+// the available photos is a clear fit for the oldtimer-fan line without
+// reusing an image already doing a different job elsewhere.
+const RennsportBeat: React.FC<{ w: BeatWindow }> = ({ w }) => {
+	const frame = useCurrentFrame();
+	if (frame < w.start || frame > w.end) return null;
+	const { opacity, rise } = beatStyle(frame, w);
+	const scale = kenBurnsScale(frame, w, 0.04);
+	return (
+		<AbsoluteFill style={{ opacity, fontFamily: FONT }}>
+			<div
+				style={{
+					position: 'absolute',
+					left: 0,
+					top: 0,
+					width: '42%',
+					height: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+					paddingLeft: 110,
+					transform: `translateY(${rise}px)`,
+				}}
+			>
+				<div style={{ fontSize: 78, fontWeight: 700, color: '#ffffff', lineHeight: 1.12 }}>
+					FORMEL 1 &amp;
+					<br />
+					RENNSPORT
+				</div>
+				<div style={{ fontSize: 48, fontWeight: 500, color: MUTED, marginTop: 26 }}>Sehr interessant</div>
+			</div>
+			<div style={{ position: 'absolute', right: 0, top: 0, width: '58%', height: '100%', overflow: 'hidden' }}>
+				<Img
+					src={staticFile(IMAGES.formula1Cars)}
+					style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})` }}
+				/>
+				<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(270deg, rgba(10,12,18,0.85) 0%, rgba(10,12,18,0) 14%)' }} />
+			</div>
 		</AbsoluteFill>
 	);
 };
@@ -394,8 +721,8 @@ const LIKED_DURATION = sceneDuration(LIKED_WINDOWS);
 const LikedScene: React.FC = () => (
 	<>
 		<HeaderBeat w={LIKED_WINDOWS[0]} />
-		<TextBeat w={LIKED_WINDOWS[1]} />
-		<TextBeat w={LIKED_WINDOWS[2]} />
+		<SammlungBeat w={LIKED_WINDOWS[1]} />
+		<HighlightsBeat w={LIKED_WINDOWS[2]} />
 		<TextBeat w={LIKED_WINDOWS[3]} />
 	</>
 );
@@ -422,9 +749,9 @@ const DISLIKED_DURATION = sceneDuration(DISLIKED_WINDOWS);
 const DislikedScene: React.FC = () => (
 	<>
 		<HeaderBeat w={DISLIKED_WINDOWS[0]} />
-		<TextBeat w={DISLIKED_WINDOWS[1]} />
-		<TextBeat w={DISLIKED_WINDOWS[2]} />
-		<TextBeat w={DISLIKED_WINDOWS[3]} />
+		<ExtrasBeat w={DISLIKED_WINDOWS[1]} />
+		<InteraktionBeat w={DISLIKED_WINDOWS[2]} />
+		<FamilienBeat w={DISLIKED_WINDOWS[3]} />
 	</>
 );
 
@@ -490,7 +817,7 @@ const AudienceScene: React.FC = () => (
 	<>
 		<HeaderBeat w={AUDIENCE_WINDOWS[0]} />
 		<TextBeat w={AUDIENCE_WINDOWS[1]} />
-		<TextBeat w={AUDIENCE_WINDOWS[2]} />
+		<RennsportBeat w={AUDIENCE_WINDOWS[2]} />
 		<TextBeat w={AUDIENCE_WINDOWS[3]} />
 	</>
 );
@@ -510,6 +837,11 @@ const QuoteScene: React.FC = () => {
 
 	return (
 		<AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', fontFamily: FONT, textAlign: 'center', padding: '0 210px', opacity: wholeOpacity }}>
+			{/* Very subtle atmospheric photo layer, heavily darkened + blurred —
+			    low enough dominance to never compete with the quote itself. */}
+			<AbsoluteFill style={{ opacity: 0.1, filter: 'blur(6px) grayscale(0.3)' }}>
+				<Img src={staticFile(IMAGES.formula1Wide)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+			</AbsoluteFill>
 			<div>
 				{QUOTE_LINES.map((line, i) => (
 					<div key={line} style={{ fontSize: 56, fontWeight: 500, color: '#ffffff', lineHeight: 1.55, opacity: lineOpacity(i) }}>
@@ -524,139 +856,165 @@ const QuoteScene: React.FC = () => {
 	);
 };
 
-// --- Score build (FOCUS → DOCK → NEXT) -------------------------------------
-// Per category: enter (name + bar animate in) → hold (score fully visible,
-// completely static, genuinely readable) → dock (cross-dissolve into the
-// accumulating list). The dock is a cross-dissolve, not a physical slide:
-// sliding a card down through the same column the list occupies is
-// geometrically guaranteed to cross every earlier row, which is exactly
-// the collision bug already root-caused and fixed earlier — retiming here
-// must not reintroduce it, so the mechanism itself is unchanged, only its
-// durations are.
-const DOCK_ROW_HEIGHT = 50;
-const LIST_TOP = 430;
-const FOCUS_Y = 210;
+// --- Score overview: "UNSERE BEWERTUNG" -------------------------------
+// All 8 categories shown together as a 5-star rating (star count derived
+// proportionally from the real score/max — never hard-coded, half-star
+// precision) instead of mixed-denominator fractions (15/20, 8/15, 8/10…),
+// which read as an unnecessary maths puzzle. The header + 8 category names
+// fade/rise in as ONE block, then each row's star rating builds up in a
+// fast top-to-bottom cascade, then everything holds completely static and
+// readable for ~5s before transitioning to the final score screen. The
+// 63/100 total deliberately does NOT appear here — only in FinalScene
+// below, so the overall score is never shown twice in a row. Individual
+// x/y values are intentionally not shown anywhere in this scene either.
+const starRating = (score: number, max: number) => Math.round((score / max) * 5 * 2) / 2;
 
-const CategoryRow: React.FC<{ index: number; localFrame: number }> = ({ index, localFrame }) => {
-	const cat = FINAL_CATEGORIES[index];
-	const slotStart = index * CATEGORY_ADVANCE;
-	const frame = localFrame - slotStart;
-	if (frame < 0) return null;
+const STAR_PATH = 'M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.6 6.1 20.6l1.3-6.6-4.9-4.6 6.6-.8L12 2.5z';
 
-	const appear = spring({ frame, fps: FPS, config: { damping: 16, stiffness: 120, mass: 0.6, overshootClamping: true } });
-	const rowOpacity = Math.min(1, appear * 1.4);
-	const dockY = LIST_TOP + index * DOCK_ROW_HEIGHT;
-
-	// Bar fills only during ENTER; extrapolateRight clamp means it then
-	// holds at its final value for the rest of the beat — no further
-	// motion during the readable hold.
-	const fill = (cat.score / cat.max) * interpolate(frame, [0, ENTER_CAT], [0, 1], CLAMP);
-
-	const focusFade = interpolate(frame, [CATEGORY_ADVANCE, CATEGORY_ADVANCE + 8], [1, 0], CLAMP);
-	const focusScale = interpolate(frame, [CATEGORY_ADVANCE, CATEGORY_ADVANCE + 8], [1, 0.62], CLAMP);
-	const dockFade = interpolate(frame, [CATEGORY_ADVANCE + 5, CATEGORY_TOTAL], [0, 1], CLAMP);
-	const dockRiseY = interpolate(dockFade, [0, 1], [dockY + 16, dockY]);
-
+// A single star whose fill fraction (0, 0.5, or 1) is expressed as a hard
+// two-stop gradient — gold up to the fill point, dim gray after — so a
+// half star reads as a clean, deliberate gold/gray split rather than a
+// blur or an overlaid clip hack.
+const RatingStar: React.FC<{ fill: number; size: number; gradientId: string }> = ({ fill, size, gradientId }) => {
+	const pct = Math.round(Math.max(0, Math.min(1, fill)) * 100);
 	return (
-		<>
-			{focusFade > 0.01 && (
-				<div
-					style={{
-						position: 'absolute',
-						top: FOCUS_Y,
-						left: '50%',
-						transform: `translate(-50%, -50%) scale(${focusScale})`,
-						textAlign: 'center',
-						opacity: rowOpacity * focusFade,
-						fontFamily: FONT,
-					}}
-				>
-					<div style={{ fontSize: 44, fontWeight: 700, color: '#ffffff' }}>{cat.label}</div>
-					<div style={{ fontSize: 110, fontWeight: 700, color: GOLD, marginTop: 14 }}>
-						{cat.score} / {cat.max}
-					</div>
-					<div style={{ width: 560, height: 14, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.12)', margin: '14px auto 0' }}>
-						<div style={{ width: `${fill * 100}%`, height: '100%', borderRadius: 14, backgroundColor: GOLD }} />
-					</div>
-				</div>
-			)}
-			{dockFade > 0.01 && (
-				<div
-					style={{
-						position: 'absolute',
-						top: dockRiseY,
-						left: '50%',
-						transform: 'translate(-50%, -50%)',
-						display: 'flex',
-						alignItems: 'center',
-						width: 780,
-						fontFamily: FONT,
-						opacity: rowOpacity * dockFade,
-					}}
-				>
-					<div style={{ fontSize: 24, fontWeight: 600, color: '#ffffff', width: 300 }}>{cat.label}</div>
-					<div style={{ flex: 1, height: 6, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.12)', margin: '0 20px' }}>
-						<div style={{ width: `${(cat.score / cat.max) * 100}%`, height: '100%', borderRadius: 6, backgroundColor: GOLD }} />
-					</div>
-					<div style={{ fontSize: 24, fontWeight: 700, color: GOLD, width: 70, textAlign: 'right' }}>
-						{cat.score}/{cat.max}
-					</div>
-				</div>
-			)}
-		</>
+		<svg width={size} height={size} viewBox="0 0 24 24">
+			<defs>
+				<linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
+					<stop offset={`${pct}%`} stopColor={GOLD} />
+					<stop offset={`${pct}%`} stopColor="rgba(255,255,255,0.16)" />
+				</linearGradient>
+			</defs>
+			<path d={STAR_PATH} fill={`url(#${gradientId})`} />
+		</svg>
 	);
 };
 
-const CATEGORIES_PHASE_END = (FINAL_CATEGORIES.length - 1) * CATEGORY_ADVANCE + CATEGORY_TOTAL;
-const SCORE_BUILD_DURATION = CATEGORIES_PHASE_END + SCORE_TOTAL_ENTER + SCORE_TOTAL_HOLD + SCORE_TOTAL_EXIT;
+const OVERVIEW_STAR_SIZE = 50;
 
-const ScoreBuildScene: React.FC = () => {
-	const frame = useCurrentFrame();
-	const totalPhaseFrame = frame - CATEGORIES_PHASE_END;
-	const totalOpacity = totalPhaseFrame < 0 ? 0 : interpolate(totalPhaseFrame, [0, SCORE_TOTAL_ENTER], [0, 1], CLAMP);
-	const totalScoreValue = Math.round(interpolate(totalPhaseFrame, [0, SCORE_TOTAL_ENTER], [0, FINAL_SCORE], CLAMP));
-	const sceneFullyVisibleEnd = CATEGORIES_PHASE_END + SCORE_TOTAL_ENTER + SCORE_TOTAL_HOLD;
-	const wholeOpacity = frame > sceneFullyVisibleEnd ? interpolate(frame, [sceneFullyVisibleEnd, SCORE_BUILD_DURATION], [1, 0], CLAMP) : 1;
+// `rowIndex` (not the label) feeds the gradient id: SVG ids/URL fragments
+// can't contain spaces or "&", both of which appear in labels like
+// "Erlebnis & Wow" — using the label broke `url(#...)` silently on every
+// multi-word category, leaving those stars fully unfilled. `idPrefix`
+// keeps the always-visible gray base layer and the animated gold overlay
+// (rendered on top of each other, see OverviewRow) from colliding on the
+// same ids.
+const StarRow: React.FC<{ rating: number; rowIndex: number; idPrefix: string }> = ({ rating, rowIndex, idPrefix }) => (
+	<div style={{ display: 'flex', gap: OVERVIEW_STAR_SIZE * 0.22 }}>
+		{[0, 1, 2, 3, 4].map((i) => (
+			<RatingStar key={i} fill={rating - i} size={OVERVIEW_STAR_SIZE} gradientId={`star-${idPrefix}-${rowIndex}-${i}`} />
+		))}
+	</div>
+);
+
+const OVERVIEW_ROW_WIDTH = 1560;
+
+// Dim gray star slots are visible from the moment the block appears (the
+// base layer below, rating=0, always fully opaque). The true gold rating
+// is a second, identical star row drawn directly on top, revealed
+// left-to-right via a growing clip-path — the same inset() wipe idiom
+// ContextScene already uses for its masked title reveal. Because the gold
+// layer is the SAME pre-rendered half/full/empty stars as before (via
+// RatingStar's existing gradient split), the wipe never has to re-derive
+// half-star correctness — it just uncovers whatever was already correct.
+const OverviewRow: React.FC<{ label: string; rating: number; rowIndex: number; starFillFrame: number }> = ({
+	label,
+	rating,
+	rowIndex,
+	starFillFrame,
+}) => {
+	const localFrame = starFillFrame - rowIndex * STAR_ROW_STAGGER;
+	const progress = interpolate(localFrame, [0, STAR_ROW_FILL_DURATION], [0, 1], CLAMP);
+	// Very subtle settle pulse exactly as this row's own fill completes —
+	// small enough to read as quality finishing touch, not motion for its
+	// own sake. No jump/rotate/heavy scale anywhere.
+	const pulse = interpolate(localFrame, [STAR_ROW_FILL_DURATION - 6, STAR_ROW_FILL_DURATION, STAR_ROW_FILL_DURATION + 6], [1, 1.03, 1], CLAMP);
 
 	return (
-		<AbsoluteFill style={{ fontFamily: FONT, opacity: wholeOpacity }}>
-			<div style={{ position: 'absolute', top: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
-				<div style={{ fontSize: 30, fontWeight: 700, letterSpacing: 3, color: MUTED }}>WIE SICH DER SCORE ZUSAMMENSETZT</div>
+		<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: OVERVIEW_ROW_WIDTH, marginBottom: 38 }}>
+			<div style={{ fontSize: 40, fontWeight: 600, color: '#ffffff' }}>{label}</div>
+			<div style={{ position: 'relative', transform: `scale(${pulse})` }}>
+				<StarRow rating={0} rowIndex={rowIndex} idPrefix="base" />
+				<div style={{ position: 'absolute', inset: 0, clipPath: `inset(0 ${100 - progress * 100}% 0 0)` }}>
+					<StarRow rating={rating} rowIndex={rowIndex} idPrefix="fill" />
+				</div>
 			</div>
-			{FINAL_CATEGORIES.map((_, i) => (
-				<CategoryRow key={FINAL_CATEGORIES[i].label} index={i} localFrame={frame} />
-			))}
-			<div
-				style={{
-					position: 'absolute',
-					top: LIST_TOP + FINAL_CATEGORIES.length * DOCK_ROW_HEIGHT + 70,
-					left: '50%',
-					transform: 'translateX(-50%)',
-					textAlign: 'center',
-					opacity: totalOpacity,
-				}}
-			>
-				<div style={{ fontSize: 32, fontWeight: 500, letterSpacing: 3, color: MUTED }}>GESAMT</div>
-				<div style={{ fontSize: 96, fontWeight: 700, color: GOLD, marginTop: 6 }}>{totalScoreValue} / 100</div>
+		</div>
+	);
+};
+
+// Hold begins only once the LAST row's gold fill has fully completed —
+// not stolen from the text-block time, and not shortening the scene.
+const STAR_ANIMATION_SPAN = (FINAL_CATEGORIES.length - 1) * STAR_ROW_STAGGER + STAR_ROW_FILL_DURATION;
+const OVERVIEW_HOLD_START = OVERVIEW_ENTER + STAR_ANIMATION_SPAN;
+const OVERVIEW_DURATION = OVERVIEW_HOLD_START + OVERVIEW_HOLD + OVERVIEW_EXIT;
+
+const OverviewScene: React.FC = () => {
+	const frame = useCurrentFrame();
+	const fullyVisibleEnd = OVERVIEW_HOLD_START + OVERVIEW_HOLD;
+	const wholeOpacity = frame > fullyVisibleEnd ? interpolate(frame, [fullyVisibleEnd, OVERVIEW_DURATION], [1, 0], CLAMP) : 1;
+	// One single enter animation for the category-name block — deliberately
+	// NOT per-row, per "Texte/Kategorien dürfen weiterhin gemeinsam
+	// erscheinen". The gold-fill wave below is a separate, later phase.
+	const enterOpacity = interpolate(frame, [0, OVERVIEW_ENTER], [0, 1], CLAMP);
+	const enterRise = interpolate(frame, [0, OVERVIEW_ENTER], [24, 0], CLAMP);
+	const starFillFrame = frame - OVERVIEW_ENTER;
+
+	return (
+		<AbsoluteFill style={{ fontFamily: FONT, opacity: wholeOpacity, justifyContent: 'center', alignItems: 'center' }}>
+			<div style={{ opacity: enterOpacity, transform: `translateY(${enterRise}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+				<div style={{ textAlign: 'center' }}>
+					<div style={{ fontSize: 42, fontWeight: 700, letterSpacing: 3, color: '#ffffff' }}>UNSERE BEWERTUNG</div>
+					<div style={{ width: 100, height: 3, backgroundColor: GOLD, margin: '20px auto 0' }} />
+				</div>
+				<div style={{ marginTop: 68 }}>
+					{FINAL_CATEGORIES.map((cat, i) => (
+						<OverviewRow key={cat.label} label={cat.label} rating={starRating(cat.score, cat.max)} rowIndex={i} starFillFrame={starFillFrame} />
+					))}
+				</div>
 			</div>
 		</AbsoluteFill>
 	);
 };
 
 // --- Final screen ------------------------------------------------------
-// Simplest screen of the whole piece: four elements, nothing repeated
-// from earlier sections, then genuinely nothing moves for the hold.
+// The actual score reveal now lives here (OverviewScene no longer shows
+// 63/100, so it never appears twice in a row). Sequential choreography:
+// label appears first and dezent → the big number counts up 0→FINAL_SCORE
+// → a very subtle settle pulse when it lands → verdict → sub-line → then
+// everything holds completely still. Still the simplest screen of the
+// whole piece — same four elements as before, nothing repeated from
+// earlier sections.
+const FINAL_LABEL_END = 12;
+const FINAL_SCORE_FADE_START = 8;
+const FINAL_SCORE_FADE_END = 18;
+const FINAL_COUNT_START = 14;
+const FINAL_COUNT_END = 44; // 30 frames ≈ 1.0s count-up, within the requested 0.8–1.2s
+const FINAL_PULSE_PEAK = 50;
+const FINAL_PULSE_END = 56;
+const FINAL_VERDICT_START = 58;
+const FINAL_VERDICT_END = 70;
+const FINAL_SUB_START = 74;
+const FINAL_SUB_END = 86;
+const FINAL_ENTER = FINAL_SUB_END; // everything has finished appearing by here
+
 const FinalScene: React.FC = () => {
 	const frame = useCurrentFrame();
-	const blockOpacity = interpolate(frame, [0, 15], [0, 1], CLAMP);
-	const scoreValue = Math.round(interpolate(frame, [8, 40], [0, FINAL_SCORE], CLAMP));
-	const verdictOpacity = interpolate(frame, [40, 52], [0, 1], CLAMP);
-	const subOpacity = interpolate(frame, [52, 64], [0, 1], CLAMP);
+	const labelOpacity = interpolate(frame, [0, FINAL_LABEL_END], [0, 1], CLAMP);
+	const scoreBlockOpacity = interpolate(frame, [FINAL_SCORE_FADE_START, FINAL_SCORE_FADE_END], [0, 1], CLAMP);
+	const scoreValue = Math.round(interpolate(frame, [FINAL_COUNT_START, FINAL_COUNT_END], [0, FINAL_SCORE], CLAMP));
+	// Very subtle settle pulse exactly as the count-up lands — no bounce,
+	// no gimmick, just enough to feel like the number "arrived".
+	const pulseScale = interpolate(frame, [FINAL_COUNT_END, FINAL_PULSE_PEAK, FINAL_PULSE_END], [1, 1.035, 1], CLAMP);
+	const verdictOpacity = interpolate(frame, [FINAL_VERDICT_START, FINAL_VERDICT_END], [0, 1], CLAMP);
+	const subOpacity = interpolate(frame, [FINAL_SUB_START, FINAL_SUB_END], [0, 1], CLAMP);
 
 	return (
-		<AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', fontFamily: FONT, textAlign: 'center', opacity: blockOpacity }}>
-			<div style={{ fontSize: 38, fontWeight: 500, letterSpacing: 4, color: MUTED }}>TASAN TRIP SCORE</div>
-			<div style={{ fontSize: 200, fontWeight: 700, color: GOLD, marginTop: 12 }}>{scoreValue} / 100</div>
+		<AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', fontFamily: FONT, textAlign: 'center' }}>
+			<div style={{ fontSize: 38, fontWeight: 500, letterSpacing: 4, color: MUTED, opacity: labelOpacity }}>TASAN TRIP SCORE</div>
+			<div style={{ fontSize: 200, fontWeight: 700, color: GOLD, marginTop: 12, opacity: scoreBlockOpacity, transform: `scale(${pulseScale})` }}>
+				{scoreValue} / 100
+			</div>
 			<div style={{ opacity: verdictOpacity, marginTop: 28 }}>
 				<div style={{ fontSize: 54, fontWeight: 700, color: '#ffffff' }}>{FINAL_VERDICT_LABEL}</div>
 			</div>
@@ -676,7 +1034,7 @@ const SCENE = {
 	community: COMMUNITY_DURATION,
 	audience: AUDIENCE_DURATION,
 	quote: QUOTE_DURATION,
-	scoreBuild: SCORE_BUILD_DURATION,
+	overview: OVERVIEW_DURATION,
 	final: FINAL_ENTER + FINAL_HOLD,
 };
 
@@ -715,8 +1073,8 @@ export const MulhouseTripScore: React.FC = () => {
 					<QuoteScene />
 				</TransitionSeries.Sequence>
 				{transition()}
-				<TransitionSeries.Sequence durationInFrames={SCENE.scoreBuild}>
-					<ScoreBuildScene />
+				<TransitionSeries.Sequence durationInFrames={SCENE.overview}>
+					<OverviewScene />
 				</TransitionSeries.Sequence>
 				{transition()}
 				<TransitionSeries.Sequence durationInFrames={SCENE.final}>

@@ -15,6 +15,13 @@ Each session should follow a clear start → work → checkpoint cycle:
 2. **Work:** Make edits, run tests, implement features
 3. **End a session:** `/daily-project-closeout` creates a checkpoint to preserve continuity
 
+### Project Organization
+Each trip project gets a canonical slug (e.g. `mulhouse-automobile-museum`) used consistently across:
+`public/images/<project-slug>/`, `src/<project-slug>/`, `out/<project-slug>/`.
+Keep it shallow — no extra nested folders unless a project genuinely grows large enough to need them.
+Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not inside a project folder.
+`src/Root.tsx` and `src/index.ts` stay at the `src/` root as application-level entry files.
+
 ### Key Files
 - **PROJECT_STATUS.md** – Persistent project memory; updated at session end
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
