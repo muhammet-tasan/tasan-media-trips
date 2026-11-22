@@ -1,7 +1,7 @@
 # TASAN MEDIA Trips — Project Status
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Route Check and Trip Score B-rolls built and rendered; project reorganized under canonical slugs; TASAN brand intro built; local repo connected to GitHub. New: local footage-analysis tool (`scripts/footage-analysis/`) built and run against the full NaturOparC raw footage (54 clips, 22 min), producing a sighting gallery and a draft edit list — NaturOparC is the project's second video and this tool is its first real head start. CapCut Phase 1/2 and remaining Mulhouse B-rolls (Cost Check, Trip Check, Planning Check) still next for the first video.
+**Current Phase:** Route Check and Trip Score B-rolls built and rendered; project reorganized under canonical slugs; TASAN brand intro built; local repo connected to GitHub. New: local footage-analysis tool (`scripts/footage-analysis/`) built and run against the full NaturOparC raw footage (54 clips, 22 min), producing a sighting gallery and a draft edit list — NaturOparC is the project's second video and this tool is its first real head start. Also new: optional mobile push notifications (`/goal`, `notify:on`/`notify:off`, see `docs/NOTIFICATIONS.md`), scoped to this project only. CapCut Phase 1/2 and remaining Mulhouse B-rolls (Cost Check, Trip Check, Planning Check) still next for the first video.
 
 ## Project Overview
 YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCut editing, with Remotion used only to produce specific B-roll clips, maps, titles, or motion graphics that CapCut can't do natively.
@@ -149,6 +149,7 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - Ran the full pipeline against the real NaturOparC raw footage (`capcut/2026 - Naturoparc Colmar/Raw/`): 54 clips, 00:22:04, 12.5GB, 3840×2160 HEVC. Tested against 5 clips first as instructed, reviewed real output, then ran the full set.
 - Hit and fixed a real calibration problem: the first version of `detect.py` used guessed fixed thresholds for motion-diff and sharpness, which were wrong by roughly an order of magnitude for this footage (everything got flagged `high_motion`, nothing `static`). Switched both to per-clip relative percentiles instead of global constants; kept brightness as a fixed threshold since luma is a genuinely absolute scale. Spot-checked multiple flagged frames against the actual thumbnails afterward to confirm the fix — all correct (a held shot of a parked car flagged `static`; a whip-pan to a close-up face flagged `high_motion`; a genuinely unusable close-up of a blank tiled wall flagged for review; an underwater viewing-window shot flagged `blurry` by the technical heuristic despite being a visually strong, usable establishing shot — a concrete example of why technical flags and actual content judgment are kept as two separate, separately-labeled things, never blended).
 - Generated `editlist.csv` for all 54 clips: 3 Hook candidates (incl. the park's entrance sign, a natural establishing shot), 2 Schluss candidates, 2 flagged for manual review (Pruefen), 47 Hauptteil. No clip crossed the 30% static-coverage bar for an automatic "Uebergang" tag — expected, since this is mostly walking/panning footage, not held tripod shots.
+- **Built optional mobile push notifications** (ntfy.sh, topic `tasan-trips`) scoped to this project only — see the new "Shared Tooling: Notifications" section above and `docs/NOTIFICATIONS.md`. Checked first that `/goal` didn't already exist (it didn't) before creating `.claude/commands/goal.md`. Implemented via the official `Notification`/`Stop`/`UserPromptSubmit` hook events in a new `.claude/settings.json`, with per-session on/off state keyed by the hook's own `session_id` field (so parallel sessions in this project never share state) and `python3` for JSON parsing instead of `jq` (not installed on this machine, and `python3` was already a project dependency). Pipe-tested both hook scripts, confirmed hooks stay non-blocking against a real unreachable host (DNS failure resolved in under a second, hook still exited 0), and sent real test notifications to the live ntfy.sh topic (verified delivery via a direct curl echo-back), not just synthetic pipe tests.
 
 **2026-09-13**
 - Reorganized the Mulhouse assets from a flat `src/`/`public/images/` layout into the canonical-slug structure (`src/mulhouse-automobile-museum/`, `public/images/mulhouse-automobile-museum/`), formalizing the project-organization convention now documented in `CLAUDE.md`.
@@ -213,3 +214,24 @@ Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a Cap
 - DJI files carry an embedded MJPEG cover-art stream (`disposition.attached_pic`) alongside the real HEVC video stream — metadata extraction explicitly skips it so fields always reflect the real video, not the cover thumbnail
 - DJI `DJI_<timestamp>_<seq>_D.MP4` filenames already sort chronologically — no separate ordering logic needed
 - `analysis/` is gitignored at the folder level (added to `.gitignore` this session) — fully regenerable from source footage, same reasoning as `out/`
+
+## Shared Tooling: Notifications
+
+Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this project only, not global to other Claude Code projects. Full mechanism, usage, and limits documented in `docs/NOTIFICATIONS.md` — this section only tracks status.
+
+### Status
+- [x] Built: `.claude/hooks/toggle.sh` (`UserPromptSubmit` hook — detects `/goal`, `notify:on`, `notify:off` in the submitted prompt) and `.claude/hooks/ntfy-ping.sh` (`Notification`/`Stop` hooks — pings only if this session's state is ON)
+- [x] `.claude/commands/goal.md` added (`/goal` didn't exist yet — checked first) — turns notifications on automatically via the same `UserPromptSubmit` mechanism, no separate code path
+- [x] Per-session state via `.claude/notify-state/<session_id>` (gitignored) — parallel sessions in this project never share on/off state, since `session_id` comes from the hook's own stdin JSON
+- [x] Pipe-tested both hook scripts against synthesized stdin payloads (on/off toggle, silent-when-off, normal prompts untouched) and against a real unreachable host (DNS failure resolved in <1s, hook still exited 0 — confirms hooks never block Claude if ntfy is unreachable)
+- [x] Sent real test notifications to `ntfy.sh/tasan-trips` (both the "needs input" and "task complete" message variants) and independently confirmed delivery via a direct curl call (ntfy.sh echoed the message back) — real push, not just a pipe-test
+- [x] `docs/NOTIFICATIONS.md` written; linked from `CLAUDE.md`; `/list-commands` updated to include `/goal`
+
+### Decisions / Design Notes
+- No `jq` installed on this machine — both hook scripts parse the hook JSON via `python3` instead (already a project dependency from the footage-analysis tool), so no new dependency was added for this feature either
+- Hooks configured in `.claude/settings.json` (new file, committed/project-scoped), not `~/.claude/settings.json` — per the user's explicit requirement that this applies only to TASAN Trips, not globally
+- Message bodies are always short, fixed strings ("Claude braucht deine Eingabe/Freigabe" / "Auftrag beendet") — never prompt text, file contents, or tool output, so nothing sensitive leaves the machine via these hooks
+- `Notification` + `Stop` only (per explicit instruction), not also `PermissionRequest` — avoids a second hook double-pinging the same permission-needed moment
+- Known, accepted limitation: `Stop` also fires on `/clear`/`/resume`/`/compact`, not only genuine task completion — documented in `docs/NOTIFICATIONS.md` rather than worked around, since distinguishing them would add real complexity for a cosmetic extra ping
+- ntfy.sh topics are unauthenticated by default — `tasan-trips` is now in the committed repo, so it's a semi-public channel name, not a secret; documented as a known limitation rather than hidden in `settings.local.json`, since the user had already disclosed and tested this topic before asking for this feature
+- New settings.json may need a one-time `/hooks` reload or session restart to take effect, since it didn't exist in this project before this session

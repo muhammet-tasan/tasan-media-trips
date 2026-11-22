@@ -26,3 +26,7 @@ _png_measure.mjs
 # Footage-analysis tool output (thumbnails, extracted frames, galleries) —
 # derived from raw footage outside the repo, regenerated on demand, never committed
 analysis/
+
+# Per-session notification on/off state (ntfy hooks) — ephemeral, session-scoped,
+# recreated as needed; never shared across machines or committed
+.claude/notify-state/

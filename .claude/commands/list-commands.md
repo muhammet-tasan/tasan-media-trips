@@ -4,7 +4,7 @@ Lists all available project management commands.
 
 ## Custom Commands for TASAN MEDIA Trips
 
-This project includes five specialized commands to streamline workflow:
+This project includes six specialized commands to streamline workflow:
 
 1. **`/project-status`** — Current phase, completed tasks, and planned next steps (reads PROJECT_STATUS.md)
 
@@ -20,5 +20,7 @@ This project includes five specialized commands to streamline workflow:
    - Preserves continuity for next session
 
 5. **`/list-commands`** — Displays this list
+
+6. **`/goal`** — Define a session goal and work toward it hands-off; automatically turns on mobile push notifications (ntfy.sh) for this session so you get pinged when Claude needs input or finishes. Toggle manually anytime with `notify:on` / `notify:off` in a normal prompt. See `docs/NOTIFICATIONS.md`.
 
 These commands maintain PROJECT_STATUS.md as architectural memory, ensuring continuity across sessions and handoffs.
