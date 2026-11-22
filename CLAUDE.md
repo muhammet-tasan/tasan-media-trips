@@ -4,7 +4,7 @@ This project creates YouTube trip videos combining DJI Pocket 3 footage, German 
 
 **Editing workflow:** CapCut is the primary video editor — footage editing, voice-over sync, and final assembly/export all happen there. Remotion is used narrowly: it builds only specific B-roll clips, maps, titles, or motion graphics for gaps identified while editing in CapCut, then those renders are imported back into CapCut. Remotion does not organize raw footage or assemble the full video.
 
-**Before starting any new B-roll:** read `docs/BROLL_GUIDELINES.md` and check for an existing relevant reference implementation (e.g. `src/MulhouseRouteCheck.tsx` for geographic Route Check graphics) before writing any code. This is mandatory, not optional — it exists to avoid repeating the many visual/timing iterations the first Route Check needed.
+**Before starting any new B-roll:** read `docs/BROLL_GUIDELINES.md` and check for an existing relevant reference implementation (e.g. `src/mulhouse-automobile-museum/MulhouseRouteCheck.tsx` for geographic Route Check graphics) before writing any code. This is mandatory, not optional — it exists to avoid repeating the many visual/timing iterations the first Route Check needed.
 
 ## How to Work with This Project
 

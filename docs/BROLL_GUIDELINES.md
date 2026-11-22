@@ -1,6 +1,6 @@
 # TASAN MEDIA Trips — B-roll Guidelines
 
-**Reference implementation:** `src/MulhouseRouteCheck.tsx` is the current reference implementation for geographic Route Check B-rolls. Consult it alongside this document before building a new one of the same type.
+**Reference implementation:** `src/mulhouse-automobile-museum/MulhouseRouteCheck.tsx` is the current reference implementation for geographic Route Check B-rolls. Consult it alongside this document before building a new one of the same type.
 
 ## 1. General workflow
 
