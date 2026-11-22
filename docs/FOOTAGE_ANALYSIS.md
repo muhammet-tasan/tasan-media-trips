@@ -37,7 +37,7 @@ Outputs live under `analysis/<slug>/`, which is **gitignored** — large and ful
 Two different kinds of "analysis" happen here, and they are never blended into one undifferentiated judgment:
 
 - **Technical measurements** (ffprobe/ffmpeg/Python): duration, resolution, fps, codec, audio levels, brightness/motion-difference proxies once §5 is built. 100% reproducible, pure signal processing — no understanding of what's actually in frame.
-- **Actual image content** (what's visible — a stork in frame, a good establishing shot, a shaky pan): this is done by **Claude, on request**, looking directly at the generated thumbnails in an active session. There is no local vision model and no cloud vision API wired into the pipeline — adding one was considered and rejected for this project's scale (a ~4-minute video from ~20 minutes of raw footage) as unnecessary complexity. Claude's content judgments, when given, are always labeled as editorial/content assessment, never mixed into the technical fields.
+- **Actual image content** (what's visible — a stork in frame, a good establishing shot, a shaky pan): this is done by **Claude, on request**, looking directly at the generated thumbnails in an active session. There is no local vision model and no cloud vision API wired into the pipeline — adding one was considered and rejected for this project's scale (a ~4-minute video from ~20 minutes of raw footage) as unnecessary complexity. Claude's content judgments, when given, are always labeled as editorial/content assessment, never mixed into the technical fields. First real use (NaturOparC, all 54 clips): see §6.5.
 
 ## 5. Scene-change / static-section / quality detection (`detect.py`)
 
@@ -67,6 +67,23 @@ Suggested-use classification (first pass, simple and explainable on purpose):
 
 This is a heuristic draft, not an editorial decision — meant to be read and adjusted by hand (or by asking Claude to adjust it after reviewing the gallery) before building the CapCut timeline.
 
+## 6.5. Editorial content review (`contact_sheet.py` + Claude's own vision)
+
+When an actual editorial pass is wanted (not just technical flags — see §4), reading up to ~670 individual thumbnail files one at a time doesn't scale. `contact_sheet.py` tiles one clip's full set of extracted thumbnails (every one of them, not a sample) into a single labeled grid image per clip, written to `analysis/<slug>/contact_sheets/<clip>.jpg`. Claude then reads one contact sheet per clip — one image call instead of dozens — and does the actual content judgment from there: visible animals/activities/landscape, composition/quality, duplicate-scene detection, hook candidates.
+
+```
+python scripts/footage-analysis/contact_sheet.py --slug <slug> [--filename <one clip>]
+```
+
+When a specific moment might fall between the regular 2s-spaced thumbnails (fast motion, an animal that could easily be missed), extract denser frames for just that clip/range — e.g. every 0.5s instead of 2s — by calling `extract_thumbnail()` from `analyze.py` directly over a tighter loop, then tile or view those individually. This is exactly how one confirmed otter sighting was found in the NaturOparC review (see below) that the standard 2s thumbnails had completely missed.
+
+**First real run (NaturOparC, all 54 clips, 2026-11-22):** produced three outputs, deliberately kept separate from the technical pipeline's own files (and from each other):
+- `analysis/<slug>/content_review.md` — the full clip-by-clip content analysis, preserved in full (not just the recommended subset)
+- `analysis/<slug>/editorial_editlist.csv` — the actual editorial cut recommendation (filename, start, end, duration, description, priority, justification), a human judgment call, **not regenerable by re-running a script**
+- `analysis/<slug>/CAPCUT_INSTRUCTIONS.md` — a proposed running order + practical CapCut steps
+
+Because these three are genuine editorial work product rather than derived/regenerable cache, they are the one part of `analysis/` that **is** committed to git (see `.gitignore` — it ignores `thumbs/`, `contact_sheets/`, `extra_frames/`, `metadata.json`, `gallery.html`, `editlist.csv` by pattern, but not these three files).
+
 ## 7. Known limitations (stated up front, not discovered later)
 
 1. No real image-content understanding in the automated pipeline — pixel/signal-based only (see §4).
@@ -76,6 +93,7 @@ This is a heuristic draft, not an editorial decision — meant to be read and ad
 5. Audio analysis is level-only (`silencedetect` is available in the bundled FFmpeg) — things like wind noise or speech intelligibility need actual listening.
 6. Heuristic suggestions are a draft, not an editorial judgment — `editlist.csv` rows are a starting point, not a cut.
 7. Edit-list start/end is always the whole clip, not a sub-clip trim — 2s-spaced thumbnails aren't frame-accurate enough to claim precise in/out points (§6).
+8. Species/content identification from thumbnails has real limits — murky water, distance, and 480px resolution sometimes make a confident call impossible. The honest answer is "plausible, not confirmed" (and the editorial write-up says so explicitly), not a guess dressed up as fact.
 
 ## 8. Where the big win actually is
 
