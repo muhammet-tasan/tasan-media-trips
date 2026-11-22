@@ -13,3 +13,10 @@ out/
 *.swo
 *~
 .cache/
+
+# Claude Code local settings (machine-specific)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# One-off analysis/scratch scripts
+_png_measure.mjs

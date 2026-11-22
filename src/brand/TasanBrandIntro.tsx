@@ -24,8 +24,12 @@ import { AbsoluteFill, Audio, Easing, Video, interpolate, staticFile, useCurrent
  *    the ring's own radius over time directly off stills of the source
  *    (see RING MEASUREMENTS below): it shrinks continuously once formed,
  *    so the crop only needs to stay safely inside its radius for as long
- *    as this composition actually plays. A soft elliptical alpha mask
- *    feathers the window's own outer edge into the canvas background (see
+ *    as this composition actually plays. Two things then make that window
+ *    invisible against the canvas: a mix-blend-mode:lighten pass lifts the
+ *    video's own near-black background up to exactly match
+ *    BACKGROUND_COLOR (per channel, max(video, bg) — letters and glint stay
+ *    untouched since they're already brighter), and a thin linear-gradient
+ *    alpha mask feathers the window's outer edge into transparency (see
  *    FEATHER below) — true transparency, not a painted overlay, so the
  *    glint's blue glow dims into the background rather than getting cut or
  *    covered.
@@ -179,29 +183,29 @@ export const TasanBrandIntro: React.FC = () => {
 					WebkitMaskComposite: 'source-in',
 				}}
 			>
-				<Video
-					src={staticFile(KLING_VIDEO_FILE)}
-					muted
-					style={{
-						position: 'absolute',
-						left: -TOTAL_X0 * SCALE,
-						top: -TOTAL_Y0 * SCALE,
-						width: CANVAS_W,
-						height: CANVAS_H,
-						objectFit: 'fill',
-						// Restrained contrast lift: the video's own dark background
-						// (measured ~30-50 RGB near the logo, not pure black) is
-						// meaningfully brighter than the new #030509 canvas, and the
-						// feather is too thin (ring-safety ceiling, see FEATHER above)
-						// to hide that gap on its own. Contrast pushes values away
-						// from mid-gray, so it crushes the dark background toward
-						// black while leaving the already-near-white letters and
-						// glint core untouched (they're already at the clamp
-						// ceiling) — only the glint's faintest outer bloom dims
-						// slightly, not its core or visible rays.
-						filter: 'contrast(160%)',
-					}}
-				/>
+				{/* Lightens the video's own near-black background up to exactly
+				    BACKGROUND_COLOR — per channel, result = max(video, bg) — via
+				    mix-blend-mode:lighten against a same-color backdrop, isolated
+				    to this stacking context so the blend can't reach past it to
+				    whatever's behind. Letters/glint are already brighter than
+				    3,5,9 on every channel, so max() leaves them untouched; only
+				    truly-dark pixels (compression noise included) get lifted. */}
+				<div style={{ position: 'absolute', inset: 0, isolation: 'isolate' }}>
+					<div style={{ position: 'absolute', inset: 0, backgroundColor: BACKGROUND_COLOR }} />
+					<Video
+						src={staticFile(KLING_VIDEO_FILE)}
+						muted
+						style={{
+							position: 'absolute',
+							left: -TOTAL_X0 * SCALE,
+							top: -TOTAL_Y0 * SCALE,
+							width: CANVAS_W,
+							height: CANVAS_H,
+							objectFit: 'fill',
+							mixBlendMode: 'lighten',
+						}}
+					/>
+				</div>
 			</div>
 
 			<Audio src={staticFile(KLING_VIDEO_FILE)} volume={volume} />
