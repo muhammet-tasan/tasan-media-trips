@@ -1,7 +1,7 @@
 # TASAN MEDIA Trips — Project Status
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Route Check and Trip Score B-rolls built and rendered; project reorganized under canonical slugs; TASAN brand intro built; local repo now connected to GitHub. CapCut Phase 1/2 and remaining B-rolls (Cost Check, Trip Check, Planning Check) next.
+**Current Phase:** Route Check and Trip Score B-rolls built and rendered; project reorganized under canonical slugs; TASAN brand intro built; local repo connected to GitHub. New: local footage-analysis tool (`scripts/footage-analysis/`) built and run against the full NaturOparC raw footage (54 clips, 22 min), producing a sighting gallery and a draft edit list — NaturOparC is the project's second video and this tool is its first real head start. CapCut Phase 1/2 and remaining Mulhouse B-rolls (Cost Check, Trip Check, Planning Check) still next for the first video.
 
 ## Project Overview
 YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCut editing, with Remotion used only to produce specific B-roll clips, maps, titles, or motion graphics that CapCut can't do natively.
@@ -145,6 +145,10 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - Pushed 8 commits to `origin/main`; verified local and remote `HEAD` match exactly and the remote file count (50) matches local.
 - Found and corrected documentation drift accumulated across the three undocumented sessions below (2026-09-08, 2026-09-11, 2026-09-13): `PROJECT_STATUS.md` was stale at 2026-09-04 and didn't reflect `MulhouseTripScore` v2, the project-slug reorganization, or `TasanBrandIntro`; `CLAUDE.md`, `PROJECT_STATUS.md`, and `docs/BROLL_GUIDELINES.md` still referenced the pre-reorg path `src/MulhouseRouteCheck.tsx` instead of `src/mulhouse-automobile-museum/MulhouseRouteCheck.tsx`.
 - Checked `Root.tsx` for stale placeholders: found the unused `MulhouseTest` composition (leftover from initial setup, no render or doc depends on it) — flagged in Architectural Notes rather than removed, since this session's scope was documentation, not code/architecture changes.
+- **Built the footage-analysis MVP** (`scripts/footage-analysis/`: `analyze.py`, `detect.py`, `editlist.py`) for sighting raw DJI footage before a CapCut rough cut — see the new "Shared Tooling: Footage Analysis" section above and `docs/FOOTAGE_ANALYSIS.md` for full design/decisions. Reused Remotion's bundled FFmpeg/ffprobe (no system install); added Pillow + numpy as the only new dependency, per the user's approved plan.
+- Ran the full pipeline against the real NaturOparC raw footage (`capcut/2026 - Naturoparc Colmar/Raw/`): 54 clips, 00:22:04, 12.5GB, 3840×2160 HEVC. Tested against 5 clips first as instructed, reviewed real output, then ran the full set.
+- Hit and fixed a real calibration problem: the first version of `detect.py` used guessed fixed thresholds for motion-diff and sharpness, which were wrong by roughly an order of magnitude for this footage (everything got flagged `high_motion`, nothing `static`). Switched both to per-clip relative percentiles instead of global constants; kept brightness as a fixed threshold since luma is a genuinely absolute scale. Spot-checked multiple flagged frames against the actual thumbnails afterward to confirm the fix — all correct (a held shot of a parked car flagged `static`; a whip-pan to a close-up face flagged `high_motion`; a genuinely unusable close-up of a blank tiled wall flagged for review; an underwater viewing-window shot flagged `blurry` by the technical heuristic despite being a visually strong, usable establishing shot — a concrete example of why technical flags and actual content judgment are kept as two separate, separately-labeled things, never blended).
+- Generated `editlist.csv` for all 54 clips: 3 Hook candidates (incl. the park's entrance sign, a natural establishing shot), 2 Schluss candidates, 2 flagged for manual review (Pruefen), 47 Hauptteil. No clip crossed the 30% static-coverage bar for an automatic "Uebergang" tag — expected, since this is mostly walking/panning footage, not held tripod shots.
 
 **2026-09-13**
 - Reorganized the Mulhouse assets from a flat `src/`/`public/images/` layout into the canonical-slug structure (`src/mulhouse-automobile-museum/`, `public/images/mulhouse-automobile-museum/`), formalizing the project-organization convention now documented in `CLAUDE.md`.
@@ -182,3 +186,30 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 
 ### Last Session Summary
 Connected the local repository to GitHub (first push to a previously-empty remote, no history conflicts), hardened `.gitignore`, and committed a pending `TasanBrandIntro` fix (lighten-blend background matching). Found and corrected documentation drift that had accumulated across three undocumented sessions (TripScore v2 approval, the project-slug reorganization, and the TasanBrandIntro build) — `PROJECT_STATUS.md` now reflects the real current state, and stale `src/MulhouseRouteCheck.tsx`-style paths in `CLAUDE.md`/`docs/BROLL_GUIDELINES.md` were corrected to the post-reorg location.
+
+## Shared Tooling: Footage Analysis
+
+Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a CapCut rough cut — separate from the Remotion/B-roll workflow, touches no `src/` composition code. Full design, decisions, and limitations are in `docs/FOOTAGE_ANALYSIS.md`; this section only tracks status.
+
+### Status
+- [x] MVP built: `scripts/footage-analysis/analyze.py` (ffprobe metadata, timestamped thumbnails, HTML gallery), `detect.py` (technical flags), `editlist.py` (draft CSV edit list)
+- [x] Verified against 5 real NaturOparC clips (metadata correct, thumbnails sharp and correctly timestamped) and spot-checked against the actual images (held-shot and whip-pan flags both confirmed correct — see `docs/FOOTAGE_ANALYSIS.md` §5)
+- [x] Full NaturOparC raw-footage inventory probed: 54 clips (+2 JPG stills, not part of the video pipeline), 00:22:04 total, 12.52GB, uniformly 3840×2160 HEVC (52 clips @ 29.97fps, 2 @ 23.98fps)
+- [x] Calibration pass completed on `detect.py`'s thresholds — switched motion/sharpness from guessed fixed constants (which misfired badly on real footage) to per-clip relative percentiles; brightness kept as a fixed threshold since luma is a genuinely absolute scale
+- [x] Pillow + numpy installed (the one new dependency this tool adds) — `scripts/footage-analysis/requirements.txt`
+- [x] Full 54-clip run complete: `metadata.json` (54 clips), 671 timestamped thumbnails, `gallery.html` with technical flag badges, `events/` (per-clip), `editlist.csv` (54 rows: 3 Hook, 2 Schluss, 2 Pruefen, 47 Hauptteil)
+- [x] Claude content-review spot-checks across the full set (not yet an exhaustive pass) — confirmed the detection logic against real frames, including one notable case worth remembering: an underwater viewing-window shot got a technical `blurry` flag (low edge detail in murky green water) while being, by actual content, a strong and usable establishing/atmosphere shot — the clearest real example yet of why `docs/FOOTAGE_ANALYSIS.md` §4 keeps technical flags and content judgment strictly separate
+- [ ] Full (not spot-check) Claude content-review pass across all 54 clips' thumbnails, if wanted before the CapCut rough cut
+- [ ] Apply `editlist.csv` suggestions to an actual CapCut rough cut (next real use of this tool's output)
+
+### Key Decisions (confirmed by user)
+- Detection approach: Pillow + numpy on bundled-FFmpeg frame samples, not a system-wide FFmpeg install (keeps the tool fully self-contained, no new system dependency)
+- AI image-content review: manual, on-request (Claude reviews generated thumbnails when asked) — no vision model/API wired into the pipeline for v1
+- Folder layout: `scripts/footage-analysis/` (tool) + `analysis/<slug>/` (outputs, gitignored — never committed, same reasoning as `out/`)
+- Bundled Remotion FFmpeg (`node_modules/@remotion/compositor-win32-x64-msvc/`) reused for metadata/thumbnails — confirmed via `-filters` that it lacks `select`/`scdet`/`freezedetect`/`blackdetect`, which is why detection needs the Python layer instead of native FFmpeg filters
+
+### Architectural Notes
+- Read-only on source footage: every ffmpeg/ffprobe call only decodes a preview frame (`-ss` + `-frames:v 1`); never writes to the source path
+- DJI files carry an embedded MJPEG cover-art stream (`disposition.attached_pic`) alongside the real HEVC video stream — metadata extraction explicitly skips it so fields always reflect the real video, not the cover thumbnail
+- DJI `DJI_<timestamp>_<seq>_D.MP4` filenames already sort chronologically — no separate ordering logic needed
+- `analysis/` is gitignored at the folder level (added to `.gitignore` this session) — fully regenerable from source footage, same reasoning as `out/`

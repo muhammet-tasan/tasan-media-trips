@@ -25,8 +25,10 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 ### Key Files
 - **PROJECT_STATUS.md** – Persistent project memory; updated at session end
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
+- **docs/FOOTAGE_ANALYSIS.md** – Local footage-sighting workflow (metadata/thumbnails/gallery for raw DJI clips); consult before extending `scripts/footage-analysis/`
 - **.claude/commands/** – Workflow commands for project management
 - **src/** – Remotion compositions (React + TypeScript) for targeted B-roll/graphics only, not full video assembly
+- **scripts/footage-analysis/** – Standalone Python tool for sighting raw footage before a CapCut rough cut; not Remotion, not part of the composition code
 - **public/** – Static assets and video files
 
 ### Principles

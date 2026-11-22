@@ -1,0 +1,5 @@
+# Footage-analysis tool (scripts/footage-analysis/) — the only new dependency
+# this project adds beyond the bundled Remotion ffmpeg/ffprobe binaries.
+# Install once with: pip install -r scripts/footage-analysis/requirements.txt
+Pillow>=13.0
+numpy>=2.5
