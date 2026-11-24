@@ -10,7 +10,7 @@ YouTube trip videos with DJI Pocket 3 footage, German voice-over, and Remotion-p
 
 ## Project Structure
 ```
-.claude/commands/      # Claude Code workflow commands
+.claude/skills/        # Claude Code workflow skills (slash commands)
 src/                   # Remotion composition source
 public/                # Static assets
 PROJECT_STATUS.md      # Persistent project memory

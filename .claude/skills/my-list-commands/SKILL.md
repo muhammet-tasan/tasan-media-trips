@@ -1,3 +1,8 @@
+---
+name: my-list-commands
+description: List all custom project commands
+disable-model-invocation: true
+---
 # /my-list-commands
 
 Lists all available project management commands.

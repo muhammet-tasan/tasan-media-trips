@@ -1,3 +1,8 @@
+---
+name: my-continue-project
+description: Resume from PROJECT_STATUS.md and ask for next work direction
+disable-model-invocation: true
+---
 # /my-continue-project
 
 Resume from PROJECT_STATUS.md and offer direction on next work.

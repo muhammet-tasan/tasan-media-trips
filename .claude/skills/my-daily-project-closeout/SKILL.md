@@ -1,3 +1,8 @@
+---
+name: my-daily-project-closeout
+description: End-of-session checkpoint: update PROJECT_STATUS.md, validate structure, prepare git commit
+disable-model-invocation: true
+---
 # /my-daily-project-closeout
 
 Standardize end-of-session checkpoints to preserve project continuity.

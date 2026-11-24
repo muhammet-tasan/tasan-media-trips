@@ -196,6 +196,7 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 
 **2026-11-24**
 - Renamed all six custom commands to a `my-` prefix (`/my-project-status`, `/my-continue-project`, `/my-next-task`, `/my-daily-project-closeout`, `/my-list-commands`, `/my-notification-on`) via `git mv` in `.claude/commands/`, and updated live references in `CLAUDE.md`, `README.md`, `docs/NOTIFICATIONS.md` and the command files themselves.
+- Later the same day: moved all six from `.claude/commands/*.md` to `.claude/skills/<name>/SKILL.md` (with `disable-model-invocation: true`, so they stay user-triggered only).
 - Gotcha: `.claude/hooks/toggle.sh` matches the prompt prefix to switch notifications on, so it now matches `/my-notification-on*`; `/my-goal` was later renamed to `/my-notification-on` (notifications only; goals use the built-in `/goal`). Older log entries above deliberately keep the historical command names.
 - Not re-verified end-to-end: the `/my-notification-on` → notifications-on link in a fresh session (new command names are likely only listed after a restart).
 - Committed the previously uncommitted `docs/PRODUCTION_STANDARDS.md` and the NaturOparC `FINAL_TIMELINE_PLAN` files together with the rename.

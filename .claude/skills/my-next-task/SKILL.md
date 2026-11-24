@@ -1,3 +1,8 @@
+---
+name: my-next-task
+description: Identify the single highest-impact next implementation step
+disable-model-invocation: true
+---
 # /my-next-task
 
 Identify the single highest-impact implementation step.

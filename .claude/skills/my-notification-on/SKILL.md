@@ -1,3 +1,8 @@
+---
+name: my-notification-on
+description: Turn on ntfy.sh mobile push notifications for this session (handled by toggle.sh hook)
+disable-model-invocation: true
+---
 # /my-notification-on
 
 Turns on mobile push notifications (ntfy.sh, topic `tasan-trips`) for **this

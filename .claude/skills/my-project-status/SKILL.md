@@ -1,3 +1,8 @@
+---
+name: my-project-status
+description: Show current phase, completed tasks and next steps from PROJECT_STATUS.md
+disable-model-invocation: true
+---
 # /my-project-status
 
 Summarize current project phase, completed work, and next steps.
