@@ -9,9 +9,9 @@ Reviews the **user's own rough cut** (the user selects scenes and cuts in CapCut
 
 ## Process
 1. Read `PROJECT_STATUS.md` (active video + slug), `docs/PRODUCTION_STANDARDS.md`, and — for B-roll suggestions — `docs/BROLL_GUIDELINES.md`. Verify against `git log` / `analysis/<slug>/` that the active video is the one meant; ask if unclear.
-2. Find the input; if the user gave a path in the arguments use it, otherwise ask once. Accepted, in order of reliability:
-   - an exported rough-cut MP4 (low resolution is fine);
-   - the CapCut draft (`…/com.lveditor.draft/<name>/draft_content.json`) **read-only** for the exact cut list (segments: material path, `source_timerange`, `target_timerange`, microseconds) — never write to drafts, never touch originals;
+2. **Find the input automatically — do not ask for paths.** Run `python3 scripts/video_assets.py` (active video; or pass a slug). It resolves, for this PC, the raw-footage folder, the newest rough-cut export, the CapCut draft and `analysis/<slug>/` from the portable table `## Video Assets (portable)` in `PROJECT_STATUS.md`. Use what it found. Only if its `problems` list is non-empty (exit code 2) ask the user — one concise question naming exactly what is missing or ambiguous (e.g. which of several drafts; set the `Draft` column afterwards). A path given in the arguments overrides the lookup. If the draft exists but its timeline has no segments, say that the cut has not been started yet and stop. Accepted inputs, in order of reliability:
+   - the exported rough-cut MP4 (`export`; low resolution is fine; if several exist the newest is used — say which one);
+   - the CapCut draft (`draft` → `draft_content.json`) **read-only** for the exact cut list (segments: material path, `source_timerange`, `target_timerange`, microseconds) — never write to drafts, never touch originals;
    - optional voice-over script / target length.
 3. Make the cut visible: for an export, extract timestamped frames (every 2 s, plus denser around cuts or doubtful spots) using the bundled FFmpeg and the contact-sheet approach from `docs/FOOTAGE_ANALYSIS.md`; read the frames. Do not claim to have seen or heard anything you did not actually examine; mark unverified points "nicht bestätigt".
 4. Review along these dimensions, each finding with a **timecode** (mm:ss or range): Dramaturgie · Bildqualität · Zuschauerbindung · Szenenlänge · Informationsvermittlung · B-Roll-Platzierung · Privatsphäre (recognizable family faces, §2 — mandatory check).

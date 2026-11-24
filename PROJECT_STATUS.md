@@ -29,6 +29,15 @@ Status values: **active** (exactly one) · **paused** · **done** (published) ·
 
 *Status evidence (2026-11-24): the newest commits (2026-11-22…24) are all NaturOparC analysis/plan work; the last Mulhouse-specific commit was 2026-09-13. The user confirmed on 2026-11-24 that Mulhouse is fully completed (`done`), not paused. Earlier today this was wrongly inferred as "paused" from git history alone — see Lessons Learned.*
 
+## Video Assets (portable)
+
+Maps each video slug to **folder names only** — no absolute paths, so this file is identical on every PC. `scripts/video_assets.py` (used by `/my-review-roughcut`) resolves the machine-specific paths: CapCut root = env `TASAN_CAPCUT_ROOT`, else optional gitignored `.claude/local.json` (`capcut_root`, `capcut_drafts_dir`), else the default `<repo>/../capcut`; drafts dir = CapCut's standard location (env `TASAN_CAPCUT_DRAFTS` to override). Analysis folder is always `analysis/<slug>/`. Standard CapCut folder layout (from `2026 - Template`): `Raw/`, `Export/`, `Audio/`, `CapCut/`, `Thumbnail/`. Leave `Draft` empty to auto-match the CapCut draft by the footage paths in its media pool; fill it in when several drafts reference the same footage. **Add a row for every new video** (closeout step 0).
+
+| Slug | CapCut folder | Raw | Export | Draft |
+|---|---|---|---|---|
+| `naturoparc` | `2026 - Naturoparc Colmar` | `Raw` | `Export` | `1122` |
+| `mulhouse-automobile-museum` | `2026 - Musee Automobile Mulhouse` | `video input` | `video ouput` | `Musee Automobile Mulhouse` |
+
 ## Project Overview
 YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCut editing, with Remotion used only to produce specific B-roll clips, maps, titles, or motion graphics that CapCut can't do natively.
 
@@ -192,6 +201,12 @@ Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/
 - See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24 entries in the Session Log.
 
 ## Session Log (all videos, newest first)
+
+**2026-11-24 [tooling / video assets]**
+- `/my-review-roughcut` no longer asks for paths: new portable table `## Video Assets (portable)` (slug → CapCut folder name, raw/export subfolders, optional draft name; names only) + `scripts/video_assets.py` resolves machine-specific paths (env `TASAN_CAPCUT_ROOT`/`TASAN_CAPCUT_DRAFTS`, optional gitignored `.claude/local.json`, default `<repo>/../capcut`), finds the newest export, auto-matches the CapCut draft by its media paths, and reports `problems` (exit 2) only when something is missing/ambiguous. No new committed config file. Tested with `python3 scripts/test-video-assets.py` (fixtures, incl. a second-PC root).
+- Found while testing: the notification hooks failed when Claude had `cd`-ed into another folder (relative hook path + relative state folder). Fixed: hook commands use `${CLAUDE_PROJECT_DIR}` and `notify.py` anchors its state folder to its own location; verified from a subdirectory. Lesson: hooks run in the *current* directory, never assume the repo root.
+- Headless `claude -p` runs get no permission prompts, so reads outside the repo (CapCut folders) and running the resolver are denied there; interactively you are asked once. An allow rule such as `Bash(python3 scripts/video_assets.py*)` in `.claude/settings.local.json` avoids the prompt (not added automatically).
+- Gotchas: two drafts can reference the same footage (e.g. `1122` and the generated `TASAN_Test_3Clips`) → set the `Draft` column; Mulhouse uses a legacy folder layout (`video input`/`video ouput`), expressed per row.
 
 **2026-11-24 [naturoparc / workflow]**
 - **Workflow change (binding for all videos):** the user selects scenes and cuts the rough cut in CapCut; Claude reviews it with concrete time-based suggestions (dramaturgy, image quality, retention, scene length, information, B-roll placement). Footage analysis is a supporting tool for finding overlooked scenes. CapCut project generation and FFmpeg rough-cut automation are parked (knowledge preserved in `docs/CAPCUT_DRAFT_RESEARCH.md`, `scripts/capcut-draft/`).

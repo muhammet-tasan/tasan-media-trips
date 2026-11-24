@@ -18,6 +18,7 @@ __pycache__/
 
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json
+.claude/local.json
 .claude/scheduled_tasks.lock
 
 # One-off analysis/scratch scripts

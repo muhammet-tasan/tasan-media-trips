@@ -12,7 +12,7 @@ Standardize end-of-session checkpoints to preserve project continuity.
 ### 0. Identify the video worked on (always first)
 - Determine which video this session actually worked on from evidence: files changed (`git status`, `git diff --stat`), paths touched (`src/<slug>/`, `analysis/<slug>/`, `out/<slug>/`) and the conversation. Never assume it is the video that was marked active.
 - Compare with `## ▶ Active Video` in `PROJECT_STATUS.md`. If different: ask the user whether this is a switch of the active video (then flip registry statuses: new one **active**, previous one **paused**/**done**) or a side task.
-- New video started this session (new slug)? Add a row to `## Video Registry` and a `## Video: <title>` section — not a "Shared Tooling" entry.
+- New video started this session (new slug)? Add a row to `## Video Registry`, a row to `## Video Assets (portable)` (folder names only, never absolute paths) and a `## Video: <title>` section — not a "Shared Tooling" entry.
 
 ### 1. Status Documentation (single source of truth, no duplicates)
 Update `PROJECT_STATUS.md` in these places only:

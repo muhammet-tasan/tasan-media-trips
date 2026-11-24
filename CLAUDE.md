@@ -29,6 +29,7 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
 - **docs/PRODUCTION_STANDARDS.md** – Mandatory channel/editorial standards (positioning, family/privacy, branding concept, hook, storytelling structure, infographics catalog); consult before planning or cutting any video
 - **docs/FOOTAGE_ANALYSIS.md** – Supporting footage-sighting tool (metadata/thumbnails/gallery for raw DJI clips; §10: finding overlooked scenes); consult before extending `scripts/footage-analysis/`
+- **PROJECT_STATUS.md → `## Video Assets (portable)`** – per-video mapping slug → CapCut folder name/raw/export/draft (names only, no absolute paths); `scripts/video_assets.py` resolves the machine-specific paths (env `TASAN_CAPCUT_ROOT`, optional gitignored `.claude/local.json`). Add a row for every new video. Tests: `python3 scripts/test-video-assets.py`
 - **docs/CAPCUT_DRAFT_RESEARCH.md** – PARKED research on generating CapCut projects; preserved knowledge only, do not build on it. Reading a CapCut draft read-only for review is fine
 - **docs/NOTIFICATIONS.md** – Optional mobile push notifications (ntfy.sh) for this project; per-task option `/my-notification-on`, off by default (run `python3 scripts/test-notifications.py` after touching the hooks)
 - **.claude/skills/** – Workflow skills (slash commands) for project management (includes `/my-notification-on`)

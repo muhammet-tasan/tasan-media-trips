@@ -109,7 +109,7 @@ Verbindlich für alle Videos (seit 2026-11-24).
 - **Nutzer:** wählt die Szenen aus und erstellt den Rohschnitt selbst in CapCut (kreative Hoheit über Auswahl, Reihenfolge, Länge). Claude schlägt keinen Rohschnitt vor, den es dann selbst baut, und generiert keine CapCut-Projekte.
 - **Claude:** analysiert den Rohschnitt und liefert konkrete, **zeitbasierte** Verbesserungsvorschläge. Entscheidungen bleiben beim Nutzer.
 
-**Eingaben für das Review** (in dieser Reihenfolge der Zuverlässigkeit)
+**Eingaben für das Review** werden **automatisch gefunden** (`scripts/video_assets.py`, Zuordnung pro Video in `PROJECT_STATUS.md` → `## Video Assets (portable)`: nur Ordnernamen; maschinenspezifische Pfade kommen aus Umgebungsvariable `TASAN_CAPCUT_ROOT`, optional der gitignorierten `.claude/local.json`, sonst `<Repo>/../capcut`). Nachgefragt wird nur, wenn etwas fehlt oder nicht eindeutig ist. Reihenfolge der Zuverlässigkeit:
 1. Export des Rohschnitts als MP4 (niedrige Auflösung genügt) — Claude sichtet ihn über zeitgestempelte Frames/Kontaktbögen (`scripts/footage-analysis/`) und, soweit verfügbar, den Ton.
 2. Optional: der CapCut-Entwurf (`draft_content.json`) **nur lesend** — liefert exakte Schnittliste (Quellclip, Ein-/Ausstieg, Timeline-Position). Format undokumentiert (siehe `docs/CAPCUT_DRAFT_RESEARCH.md`); nie schreiben, nie bestehende Entwürfe verändern.
 3. Optional: Voice-over-Skript/Stichpunkte, Zielvorgabe zur Länge.

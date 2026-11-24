@@ -18,7 +18,7 @@ Reads the hook's JSON from stdin. Never blocks, never raises: always exit 0.
 Environment (tests / overrides):
   TASAN_NTFY_BASE         base URL, default https://ntfy.sh
   TASAN_NTFY_TOPIC        topic, default tasan-trips
-  TASAN_NOTIFY_STATE_DIR  state dir, default .claude/notify-state
+  TASAN_NOTIFY_STATE_DIR  state dir, default <script dir>/../notify-state
   TASAN_NOTIFY_GOAL_WAIT  seconds to wait for the /goal verdict, default 12
 """
 import json
@@ -28,7 +28,10 @@ import sys
 import time
 import urllib.request
 
-STATE_DIR = os.environ.get("TASAN_NOTIFY_STATE_DIR", ".claude/notify-state")
+# Anchored to this script (not the current directory): hooks may run while Claude
+# has cd-ed elsewhere, and the state must always be the same folder.
+STATE_DIR = os.environ.get("TASAN_NOTIFY_STATE_DIR") or os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "notify-state")
 BASE = os.environ.get("TASAN_NTFY_BASE", "https://ntfy.sh").rstrip("/")
 TOPIC = os.environ.get("TASAN_NTFY_TOPIC", "tasan-trips")
 GOAL_WAIT = float(os.environ.get("TASAN_NOTIFY_GOAL_WAIT", "12"))
