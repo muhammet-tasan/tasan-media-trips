@@ -13,7 +13,7 @@ when Claude needs input or finishes a turn.
 
 Handled by the `UserPromptSubmit` hook (`.claude/hooks/toggle.sh`), which sees
 `/my-notification-on` as the submitted prompt before this command's text is
-processed. Turn off again any time with `notify:off` in a normal prompt. See
+processed. Off by default in every session; turn off again with `/my-notification-off`. See
 `docs/NOTIFICATIONS.md`.
 
 Goals are not handled here — use Claude Code's built-in `/goal <condition>` for

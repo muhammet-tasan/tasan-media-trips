@@ -288,11 +288,12 @@ Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a Cap
 Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this project only, not global to other Claude Code projects. Full mechanism, usage, and limits documented in `docs/NOTIFICATIONS.md` — this section only tracks status.
 
 ### Status
-- [x] Built: `.claude/hooks/toggle.sh` (`UserPromptSubmit` hook — detects `/my-notification-on`, `notify:on`, `notify:off` in the submitted prompt) and `.claude/hooks/ntfy-ping.sh` (`Notification`/`Stop` hooks — pings only if this session's state is ON)
+- [x] Built: `.claude/hooks/toggle.sh` (`UserPromptSubmit` hook — only the exact first word `/my-notification-on` / `/my-notification-off` changes state; `SessionStart`/`SessionEnd` hooks reset and clean up state) and `.claude/hooks/ntfy-ping.sh` (`Notification`/`Stop` hooks — pings only if this session's state is ON)
 - [x] Command (originally `goal.md`, now the skill `.claude/skills/my-notification-on/`) turns notifications on automatically via the same `UserPromptSubmit` mechanism; goals themselves use Claude Code's built-in `/goal`
 - [x] Per-session state via `.claude/notify-state/<session_id>` (gitignored) — parallel sessions in this project never share on/off state, since `session_id` comes from the hook's own stdin JSON
 - [x] Pipe-tested both hook scripts against synthesized stdin payloads (on/off toggle, silent-when-off, normal prompts untouched) and against a real unreachable host (DNS failure resolved in <1s, hook still exited 0 — confirms hooks never block Claude if ntfy is unreachable)
 - [x] Sent real test notifications to `ntfy.sh/tasan-trips` (both the "needs input" and "task complete" message variants) and independently confirmed delivery via a direct curl call (ntfy.sh echoed the message back) — real push, not just a pipe-test
+- [x] **2026-11-24 bug fix — unwanted pings:** notifications are now off by default in every session, switched on only by the exact command `/my-notification-on` (off: `/my-notification-off`); see Lessons Learned. Tested with `scripts/test-notifications.sh` (stubbed curl) plus real end-to-end runs in fresh headless sessions (OFF → silent, ON → one real push)
 - [x] `docs/NOTIFICATIONS.md` written; linked from `CLAUDE.md`; `/my-list-commands` lists `/my-notification-on`
 
 ### Decisions / Design Notes
@@ -303,6 +304,11 @@ Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this
 - Known, accepted limitation: `Stop` also fires on `/clear`/`/resume`/`/compact`, not only genuine task completion — documented in `docs/NOTIFICATIONS.md` rather than worked around, since distinguishing them would add real complexity for a cosmetic extra ping
 - ntfy.sh topics are unauthenticated by default — `tasan-trips` is now in the committed repo, so it's a semi-public channel name, not a secret; documented as a known limitation rather than hidden in `settings.local.json`, since the user had already disclosed and tested this topic before asking for this feature
 - New settings.json may need a one-time `/hooks` reload or session restart to take effect, since it didn't exist in this project before this session
+
+## Lessons Learned (notifications)
+
+- **2026-11-24 — Unwanted ntfy pings.** What the evidence showed: the ntfy topic log held only our own fixed messages, all from sessions that had a state file; a fresh headless session stayed silent, so the per-session logic itself worked. Real weaknesses found: (1) state files were never cleaned up and are keyed by `session_id`, so a resumed old session (ids from 11-22/11-23 still existed) came back ON without the user switching it on; (2) the hook also switched on for the text `notify:on` anywhere in a prompt and for `/goal`/`/my-goal`, i.e. far more than the one intended trigger — quoting or discussing the feature could activate it; (3) once ON, every turn end, idle notice and each turn of a multi-turn `/goal` run pinged, which feels like "constantly"; (4) nothing stopped Claude's own tools from creating the state file.
+- **Prevention:** default OFF enforced by a `SessionStart` reset (startup/resume/clear) + `SessionEnd` cleanup + daily purge; activation only by the exact first word `/my-notification-on`; a `permissions.deny` rule keeps Claude from writing `.claude/notify-state/`; behaviour covered by `scripts/test-notifications.sh`. Rule of thumb: persistent "on" switches need an explicit reset point and a single narrow trigger — never substring matching.
 
 ## Lessons Learned (project memory itself)
 

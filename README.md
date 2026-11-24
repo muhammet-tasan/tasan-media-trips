@@ -22,6 +22,7 @@ CLAUDE.md              # Project documentation
 - `/my-continue-project` – Resume the active video at its exact step
 - `/my-daily-project-closeout` – End-of-session checkpoint
 - `/my-next-task` – Identify highest-impact work
+- `/my-notification-on` / `/my-notification-off` – Mobile push notifications for this session (off by default)
 - `/my-list-commands` – Show all commands
 
 See CLAUDE.md for full documentation.
