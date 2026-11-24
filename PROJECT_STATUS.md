@@ -9,13 +9,13 @@ Exactly one video is Active at any time. This block is the **only** place that h
 
 - **Slug:** `naturoparc`
 - **Title:** NaturOparC (Hunawihr, Elsass — Tier-/Naturpark)
-- **Phase:** Editing — CapCut rough cut (footage analysis, content review and final cut plan are done)
-- **Resume point:** Turn `analysis/naturoparc/FINAL_TIMELINE_PLAN.csv` (26 rows: hook → arrival → animals → close) into a CapCut rough cut as fast and automated as possible.
+- **Phase:** Editing — **user is creating the rough cut in CapCut** (Claude reviews it afterwards); footage analysis, content review and the editorial plan are done
+- **Resume point:** Waiting for the user's CapCut rough cut. When it exists (export MP4 and/or CapCut draft read-only), run `/my-review-roughcut` → `analysis/naturoparc/ROUGHCUT_REVIEW.md`. `analysis/naturoparc/FINAL_TIMELINE_PLAN.md/.csv` stays as an optional reference of Claude's earlier editorial suggestion, not a task list.
 - **Last decisions:** Hook = quick animal flash-cuts (~8s), no staircase climb; no recognizable family faces (`docs/PRODUCTION_STANDARDS.md` §2); watermark branding is a placeholder only, `TasanBrandIntro` not used; plan totals ~162s of raw clips vs. ~240s target, the gap is intentionally left for voice-over, info graphics and holds.
 - **Next steps (concrete):**
-  1. Decide the automation route for the rough cut (e.g. a script that trims and concatenates the plan's clips with the bundled FFmpeg into one rough-cut file for CapCut) — nothing built yet; CapCut draft files are undocumented, so a plain MP4/clip-folder import is the safe baseline.
-  2. Review/refine the rough cut in CapCut (hard cuts, hook timing).
-  3. Plan voice-over, then identify B-roll gaps (Route Check / Planning Check / Trip Score) — Remotion only after a concrete gap shows up.
+  1. User: create the rough cut in CapCut (scene selection is theirs); export a preview MP4 when ready.
+  2. Claude: `/my-review-roughcut` on that cut → time-based suggestions (`analysis/naturoparc/ROUGHCUT_REVIEW.md`), incl. overlooked scenes from the raw footage via the footage-analysis outputs and a privacy check (`docs/PRODUCTION_STANDARDS.md` §2).
+  3. User refines the cut; then plan voice-over, then identify B-roll gaps (Route Check / Planning Check / Trip Score) — Remotion only after a concrete gap shows up. Two plan clips (`…_0007_D.MP4`, `…_0055_D.MP4`) are missing from the `Raw/` folder; irrelevant unless the user wants them.
 - **Details:** `## Video: NaturOparC` below; plan in `analysis/naturoparc/FINAL_TIMELINE_PLAN.md`.
 
 ## Video Registry
@@ -32,9 +32,11 @@ Status values: **active** (exactly one) · **paused** · **done** (published) ·
 ## Project Overview
 YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCut editing, with Remotion used only to produce specific B-roll clips, maps, titles, or motion graphics that CapCut can't do natively.
 
-## Workflow (Corrected)
+## Workflow (Corrected, updated 2026-11-24)
 1. DJI Pocket 3 footage
-2. → Manual rough/final editing in **CapCut**
+2. → **User** selects scenes and creates the rough cut in **CapCut** (Claude does not build the cut)
+2b. → **Claude reviews the rough cut** with time-based suggestions (`/my-review-roughcut`, `docs/PRODUCTION_STANDARDS.md` §7); footage analysis helps find overlooked scenes
+2c. → User refines the cut in CapCut
 3. → Plan and record German voice-over
 4. → Identify places in the CapCut edit where additional B-roll / visual explanation is needed
 5. → Create *only those specific* B-roll clips, maps, titles, or motion graphics in **Remotion**
@@ -46,7 +48,8 @@ YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCu
 
 ## Production Workflow (Standard Template — applies to every video)
 
-### Phase 1 — CapCut Visual Cleanup
+### Phase 1 — Rough cut (user) + review (Claude)
+- The user creates the rough cut in CapCut; Claude reviews it via `/my-review-roughcut` (dramaturgy, image quality, retention, scene length, information, B-roll placement).
 - Review existing cuts; hard cuts are the default.
 - Use transitions only where they improve flow (short, subtle, motion-matched).
 - Avoid flashy transitions between every scene.
@@ -171,11 +174,12 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - [x] Footage sighted with `scripts/footage-analysis/` (metadata, 671 thumbnails, gallery, technical flags) — see `## Shared Tooling: Footage Analysis`
 - [x] Full editorial content review of all 54 clips → `analysis/naturoparc/content_review.md`, `editorial_editlist.csv`
 - [x] Editorial standards written (`docs/PRODUCTION_STANDARDS.md`) and applied → `analysis/naturoparc/FINAL_TIMELINE_PLAN.md` / `.csv` (supersedes `CAPCUT_INSTRUCTIONS.md`)
-- [ ] CapCut rough cut from the plan (active step; automation route open)
+- [ ] CapCut rough cut — **by the user** (active step); then Claude's review (`/my-review-roughcut`)
 - [ ] Info/B-roll planning for NaturOparC (prices, parking, visit duration, kids suitability, …)
 - [ ] Voice-over, music, watermark branding (standard documented, not yet built), final assembly and export
 
-### Rough-cut automation research (2026-11-24, nothing implemented yet)
+### Rough-cut automation research (2026-11-24) — PARKED, kept as knowledge
+Decision 2026-11-24: no automatic rough cut and no CapCut project generation; the user cuts, Claude reviews. The findings below stay for reference; see also `docs/CAPCUT_DRAFT_RESEARCH.md` (generated test project `TASAN_Test_3Clips` exists in CapCut's drafts folder; opening it was never confirmed; harmless to delete).
 Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/Raw/` (outside the repo, next to it):
 - Raw clips are HEVC Main10 (`yuv420p10le`, BT.709), 4K, ~83 Mbps, AAC audio, plus DJI data streams and an MJPEG cover image. **Keyframe every 1.001 s (GOP 30)** — so stream-copy cuts (`-c copy`, no re-encode, instant, zero quality loss) are possible with at most ~1 s granularity.
 - Bundled Remotion FFmpeg (n7.1) has `-c copy`, MP4/MOV muxers, `libx264`/`libx265`/`prores_ks`/`hevc_nvenc` encoders, but no `trim`/`select` filters (not needed for input-seek + stream copy).
@@ -188,6 +192,10 @@ Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/
 - See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24 entries in the Session Log.
 
 ## Session Log (all videos, newest first)
+
+**2026-11-24 [naturoparc / workflow]**
+- **Workflow change (binding for all videos):** the user selects scenes and cuts the rough cut in CapCut; Claude reviews it with concrete time-based suggestions (dramaturgy, image quality, retention, scene length, information, B-roll placement). Footage analysis is a supporting tool for finding overlooked scenes. CapCut project generation and FFmpeg rough-cut automation are parked (knowledge preserved in `docs/CAPCUT_DRAFT_RESEARCH.md`, `scripts/capcut-draft/`).
+- Updated `docs/PRODUCTION_STANDARDS.md` (new §7), `docs/FOOTAGE_ANALYSIS.md` (§10), `CLAUDE.md`, this file, the `/my-*` skills, and added the skill `/my-review-roughcut`.
 
 **2026-11-24 [tooling / notifications]**
 - Fixed unwanted ntfy pings and redesigned notifications as a per-task option (`/my-notification-on` anywhere in a prompt, bound to `prompt_id`, auto-reset after the task and at the next prompt; `/goal` alone arms nothing). One script `.claude/hooks/notify.py` replaces four shell scripts; `/my-notification-off` dropped. Root causes, empirical hook findings and rules in `## Lessons Learned (notifications)`.

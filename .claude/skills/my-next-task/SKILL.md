@@ -33,4 +33,4 @@ Identify the single highest-impact implementation step.
 Soll ich loslegen?
 ```
 
-Stay within the active video unless explicitly asked; avoid proposing work that isn't in `PROJECT_STATUS.md` or follows from it.
+Respect the workflow in `docs/PRODUCTION_STANDARDS.md` §7: the user selects scenes and cuts in CapCut; never propose building the rough cut or CapCut projects as the next task — propose reviewing the cut (`/my-review-roughcut`) or support work instead. Stay within the active video unless explicitly asked; avoid proposing work that isn't in `PROJECT_STATUS.md` or follows from it.

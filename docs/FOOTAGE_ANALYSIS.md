@@ -2,7 +2,9 @@
 
 **Reference implementation:** `scripts/footage-analysis/analyze.py` is the only script in this workflow so far. Consult it alongside this document before extending the pipeline.
 
-**Purpose:** sight raw DJI Osmo Pocket 3 footage fast — metadata, timestamped thumbnails, and an HTML gallery — before building a CapCut rough cut. This tool is separate from the Remotion/B-roll workflow: it never touches `src/`, never produces anything that gets imported into a Remotion composition, and has no relationship to CapCut's project format. It only produces things to *look at* while editing in CapCut.
+**Role since 2026-11-24:** a *supporting* tool. The user makes the scene selection and the CapCut rough cut; Claude reviews that cut (`docs/PRODUCTION_STANDARDS.md` §7). This tool's main remaining job is to help find **interesting scenes in the original footage that the rough cut overlooked** (§10). It does not build cuts or CapCut projects.
+
+**Purpose:** sight raw DJI Osmo Pocket 3 footage fast — metadata, timestamped thumbnails, and an HTML gallery. This tool is separate from the Remotion/B-roll workflow: it never touches `src/`, never produces anything that gets imported into a Remotion composition, and has no relationship to CapCut's project format. It only produces things to *look at* while editing in CapCut.
 
 ## 1. What this is not
 
@@ -109,3 +111,13 @@ python scripts/footage-analysis/analyze.py --slug <project-slug> --rebuild-galle
 ```
 
 The last step re-renders `gallery.html` so it picks up the flags `detect.py` just computed (the first `analyze.py` run already built a gallery, but without flags, since `detect.py` hadn't run yet). Use `--limit N` on the first command to test against a handful of clips before committing to a full run on a large folder — a 54-clip, 22-minute, 12.5GB NaturOparC shoot took roughly 30–35 minutes end to end on this machine, almost all of it in per-thumbnail 4K HEVC decode.
+
+## 10. Role in the current workflow: finding overlooked scenes (added 2026-11-24)
+
+After the user's rough cut exists, use the existing analysis outputs (`content_review.md`, `editorial_editlist.csv`, thumbnails/contact sheets, `metadata.json`) to answer: *which strong moments in the raw footage are not in the cut?*
+1. Get the cut's used source ranges: from the CapCut draft (read-only, `draft_content.json` → segments' `source_timerange` + material path; see `docs/CAPCUT_DRAFT_RESEARCH.md`) or, if only an export exists, by matching exported frames against the thumbnails.
+2. Subtract used ranges from the clips rated Hoch/Mittel in `editorial_editlist.csv` and from notable moments in `content_review.md`.
+3. Report candidates as `clip name | time range | what is visible | why it could help (hook, variety, info, B-roll cover)` — suggestions only; the user decides. Re-check family-privacy (`docs/PRODUCTION_STANDARDS.md` §2) for every candidate.
+4. Dense-frame extraction (§6.5) can be re-run for a specific clip/range when a moment might fall between the 2 s samples.
+
+Do **not** use this tool to assemble or order a cut; scene selection and sequence are the user's.

@@ -101,6 +101,34 @@ Nicht jede Grafik muss in jedem Video erscheinen — Auswahl nach tatsächlichem
 
 Anforderungen: einheitlich gestaltet, professionell und minimalistisch, gut lesbar, unterstützt den Film statt ihn zu unterbrechen, nach Möglichkeit über passendem Videomaterial eingeblendet. Google-Bewertungen müssen nachvollziehbar und korrekt wiedergegeben werden.
 
-## 7. Ausnahmen
+## 7. Produktions-Workflow: Rohschnitt durch den Nutzer, Review durch Claude
+
+Verbindlich für alle Videos (seit 2026-11-24).
+
+**Rollen**
+- **Nutzer:** wählt die Szenen aus und erstellt den Rohschnitt selbst in CapCut (kreative Hoheit über Auswahl, Reihenfolge, Länge). Claude schlägt keinen Rohschnitt vor, den es dann selbst baut, und generiert keine CapCut-Projekte.
+- **Claude:** analysiert den Rohschnitt und liefert konkrete, **zeitbasierte** Verbesserungsvorschläge. Entscheidungen bleiben beim Nutzer.
+
+**Eingaben für das Review** (in dieser Reihenfolge der Zuverlässigkeit)
+1. Export des Rohschnitts als MP4 (niedrige Auflösung genügt) — Claude sichtet ihn über zeitgestempelte Frames/Kontaktbögen (`scripts/footage-analysis/`) und, soweit verfügbar, den Ton.
+2. Optional: der CapCut-Entwurf (`draft_content.json`) **nur lesend** — liefert exakte Schnittliste (Quellclip, Ein-/Ausstieg, Timeline-Position). Format undokumentiert (siehe `docs/CAPCUT_DRAFT_RESEARCH.md`); nie schreiben, nie bestehende Entwürfe verändern.
+3. Optional: Voice-over-Skript/Stichpunkte, Zielvorgabe zur Länge.
+
+**Prüfdimensionen** — jede Anmerkung trägt einen Timecode (mm:ss, bei Bedarf Bereich) und ist einer Dimension zugeordnet:
+- **Dramaturgie** — Aufbau gemäß §5, Hook gemäß §4, Spannungsbogen, Wiederholungen, Abschluss.
+- **Bildqualität** — Schärfe, Belichtung, Wackler, Horizont, Farbanschluss zwischen Schnitten (technische Hinweise nur als Hinweise; Inhalt separat bewerten, vgl. `docs/FOOTAGE_ANALYSIS.md` §4).
+- **Zuschauerbindung** — Durchhänger, Tempo, Abwechslung, Momente mit Abbruchrisiko.
+- **Szenenlänge** — zu lang/zu kurz, relativ zum Inhalt (keine starren Sekundenregeln, §5).
+- **Informationsvermittlung** — wo fehlt praktische Information, wo ist sie schwer verständlich, Passung zum Voice-over.
+- **B-Roll-Platzierung** — wo eine Infografik/Karte/Titel einen echten Mehrwert hätte (Katalog §6), mit Vorschlag der Grafikart; Umsetzung in Remotion erst nach Freigabe und nach `docs/BROLL_GUIDELINES.md`.
+- **Privatsphäre (Pflichtprüfung)** — erkennbare Gesichter von Familienmitgliedern gemäß §2 melden.
+
+**Ausgabeformat** (`analysis/<slug>/ROUGHCUT_REVIEW.md`, bei Wiederholung versioniert, z. B. `ROUGHCUT_REVIEW_v2.md`): kurze Gesamteinschätzung (Länge, Struktur, 3 wichtigste Hebel), danach eine Tabelle `Timecode | Dimension | Beobachtung | Vorschlag | Priorität (Hoch/Mittel/Niedrig)`. Beobachtungen nennen, was tatsächlich zu sehen/hören war; Unsicheres wird als "nicht bestätigt" markiert, nicht geraten.
+
+**Rolle der Footage-Analyse:** unterstützendes Werkzeug, nicht Schnittersteller. Sie hilft vor allem dabei, **übersehene interessante Szenen im Originalmaterial** zu finden (Abgleich: verwendete Quellbereiche des Rohschnitts gegen `content_review.md`/Thumbnails/`editorial_editlist.csv` → ungenutzte starke Momente, jeweils mit Clipname und Zeitbereich vorgeschlagen). Details: `docs/FOOTAGE_ANALYSIS.md` §10.
+
+Skill: `/my-review-roughcut`.
+
+## 8. Ausnahmen
 
 Projektbezogene Abweichungen von diesen Standards sind zulässig, aber nur wenn redaktionell begründet und explizit dokumentiert — z. B. als Eintrag in `PROJECT_STATUS.md` zum jeweiligen Video. Keine stillschweigenden Abweichungen.

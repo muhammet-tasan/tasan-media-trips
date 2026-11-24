@@ -2,11 +2,11 @@
 
 This project creates YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and Remotion-powered motion graphics.
 
-**Editing workflow:** CapCut is the primary video editor — footage editing, voice-over sync, and final assembly/export all happen there. Remotion is used narrowly: it builds only specific B-roll clips, maps, titles, or motion graphics for gaps identified while editing in CapCut, then those renders are imported back into CapCut. Remotion does not organize raw footage or assemble the full video.
+**Editing workflow (since 2026-11-24):** CapCut is the primary video editor — **the user selects the scenes and creates the rough cut themselves**, and voice-over sync and final assembly/export also happen there. Claude does not build rough cuts or CapCut projects; its job is to **review the user's rough cut** and give concrete, time-based suggestions (dramaturgy, image quality, viewer retention, scene length, information, B-roll placement) via `/my-review-roughcut`. The footage-analysis tool stays as a supporting tool, mainly to find interesting scenes in the raw footage that the cut overlooked. Remotion is used narrowly: it builds only specific B-roll clips, maps, titles, or motion graphics for gaps identified while editing in CapCut, then those renders are imported back into CapCut. Remotion does not organize raw footage or assemble the full video.
 
 **Before starting any new B-roll:** read `docs/BROLL_GUIDELINES.md` and check for an existing relevant reference implementation (e.g. `src/mulhouse-automobile-museum/MulhouseRouteCheck.tsx` for geographic Route Check graphics) before writing any code. This is mandatory, not optional — it exists to avoid repeating the many visual/timing iterations the first Route Check needed.
 
-**Before planning or cutting any video (editorial work, not just B-rolls):** read `docs/PRODUCTION_STANDARDS.md`. It is the binding editorial standard for channel positioning, family-footage/privacy rules, the hook, storytelling/editing structure, and the reusable-infographics catalog — applies by default to every future video; project-specific exceptions must be documented, not silently taken.
+**Before reviewing a rough cut or giving any editorial advice (not just B-rolls):** read `docs/PRODUCTION_STANDARDS.md` (§7 defines the review workflow). It is the binding editorial standard for channel positioning, family-footage/privacy rules, the hook, storytelling/editing structure, and the reusable-infographics catalog — applies by default to every future video; project-specific exceptions must be documented, not silently taken.
 
 ## How to Work with This Project
 
@@ -28,7 +28,8 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 - **PROJECT_STATUS.md** – Persistent project memory (Active Video block, Video Registry, per-video sections, session log, lessons learned); updated at session end by `/my-daily-project-closeout`
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
 - **docs/PRODUCTION_STANDARDS.md** – Mandatory channel/editorial standards (positioning, family/privacy, branding concept, hook, storytelling structure, infographics catalog); consult before planning or cutting any video
-- **docs/FOOTAGE_ANALYSIS.md** – Local footage-sighting workflow (metadata/thumbnails/gallery for raw DJI clips); consult before extending `scripts/footage-analysis/`
+- **docs/FOOTAGE_ANALYSIS.md** – Supporting footage-sighting tool (metadata/thumbnails/gallery for raw DJI clips; §10: finding overlooked scenes); consult before extending `scripts/footage-analysis/`
+- **docs/CAPCUT_DRAFT_RESEARCH.md** – PARKED research on generating CapCut projects; preserved knowledge only, do not build on it. Reading a CapCut draft read-only for review is fine
 - **docs/NOTIFICATIONS.md** – Optional mobile push notifications (ntfy.sh) for this project; per-task option `/my-notification-on`, off by default (run `python3 scripts/test-notifications.py` after touching the hooks)
 - **.claude/skills/** – Workflow skills (slash commands) for project management (includes `/my-notification-on`)
 - **.claude/hooks/** – Notification hooks for this project only (see `docs/NOTIFICATIONS.md`); not global to other Claude Code projects
