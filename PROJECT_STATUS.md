@@ -25,9 +25,9 @@ Status values: **active** (exactly one) · **paused** · **done** (published) ·
 | Slug | Title | Status | Phase / state | Details |
 |---|---|---|---|---|
 | `naturoparc` | NaturOparC | **active** | CapCut rough cut next | `## Video: NaturOparC`, `analysis/naturoparc/` |
-| `mulhouse-automobile-museum` | Mulhouse Automobile Museum | paused | B-rolls Route Check + Trip Score + brand intro built; CapCut Phase 1/2, Cost/Trip/Planning Check, music, VO, export still open | `## Video: Mulhouse Automobile Museum`, `src/mulhouse-automobile-museum/` |
+| `mulhouse-automobile-museum` | Mulhouse Automobile Museum | done | Completed (confirmed by user 2026-11-24); history and B-roll assets kept in its section | `## Video: Mulhouse Automobile Museum`, `src/mulhouse-automobile-museum/` |
 
-*Status evidence (2026-11-24 audit): the newest commits (2026-11-22…24) are all NaturOparC analysis/plan work; the last Mulhouse-specific commit was 2026-09-13 (the 2026-11-22 brand-intro fix is shared tooling). "paused" for Mulhouse is inferred from that plus the user stating NaturOparC is the current video.*
+*Status evidence (2026-11-24): the newest commits (2026-11-22…24) are all NaturOparC analysis/plan work; the last Mulhouse-specific commit was 2026-09-13. The user confirmed on 2026-11-24 that Mulhouse is fully completed (`done`), not paused. Earlier today this was wrongly inferred as "paused" from git history alone — see Lessons Learned.*
 
 ## Project Overview
 YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCut editing, with Remotion used only to produce specific B-roll clips, maps, titles, or motion graphics that CapCut can't do natively.
@@ -86,7 +86,7 @@ Final German voice-over added near the end, but narration topics/approximate tim
 
 ## Video: Mulhouse Automobile Museum (slug `mulhouse-automobile-museum`)
 
-> **Registry status: paused** (see Video Registry). Last real Mulhouse work: brand intro fix, 2026-11-22. Open items below are still valid but not the current focus.
+> **Registry status: done** — completed, confirmed by the user on 2026-11-24. The unchecked items, "Blocked/In Progress" and "Next Steps" below are the **historical** planning state from before completion; they are no longer open work. Kept for reference (the B-roll components and decisions remain the reference implementation for future videos).
 
 ### Status
 - [x] Main Pocket 3 footage manually cut in CapCut
@@ -179,6 +179,10 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24 entries in the Session Log.
 
 ## Session Log (all videos, newest first)
+
+**2026-11-24 [mulhouse-automobile-museum / naturoparc]**
+- User confirmed Mulhouse is fully completed → registry status `done` (was wrongly inferred as `paused`); banner in the Mulhouse section marks its open items as historical; auto-memory updated; new lesson: git history can't tell paused from done, ask instead of inferring.
+- Tested the rewritten skills in fresh headless sessions (`claude -p`, with `MSYS_NO_PATHCONV=1` under Git Bash so `/my-…` isn't turned into a path): `/my-project-status` and `/my-continue-project` both identified NaturOparC as active, Mulhouse as done, and cross-checked git. FFmpeg rough-cut script deliberately NOT built yet — automation approach to be discussed first.
 
 **2026-11-24 [naturoparc / project memory]**
 - Fixed project memory: `/my-project-status` showed Mulhouse although NaturOparC is the active video. Restructured this file into Active Video block + Video Registry + per-video sections + cross-video log + Lessons Learned (causes and prevention rules in `## Lessons Learned`).
@@ -304,4 +308,5 @@ Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this
 
 - **2026-11-24 — Status showed Mulhouse although NaturOparC was being worked on.** Causes: (1) the status file had one hard-coded `## Current Video: Mulhouse` section, so a second video had no home — NaturOparC was filed under "Shared Tooling" and only mentioned in a one-line "Current Phase" blob; (2) `CLAUDE.md` listed only Mulhouse under "Videos in Progress"; (3) the skills' output templates literally contained "Mulhouse Automobile Museum" and told Claude to avoid anything outside the status file; (4) closeout only appended to the log and never re-stated *which* video is active or where to resume; (5) the auto-memory note still said "nothing exists for NaturOparC". Fix: one Active Video block + a Video Registry as the single source of truth; skills read them generically (no video names), cross-check against `git log`, and closeout must refresh both.
 - **Rules that prevent a repeat:** never hard-code a video name in a skill or in `CLAUDE.md`; per-video state lives only in its own section; the resume point lives only in `## ▶ Active Video`; when evidence (git history, files in `analysis/<slug>/`, `src/<slug>/`) disagrees with the status file, trust the evidence, fix the file, and tell the user; starting a new video means adding a registry row and flipping statuses in the same closeout.
+- **Git history can't distinguish "paused" from "done".** Mulhouse was first inferred as `paused` from the lack of recent commits, but it was finished. When a video's status is not documented, ask the user instead of inferring it; record the user's answer in the registry.
 - **Don't track a video as "tooling".** If work produces per-video artifacts (`analysis/<slug>/`, `src/<slug>/`, `out/<slug>/`), the video needs a registry row and a section — shared tooling sections describe tools only.
