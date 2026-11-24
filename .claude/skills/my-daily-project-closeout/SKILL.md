@@ -7,18 +7,24 @@ disable-model-invocation: true
 
 Standardize end-of-session checkpoints to preserve project continuity.
 
-## Six-Step Workflow
+## Workflow (Step 0 + six steps)
 
-### 1. Status Documentation
-- Update PROJECT_STATUS.md with:
-  - What was implemented this session
-  - Current milestones (completed / in progress / blocked)
-  - New decisions made
-  - Updated next steps (prioritized)
-  - Any architectural notes discovered
+### 0. Identify the video worked on (always first)
+- Determine which video this session actually worked on from evidence: files changed (`git status`, `git diff --stat`), paths touched (`src/<slug>/`, `analysis/<slug>/`, `out/<slug>/`) and the conversation. Never assume it is the video that was marked active.
+- Compare with `## ▶ Active Video` in `PROJECT_STATUS.md`. If different: ask the user whether this is a switch of the active video (then flip registry statuses: new one **active**, previous one **paused**/**done**) or a side task.
+- New video started this session (new slug)? Add a row to `## Video Registry` and a `## Video: <title>` section — not a "Shared Tooling" entry.
+
+### 1. Status Documentation (single source of truth, no duplicates)
+Update `PROJECT_STATUS.md` in these places only:
+- `## ▶ Active Video`: **Phase**, **Resume point** (exactly where the next session starts), **Last decisions** (decisions made this session, with the why), **Next steps (concrete)** — 1–3 actionable steps that name files/commands, not vague topics
+- `## Video Registry`: status + one-line state for the video worked on (and any video whose status changed)
+- The worked-on video's `## Video: <title>` section: tick/add checklist items, record decisions and gotchas specific to that video
+- `**Last Updated:**` date in the header
+Do NOT create extra status/notes files, and do not copy the resume point into other documents (CLAUDE.md, README, memory) — link to it instead.
 
 ### 2. Session Logging
-- Timestamp: today's date
+Add one entry to `## Session Log (all videos, newest first)` at the top, tagged with the video slug:
+- Date and `[slug]`
 - What was completed (bullet list)
 - Architectural choices made (why, not just what)
 - Standards or patterns established
@@ -27,7 +33,8 @@ Standardize end-of-session checkpoints to preserve project continuity.
 ### 3. Standards Extraction
 - Document any successful patterns found
 - Note anti-patterns to avoid
-- Update CLAUDE.md if new guidance emerged
+- Update CLAUDE.md if new guidance emerged (rules only — never a list of videos or their status)
+- If the lesson is about the project memory itself, add it to `## Lessons Learned` in `PROJECT_STATUS.md`
 - Link related decisions for future reference
 
 ### 4. Structure Validation
@@ -35,6 +42,8 @@ Standardize end-of-session checkpoints to preserve project continuity.
 - [ ] All assets in proper locations (public/, src/, etc.)
 - [ ] No duplicate content or outdated code
 - [ ] Documentation matches folder organization
+- [ ] Exactly one video is `active` in the registry, and it matches the `## ▶ Active Video` block
+- [ ] No video name hard-coded in skills or CLAUDE.md
 - [ ] .gitignore is up to date
 
 ### 5. Git Preparation
@@ -44,6 +53,7 @@ Standardize end-of-session checkpoints to preserve project continuity.
 - Do NOT push automatically; wait for explicit user confirmation
 
 ### 6. Continuity Preservation
+- Read the `## ▶ Active Video` block back as if you were a fresh session: could `/my-continue-project` resume from it without this chat? If not, fix it now
 - Ensure PROJECT_STATUS.md is complete and readable for next session
 - Document any edge cases or gotchas
 - Note if external dependencies (footage, assets) are needed
@@ -56,14 +66,15 @@ Present a summary table:
 
 | Step | Status | Notes |
 |------|--------|-------|
-| Status updated | ✓ | [brief note] |
+| Video identified | ✓ | [slug, switched/unchanged] |
+| Status updated | ✓ | [Active block + registry + video section] |
 | Logged session | ✓ | [brief note] |
 | Standards extracted | ✓ | [brief note] |
 | Structure validated | ✓ | [brief note] |
 | Git ready | ✓ | [commit message] |
 | Continuity preserved | ✓ | [brief note] |
 
-**Next session:** Can resume from PROJECT_STATUS.md next steps
+**Next session:** resumes on <active video slug> at <resume point>
 ```
 
 ## Key Principles

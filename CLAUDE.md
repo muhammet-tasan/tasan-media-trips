@@ -25,7 +25,7 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 `src/Root.tsx` and `src/index.ts` stay at the `src/` root as application-level entry files.
 
 ### Key Files
-- **PROJECT_STATUS.md** – Persistent project memory; updated at session end
+- **PROJECT_STATUS.md** – Persistent project memory (Active Video block, Video Registry, per-video sections, session log, lessons learned); updated at session end by `/my-daily-project-closeout`
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
 - **docs/PRODUCTION_STANDARDS.md** – Mandatory channel/editorial standards (positioning, family/privacy, branding concept, hook, storytelling structure, infographics catalog); consult before planning or cutting any video
 - **docs/FOOTAGE_ANALYSIS.md** – Local footage-sighting workflow (metadata/thumbnails/gallery for raw DJI clips); consult before extending `scripts/footage-analysis/`
@@ -42,10 +42,8 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 - **Resumability** – Future sessions inherit full context
 - **Simplicity** – Only add what serves the workflow
 
-## Videos in Progress
-
-### Mulhouse Automobile Museum
-First production video; status tracked in PROJECT_STATUS.md.
+## Videos
+Which video is active, which are paused/done/planned, and where to resume are tracked **only** in `PROJECT_STATUS.md` (`## ▶ Active Video` + `## Video Registry`). Do not list videos or their status here — it goes stale. The `/my-*` skills read that structure generically and verify it against git history; trust evidence over a stale status file and fix the file.
 
 ## Technical Setup
 - **Remotion:** React-based video composition

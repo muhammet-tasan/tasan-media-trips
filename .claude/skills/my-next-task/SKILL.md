@@ -8,8 +8,8 @@ disable-model-invocation: true
 Identify the single highest-impact implementation step.
 
 ## Process
-1. Read PROJECT_STATUS.md
-2. Review pending items and architectural notes
+1. Read `PROJECT_STATUS.md`: `## ▶ Active Video` first (its **Next steps** are the candidates), then the active video's section and architectural notes. Never default to a video just because it appears first in the file.
+2. Cross-check with `git log -5` that the active video is really the one being worked on; flag a mismatch
 3. Identify the one task that unblocks the most downstream work
 4. Explain why it's the priority
 5. Specify required inputs and expected outputs
@@ -33,4 +33,4 @@ Identify the single highest-impact implementation step.
 Soll ich loslegen?
 ```
 
-Avoid proposing work outside PROJECT_STATUS.md unless explicitly asked.
+Stay within the active video unless explicitly asked; avoid proposing work that isn't in `PROJECT_STATUS.md` or follows from it.

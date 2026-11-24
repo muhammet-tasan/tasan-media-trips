@@ -1,7 +1,33 @@
 # TASAN MEDIA Trips — Project Status
 
-**Last Updated:** 2026-11-24  
-**Current Phase:** Route Check and Trip Score B-rolls built and rendered; project reorganized under canonical slugs; TASAN brand intro built; local repo connected to GitHub. Footage-analysis tool (`scripts/footage-analysis/`) built and run against the full NaturOparC raw footage (54 clips, 22 min) — technical pipeline, a full editorial content-review pass, and now a final editorial cut plan (`analysis/naturoparc/FINAL_TIMELINE_PLAN.md`/`.csv`, superseding `CAPCUT_INSTRUCTIONS.md`) are all done; NaturOparC is ready for a CapCut rough cut. New: binding channel-wide editorial standards in `docs/PRODUCTION_STANDARDS.md` (positioning, family/privacy, hook, storytelling structure, infographics catalog, and a documented-but-not-yet-built watermark branding standard) apply by default to every future video. Also: optional mobile push notifications (`/goal`, `notify:on`/`notify:off`, see `docs/NOTIFICATIONS.md`), scoped to this project only. CapCut Phase 1/2 and remaining Mulhouse B-rolls (Cost Check, Trip Check, Planning Check) still next for the first video.
+**Last Updated:** 2026-11-24
+**How to read this file:** (1) `## ▶ Active Video` is the single resume point. (2) `## Video Registry` lists every video and its status. (3) Details per video live in their own `## Video: …` section. Shared tooling and the cross-video log come after. The skills `/my-project-status`, `/my-continue-project`, `/my-next-task` and `/my-daily-project-closeout` read this structure — keep the headings and field names below intact.
+
+## ▶ Active Video
+
+Exactly one video is Active at any time. This block is the **only** place that holds the resume point; the registry status must agree with it. Update it at every closeout (and whenever the user switches videos).
+
+- **Slug:** `naturoparc`
+- **Title:** NaturOparC (Hunawihr, Elsass — Tier-/Naturpark)
+- **Phase:** Editing — CapCut rough cut (footage analysis, content review and final cut plan are done)
+- **Resume point:** Turn `analysis/naturoparc/FINAL_TIMELINE_PLAN.csv` (26 rows: hook → arrival → animals → close) into a CapCut rough cut as fast and automated as possible.
+- **Last decisions:** Hook = quick animal flash-cuts (~8s), no staircase climb; no recognizable family faces (`docs/PRODUCTION_STANDARDS.md` §2); watermark branding is a placeholder only, `TasanBrandIntro` not used; plan totals ~162s of raw clips vs. ~240s target, the gap is intentionally left for voice-over, info graphics and holds.
+- **Next steps (concrete):**
+  1. Decide the automation route for the rough cut (e.g. a script that trims and concatenates the plan's clips with the bundled FFmpeg into one rough-cut file for CapCut) — nothing built yet; CapCut draft files are undocumented, so a plain MP4/clip-folder import is the safe baseline.
+  2. Review/refine the rough cut in CapCut (hard cuts, hook timing).
+  3. Plan voice-over, then identify B-roll gaps (Route Check / Planning Check / Trip Score) — Remotion only after a concrete gap shows up.
+- **Details:** `## Video: NaturOparC` below; plan in `analysis/naturoparc/FINAL_TIMELINE_PLAN.md`.
+
+## Video Registry
+
+Status values: **active** (exactly one) · **paused** · **done** (published) · **planned**. Add a row when a new video starts; never delete rows.
+
+| Slug | Title | Status | Phase / state | Details |
+|---|---|---|---|---|
+| `naturoparc` | NaturOparC | **active** | CapCut rough cut next | `## Video: NaturOparC`, `analysis/naturoparc/` |
+| `mulhouse-automobile-museum` | Mulhouse Automobile Museum | paused | B-rolls Route Check + Trip Score + brand intro built; CapCut Phase 1/2, Cost/Trip/Planning Check, music, VO, export still open | `## Video: Mulhouse Automobile Museum`, `src/mulhouse-automobile-museum/` |
+
+*Status evidence (2026-11-24 audit): the newest commits (2026-11-22…24) are all NaturOparC analysis/plan work; the last Mulhouse-specific commit was 2026-09-13 (the 2026-11-22 brand-intro fix is shared tooling). "paused" for Mulhouse is inferred from that plus the user stating NaturOparC is the current video.*
 
 ## Project Overview
 YouTube trip videos combining DJI Pocket 3 footage, German voice-over, and CapCut editing, with Remotion used only to produce specific B-roll clips, maps, titles, or motion graphics that CapCut can't do natively.
@@ -58,7 +84,9 @@ Add background music in CapCut after B-roll/visual structure is set; preserve us
 ### Phase 5 — Voice-over
 Final German voice-over added near the end, but narration topics/approximate timing are planned before finalizing B-roll so visuals support narration. Voice-over adds information/opinion — it must not just describe what's visible (bad: "here we see an old car"; better: why it matters + practical visitor info). After narration: duck music under speech, balance ambience, final audio cleanup, subtitles if useful, final YouTube export.
 
-## Current Video: Mulhouse Automobile Museum
+## Video: Mulhouse Automobile Museum (slug `mulhouse-automobile-museum`)
+
+> **Registry status: paused** (see Video Registry). Last real Mulhouse work: brand intro fix, 2026-11-22. Open items below are still valid but not the current focus.
 
 ### Status
 - [x] Main Pocket 3 footage manually cut in CapCut
@@ -135,7 +163,35 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - `Root.tsx` still declares a `MulhouseTest` composition (plain placeholder text, no asset or render dependency) left over from initial Remotion setup — it is dead code, unreferenced by any render or doc, and was deliberately left untouched during this cleanup since it is harmless; remove it the next time `Root.tsx` is touched for an actual composition change.
 - GitHub remote: `https://github.com/muhammet-tasan/tasan-media-trips`, branch `main`, upstream tracking configured. No automatic push — pushes remain an explicit, reviewed step per session (see `CLAUDE.md` principles).
 
-### Session Log
+## Video: NaturOparC (slug `naturoparc`)
+
+> **Registry status: active.** Raw footage: 54 DJI Pocket 3 clips (~22 min, 3840×2160) + 2 stills; not committed. No `src/naturoparc/` or `out/naturoparc/` yet — create only when a Remotion B-roll is actually needed (per the slug convention in `CLAUDE.md`).
+
+### Status
+- [x] Footage sighted with `scripts/footage-analysis/` (metadata, 671 thumbnails, gallery, technical flags) — see `## Shared Tooling: Footage Analysis`
+- [x] Full editorial content review of all 54 clips → `analysis/naturoparc/content_review.md`, `editorial_editlist.csv`
+- [x] Editorial standards written (`docs/PRODUCTION_STANDARDS.md`) and applied → `analysis/naturoparc/FINAL_TIMELINE_PLAN.md` / `.csv` (supersedes `CAPCUT_INSTRUCTIONS.md`)
+- [ ] CapCut rough cut from the plan (active step; automation route open)
+- [ ] Info/B-roll planning for NaturOparC (prices, parking, visit duration, kids suitability, …)
+- [ ] Voice-over, music, watermark branding (standard documented, not yet built), final assembly and export
+
+### Decisions Made
+- See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24 entries in the Session Log.
+
+## Session Log (all videos, newest first)
+
+**2026-11-24 [naturoparc / project memory]**
+- Fixed project memory: `/my-project-status` showed Mulhouse although NaturOparC is the active video. Restructured this file into Active Video block + Video Registry + per-video sections + cross-video log + Lessons Learned (causes and prevention rules in `## Lessons Learned`).
+- Rewrote `/my-project-status`, `/my-continue-project`, `/my-next-task` to read the Active block generically and cross-check `git log`; `/my-daily-project-closeout` gained Step 0 (identify the video worked on) and must refresh Active block + registry. `CLAUDE.md` no longer lists videos.
+- Removed redundant `### Last Session Summary`; corrected stale `/goal` references in the Notifications section; updated the NaturOparC auto-memory note.
+- Verified structurally (exactly one active row, matches Active slug, each row has a section). Not yet verified in a fresh session: that the rewritten skills show NaturOparC first.
+
+**2026-11-24**
+- Renamed all six custom commands to a `my-` prefix (`/my-project-status`, `/my-continue-project`, `/my-next-task`, `/my-daily-project-closeout`, `/my-list-commands`, `/my-notification-on`) via `git mv` in `.claude/commands/`, and updated live references in `CLAUDE.md`, `README.md`, `docs/NOTIFICATIONS.md` and the command files themselves.
+- Later the same day: moved all six from `.claude/commands/*.md` to `.claude/skills/<name>/SKILL.md` (with `disable-model-invocation: true`, so they stay user-triggered only).
+- Gotcha: `.claude/hooks/toggle.sh` matches the prompt prefix to switch notifications on, so it now matches `/my-notification-on*`; `/my-goal` was later renamed to `/my-notification-on` (notifications only; goals use the built-in `/goal`). Older log entries above deliberately keep the historical command names.
+- Not re-verified end-to-end: the `/my-notification-on` → notifications-on link in a fresh session (new command names are likely only listed after a restart).
+- Committed the previously uncommitted `docs/PRODUCTION_STANDARDS.md` and the NaturOparC `FINAL_TIMELINE_PLAN` files together with the rename.
 
 **2026-11-23**
 - **Established binding, channel-wide editorial production standards** in new `docs/PRODUCTION_STANDARDS.md`, covering: channel positioning (TASAN Trips is explicitly NOT a family vlog), family-footage/privacy rules (no recognizable faces of family members; focus on activity/hands/animal, not person; checked before every final cut, not pre-planned into the edit just because footage exists), a new branding concept (TASAN wordmark → shrinks → glides into a subtle watermark position, documented as a future standard only — **not implemented this session**, existing `TasanBrandIntro` left untouched), a hook standard (~6–10s, no narration, strongest footage first), a storytelling/editing structure (hook → orientation → sights → info → practical visitor info → honest verdict → close; mostly hard cuts, quality over quantity, no rigid per-shot second rules), and a cross-reference (not a duplicate) to the existing reusable-infographics catalog already defined in this file's Phase 3 and in `docs/BROLL_GUIDELINES.md`.
@@ -194,16 +250,6 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - Updated CLAUDE.md to reflect Remotion's narrow, on-demand role alongside CapCut as primary editor.
 - No code or Remotion components changed this session; documentation/workflow correction only.
 
-**2026-11-24**
-- Renamed all six custom commands to a `my-` prefix (`/my-project-status`, `/my-continue-project`, `/my-next-task`, `/my-daily-project-closeout`, `/my-list-commands`, `/my-notification-on`) via `git mv` in `.claude/commands/`, and updated live references in `CLAUDE.md`, `README.md`, `docs/NOTIFICATIONS.md` and the command files themselves.
-- Later the same day: moved all six from `.claude/commands/*.md` to `.claude/skills/<name>/SKILL.md` (with `disable-model-invocation: true`, so they stay user-triggered only).
-- Gotcha: `.claude/hooks/toggle.sh` matches the prompt prefix to switch notifications on, so it now matches `/my-notification-on*`; `/my-goal` was later renamed to `/my-notification-on` (notifications only; goals use the built-in `/goal`). Older log entries above deliberately keep the historical command names.
-- Not re-verified end-to-end: the `/my-notification-on` → notifications-on link in a fresh session (new command names are likely only listed after a restart).
-- Committed the previously uncommitted `docs/PRODUCTION_STANDARDS.md` and the NaturOparC `FINAL_TIMELINE_PLAN` files together with the rename.
-
-### Last Session Summary
-Connected the local repository to GitHub (first push to a previously-empty remote, no history conflicts), hardened `.gitignore`, and committed a pending `TasanBrandIntro` fix (lighten-blend background matching). Found and corrected documentation drift that had accumulated across three undocumented sessions (TripScore v2 approval, the project-slug reorganization, and the TasanBrandIntro build) — `PROJECT_STATUS.md` now reflects the real current state, and stale `src/MulhouseRouteCheck.tsx`-style paths in `CLAUDE.md`/`docs/BROLL_GUIDELINES.md` were corrected to the post-reorg location.
-
 ## Shared Tooling: Footage Analysis
 
 Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a CapCut rough cut — separate from the Remotion/B-roll workflow, touches no `src/` composition code. Full design, decisions, and limitations are in `docs/FOOTAGE_ANALYSIS.md`; this section only tracks status.
@@ -218,7 +264,7 @@ Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a Cap
 - [x] Claude content-review spot-checks across the full set during calibration — confirmed the detection logic against real frames, including one notable case worth remembering: an underwater viewing-window shot got a technical `blurry` flag (low edge detail in murky green water) while being, by actual content, a strong and usable establishing/atmosphere shot — the clearest real example yet of why `docs/FOOTAGE_ANALYSIS.md` §4 keeps technical flags and content judgment strictly separate
 - [x] **Full editorial content-review pass completed, all 54 clips** — built `contact_sheet.py` (tiles every thumbnail of a clip into one labeled grid image, so one image read covers a whole clip instead of dozens) and read one contact sheet per clip; extracted additional 0.5s-spaced frames for the otter tunnel, stork enclosure, and tower-top view where a fast/subtle moment could fall between the standard 2s samples. Confirmed sightings: turtles, koi being fed, black swans (walking + drinking), a goat being hand-fed, a stork nest, varied fish in the indoor aquarium tunnel, and — only via the extra dense frames — an otter actually swimming, invisible in the standard 2s thumbnails. Several contents stayed honestly unconfirmed (distant birds in the open enclosure plausibly storks, a rodent species plausibly capybara) rather than asserted without reliable visual evidence.
 - [x] Three editorial outputs written: `analysis/naturoparc/content_review.md` (full per-clip analysis, nothing dropped), `analysis/naturoparc/editorial_editlist.csv` (prioritized cut list — Hoch/Mittel/Niedrig — with filename/start/end/duration/description/priority/justification), `analysis/naturoparc/CAPCUT_INSTRUCTIONS.md` (proposed running order + practical CapCut steps). Hoch+Mittel priority alone totals 212s (3:32) of raw footage, a realistic base for an "ungefähr vier Minuten" video once intro/transitions are added.
-- [ ] Apply the editorial edit list to an actual CapCut rough cut (next real use of this tool's output)
+- [ ] Apply the cut plan to an actual CapCut rough cut — tracked as the active step in `## Video: NaturOparC`
 
 ### Key Decisions (confirmed by user)
 - Detection approach: Pillow + numpy on bundled-FFmpeg frame samples, not a system-wide FFmpeg install (keeps the tool fully self-contained, no new system dependency)
@@ -238,12 +284,12 @@ Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a Cap
 Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this project only, not global to other Claude Code projects. Full mechanism, usage, and limits documented in `docs/NOTIFICATIONS.md` — this section only tracks status.
 
 ### Status
-- [x] Built: `.claude/hooks/toggle.sh` (`UserPromptSubmit` hook — detects `/goal`, `notify:on`, `notify:off` in the submitted prompt) and `.claude/hooks/ntfy-ping.sh` (`Notification`/`Stop` hooks — pings only if this session's state is ON)
-- [x] `.claude/commands/goal.md` added (`/goal` didn't exist yet — checked first) — turns notifications on automatically via the same `UserPromptSubmit` mechanism, no separate code path
+- [x] Built: `.claude/hooks/toggle.sh` (`UserPromptSubmit` hook — detects `/my-notification-on`, `notify:on`, `notify:off` in the submitted prompt) and `.claude/hooks/ntfy-ping.sh` (`Notification`/`Stop` hooks — pings only if this session's state is ON)
+- [x] Command (originally `goal.md`, now the skill `.claude/skills/my-notification-on/`) turns notifications on automatically via the same `UserPromptSubmit` mechanism; goals themselves use Claude Code's built-in `/goal`
 - [x] Per-session state via `.claude/notify-state/<session_id>` (gitignored) — parallel sessions in this project never share on/off state, since `session_id` comes from the hook's own stdin JSON
 - [x] Pipe-tested both hook scripts against synthesized stdin payloads (on/off toggle, silent-when-off, normal prompts untouched) and against a real unreachable host (DNS failure resolved in <1s, hook still exited 0 — confirms hooks never block Claude if ntfy is unreachable)
 - [x] Sent real test notifications to `ntfy.sh/tasan-trips` (both the "needs input" and "task complete" message variants) and independently confirmed delivery via a direct curl call (ntfy.sh echoed the message back) — real push, not just a pipe-test
-- [x] `docs/NOTIFICATIONS.md` written; linked from `CLAUDE.md`; `/list-commands` updated to include `/goal`
+- [x] `docs/NOTIFICATIONS.md` written; linked from `CLAUDE.md`; `/my-list-commands` lists `/my-notification-on`
 
 ### Decisions / Design Notes
 - No `jq` installed on this machine — both hook scripts parse the hook JSON via `python3` instead (already a project dependency from the footage-analysis tool), so no new dependency was added for this feature either
@@ -253,3 +299,9 @@ Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this
 - Known, accepted limitation: `Stop` also fires on `/clear`/`/resume`/`/compact`, not only genuine task completion — documented in `docs/NOTIFICATIONS.md` rather than worked around, since distinguishing them would add real complexity for a cosmetic extra ping
 - ntfy.sh topics are unauthenticated by default — `tasan-trips` is now in the committed repo, so it's a semi-public channel name, not a secret; documented as a known limitation rather than hidden in `settings.local.json`, since the user had already disclosed and tested this topic before asking for this feature
 - New settings.json may need a one-time `/hooks` reload or session restart to take effect, since it didn't exist in this project before this session
+
+## Lessons Learned (project memory itself)
+
+- **2026-11-24 — Status showed Mulhouse although NaturOparC was being worked on.** Causes: (1) the status file had one hard-coded `## Current Video: Mulhouse` section, so a second video had no home — NaturOparC was filed under "Shared Tooling" and only mentioned in a one-line "Current Phase" blob; (2) `CLAUDE.md` listed only Mulhouse under "Videos in Progress"; (3) the skills' output templates literally contained "Mulhouse Automobile Museum" and told Claude to avoid anything outside the status file; (4) closeout only appended to the log and never re-stated *which* video is active or where to resume; (5) the auto-memory note still said "nothing exists for NaturOparC". Fix: one Active Video block + a Video Registry as the single source of truth; skills read them generically (no video names), cross-check against `git log`, and closeout must refresh both.
+- **Rules that prevent a repeat:** never hard-code a video name in a skill or in `CLAUDE.md`; per-video state lives only in its own section; the resume point lives only in `## ▶ Active Video`; when evidence (git history, files in `analysis/<slug>/`, `src/<slug>/`) disagrees with the status file, trust the evidence, fix the file, and tell the user; starting a new video means adding a registry row and flipping statuses in the same closeout.
+- **Don't track a video as "tooling".** If work produces per-video artifacts (`analysis/<slug>/`, `src/<slug>/`, `out/<slug>/`), the video needs a registry row and a section — shared tooling sections describe tools only.

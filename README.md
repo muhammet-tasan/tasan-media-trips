@@ -18,8 +18,8 @@ CLAUDE.md              # Project documentation
 ```
 
 ## Quick Start
-- `/my-project-status` – Current project phase and status
-- `/my-continue-project` – Resume work and get next steps
+- `/my-project-status` – Active video first, then other videos
+- `/my-continue-project` – Resume the active video at its exact step
 - `/my-daily-project-closeout` – End-of-session checkpoint
 - `/my-next-task` – Identify highest-impact work
 - `/my-list-commands` – Show all commands

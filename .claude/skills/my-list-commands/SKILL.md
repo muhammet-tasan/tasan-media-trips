@@ -11,9 +11,9 @@ Lists all available project management commands.
 
 This project includes six specialized commands to streamline workflow:
 
-1. **`/my-project-status`** — Current phase, completed tasks, and planned next steps (reads PROJECT_STATUS.md)
+1. **`/my-project-status`** — Active video first (phase, resume point, next steps), then other videos; verified against git history
 
-2. **`/my-continue-project`** — Resumes from PROJECT_STATUS.md and asks for next work direction
+2. **`/my-continue-project`** — Resumes the active video at its exact work step (reads PROJECT_STATUS.md, checks git history)
 
 3. **`/my-next-task`** — Identifies the single highest-impact implementation step to prioritize
 
