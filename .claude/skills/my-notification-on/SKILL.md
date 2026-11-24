@@ -1,31 +1,26 @@
 ---
 name: my-notification-on
-description: Turn on ntfy.sh mobile push notifications for this session (handled by toggle.sh hook)
+description: Mark a task so that ntfy.sh push notifications are sent for this task only; combinable with other commands, e.g. "/goal /my-notification-on <condition>"
 disable-model-invocation: true
 ---
 # /my-notification-on
 
-Turns on mobile push notifications (ntfy.sh, topic `tasan-trips`) for **this
-session only**, so you can step away from the terminal and still get pinged
-when Claude needs input or finishes a turn.
+A **per-task option**, not a session setting. The token `/my-notification-on`
+anywhere in a prompt (standalone, e.g. `/goal /my-notification-on <Bedingung>`
+or `/my-notification-on <Auftrag>`) makes the hooks send ntfy.sh pushes
+(topic `tasan-trips`) for **that task only**. When the task finishes or the next
+prompt is submitted, it is switched off again. Next task = off by default.
 
-## How it works (automatic)
-
-Handled by the `UserPromptSubmit` hook (`.claude/hooks/toggle.sh`), which sees
-`/my-notification-on` as the submitted prompt before this command's text is
-processed. Off by default in every session; turn off again with `/my-notification-off`. See
-`docs/NOTIFICATIONS.md`.
-
-Goals are not handled here — use Claude Code's built-in `/goal <condition>` for
-that (run `/my-notification-on` first if you want pings during a goal run).
+Enforcement is done by hooks (`.claude/hooks/notify.py`), not by this text.
+See `docs/NOTIFICATIONS.md`.
 
 ## Process
+1. If this skill was invoked at the start of a prompt with arguments, treat the
+   arguments as the actual task and carry it out.
+2. If there are no arguments, reply with exactly one line and do nothing else.
+3. Never send notifications yourself and never touch the hook state directory.
 
-1. Confirm in one line that notifications are on for this session.
-2. Don't send notifications yourself — the `Notification` and `Stop` hooks do.
-
-## Output Format
-
+## Output (no arguments)
 ```
-🔔 Mobile notifications are on for this session (ntfy.sh/tasan-trips).
+🔔 Notifications are on for this task only.
 ```

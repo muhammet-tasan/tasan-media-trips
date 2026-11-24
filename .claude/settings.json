@@ -1,57 +1,37 @@
 {
   "hooks": {
-    "Notification": [
+    "UserPromptSubmit": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/ntfy-ping.sh notify",
-            "timeout": 8
-          }
+          { "type": "command", "command": "python3 .claude/hooks/notify.py prompt", "timeout": 5 }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/ntfy-ping.sh complete",
-            "timeout": 8
-          }
+          { "type": "command", "command": "python3 .claude/hooks/notify.py stop", "timeout": 25 }
         ]
       }
     ],
-    "UserPromptSubmit": [
+    "Notification": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/toggle.sh",
-            "timeout": 5
-          }
+          { "type": "command", "command": "python3 .claude/hooks/notify.py notification", "timeout": 8 }
         ]
       }
     ],
     "SessionStart": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/session-start.sh",
-            "timeout": 5
-          }
+          { "type": "command", "command": "python3 .claude/hooks/notify.py start", "timeout": 5 }
         ]
       }
     ],
     "SessionEnd": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/session-end.sh",
-            "timeout": 5
-          }
+          { "type": "command", "command": "python3 .claude/hooks/notify.py end", "timeout": 5 }
         ]
       }
     ]
@@ -59,7 +39,6 @@
   "permissions": {
     "deny": [
       "Edit(.claude/notify-state/**)",
-      "Write(.claude/notify-state/**)",
       "Bash(touch .claude/notify-state*)",
       "Bash(*notify-state/*)"
     ]

@@ -180,6 +180,10 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 
 ## Session Log (all videos, newest first)
 
+**2026-11-24 [tooling / notifications]**
+- Fixed unwanted ntfy pings and redesigned notifications as a per-task option (`/my-notification-on` anywhere in a prompt, bound to `prompt_id`, auto-reset after the task and at the next prompt; `/goal` alone arms nothing). One script `.claude/hooks/notify.py` replaces four shell scripts; `/my-notification-off` dropped. Root causes, empirical hook findings and rules in `## Lessons Learned (notifications)`.
+- Tested: `python3 scripts/test-notifications.py` (47 checks, mock server) and real headless end-to-end runs. Also tested the previously untested skills in fresh headless sessions: `/my-next-task` (NaturOparC rough-cut automation proposed) and `/my-daily-project-closeout` (run in a throw-away worktree: correctly found nothing to update, made no changes).
+
 **2026-11-24 [mulhouse-automobile-museum / naturoparc]**
 - User confirmed Mulhouse is fully completed → registry status `done` (was wrongly inferred as `paused`); banner in the Mulhouse section marks its open items as historical; auto-memory updated; new lesson: git history can't tell paused from done, ask instead of inferring.
 - Tested the rewritten skills in fresh headless sessions (`claude -p`, with `MSYS_NO_PATHCONV=1` under Git Bash so `/my-…` isn't turned into a path): `/my-project-status` and `/my-continue-project` both identified NaturOparC as active, Mulhouse as done, and cross-checked git. FFmpeg rough-cut script deliberately NOT built yet — automation approach to be discussed first.
@@ -193,7 +197,7 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 **2026-11-24**
 - Renamed all six custom commands to a `my-` prefix (`/my-project-status`, `/my-continue-project`, `/my-next-task`, `/my-daily-project-closeout`, `/my-list-commands`, `/my-notification-on`) via `git mv` in `.claude/commands/`, and updated live references in `CLAUDE.md`, `README.md`, `docs/NOTIFICATIONS.md` and the command files themselves.
 - Later the same day: moved all six from `.claude/commands/*.md` to `.claude/skills/<name>/SKILL.md` (with `disable-model-invocation: true`, so they stay user-triggered only).
-- Gotcha: `.claude/hooks/toggle.sh` matches the prompt prefix to switch notifications on, so it now matches `/my-notification-on*`; `/my-goal` was later renamed to `/my-notification-on` (notifications only; goals use the built-in `/goal`). Older log entries above deliberately keep the historical command names.
+- (Superseded later the same day: `toggle.sh` and friends were replaced by `.claude/hooks/notify.py`; notifications are now a per-task option — see `
 - Not re-verified end-to-end: the `/my-notification-on` → notifications-on link in a fresh session (new command names are likely only listed after a restart).
 - Committed the previously uncommitted `docs/PRODUCTION_STANDARDS.md` and the NaturOparC `FINAL_TIMELINE_PLAN` files together with the rename.
 
@@ -288,12 +292,12 @@ Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a Cap
 Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this project only, not global to other Claude Code projects. Full mechanism, usage, and limits documented in `docs/NOTIFICATIONS.md` — this section only tracks status.
 
 ### Status
-- [x] Built: `.claude/hooks/toggle.sh` (`UserPromptSubmit` hook — only the exact first word `/my-notification-on` / `/my-notification-off` changes state; `SessionStart`/`SessionEnd` hooks reset and clean up state) and `.claude/hooks/ntfy-ping.sh` (`Notification`/`Stop` hooks — pings only if this session's state is ON)
-- [x] Command (originally `goal.md`, now the skill `.claude/skills/my-notification-on/`) turns notifications on automatically via the same `UserPromptSubmit` mechanism; goals themselves use Claude Code's built-in `/goal`
-- [x] Per-session state via `.claude/notify-state/<session_id>` (gitignored) — parallel sessions in this project never share on/off state, since `session_id` comes from the hook's own stdin JSON
+- [x] **Current design (2026-11-24, per-task):** single script `.claude/hooks/notify.py` (hooks `UserPromptSubmit`/`Stop`/`Notification`/`SessionStart`/`SessionEnd` in `.claude/settings.json`). Off by default; the standalone token `/my-notification-on` anywhere in a prompt (e.g. `/goal /my-notification-on …`) arms notifications for **that task only**, bound to the hook payload's `prompt_id`; cleared when the task ends and again at the next prompt. `/goal` alone arms nothing. Replaced the older `toggle.sh`/`ntfy-ping.sh`/`session-*.sh` scripts and the never-released `/my-notification-off`. Details: `docs/NOTIFICATIONS.md`
+- [x] Skill `.claude/skills/my-notification-on/` is only the documented marker; goals use Claude Code's built-in `/goal`
+- [x] Per-session state file keyed by `session_id` (gitignored, folder under `.claude/`; `permissions.deny` keeps Claude's own tools out) — parallel sessions never share state
 - [x] Pipe-tested both hook scripts against synthesized stdin payloads (on/off toggle, silent-when-off, normal prompts untouched) and against a real unreachable host (DNS failure resolved in <1s, hook still exited 0 — confirms hooks never block Claude if ntfy is unreachable)
 - [x] Sent real test notifications to `ntfy.sh/tasan-trips` (both the "needs input" and "task complete" message variants) and independently confirmed delivery via a direct curl call (ntfy.sh echoed the message back) — real push, not just a pipe-test
-- [x] **2026-11-24 bug fix — unwanted pings:** notifications are now off by default in every session, switched on only by the exact command `/my-notification-on` (off: `/my-notification-off`); see Lessons Learned. Tested with `scripts/test-notifications.sh` (stubbed curl) plus real end-to-end runs in fresh headless sessions (OFF → silent, ON → one real push)
+- [x] **2026-11-24 bug fix — unwanted pings** (see Lessons Learned). Tested with `python3 scripts/test-notifications.py` (47 checks, local mock server, no real pushes: consecutive tasks in one session with/without marker, `/goal` runs, parallel sessions, lifecycle) plus real end-to-end runs in fresh headless sessions: plain prompt → silent; `/my-notification-on …` → 1 push; `/goal /my-notification-on …` → 1 push at goal end; `/goal …` alone → silent
 - [x] `docs/NOTIFICATIONS.md` written; linked from `CLAUDE.md`; `/my-list-commands` lists `/my-notification-on`
 
 ### Decisions / Design Notes
@@ -308,7 +312,9 @@ Optional mobile push notifications (ntfy.sh, topic `tasan-trips`) scoped to this
 ## Lessons Learned (notifications)
 
 - **2026-11-24 — Unwanted ntfy pings.** What the evidence showed: the ntfy topic log held only our own fixed messages, all from sessions that had a state file; a fresh headless session stayed silent, so the per-session logic itself worked. Real weaknesses found: (1) state files were never cleaned up and are keyed by `session_id`, so a resumed old session (ids from 11-22/11-23 still existed) came back ON without the user switching it on; (2) the hook also switched on for the text `notify:on` anywhere in a prompt and for `/goal`/`/my-goal`, i.e. far more than the one intended trigger — quoting or discussing the feature could activate it; (3) once ON, every turn end, idle notice and each turn of a multi-turn `/goal` run pinged, which feels like "constantly"; (4) nothing stopped Claude's own tools from creating the state file.
-- **Prevention:** default OFF enforced by a `SessionStart` reset (startup/resume/clear) + `SessionEnd` cleanup + daily purge; activation only by the exact first word `/my-notification-on`; a `permissions.deny` rule keeps Claude from writing `.claude/notify-state/`; behaviour covered by `scripts/test-notifications.sh`. Rule of thumb: persistent "on" switches need an explicit reset point and a single narrow trigger — never substring matching.
+- **First fix (same day) was still wrong in scope:** it made notifications a *session* switch (reset only at session start). The user's actual requirement is a **per-task option** that combines with other commands (`/goal /my-notification-on …`) and resets after every task, even within one session.
+- **What makes per-task reliable (verified empirically on 2.1.331, not assumed):** the hook payloads carry a `prompt_id` shared by `UserPromptSubmit` and all `Stop` events of one task, including `/goal` continuation turns (`stop_hook_active: true`); a `/goal` verdict is written to the transcript as a `goal_status` attachment a few seconds *after* its Stop event, so the Stop hook must wait for it before deciding the task is over; there is no hook for user interrupts, so the next `UserPromptSubmit` is the guaranteed reset point.
+- **Prevention / rules of thumb:** an "on" flag must be bound to the unit it was requested for (prompt/task id), cleared at the *start* of every new unit (not only the end of the last), and triggered by one narrow token. Verify hook-payload assumptions with a debug hook before designing around them. Never test hooks with real pushes when a mock server works. Own deny rules also block my own Bash commands containing the guarded path — write such files with the Write/Edit tools.
 
 ## Lessons Learned (project memory itself)
 

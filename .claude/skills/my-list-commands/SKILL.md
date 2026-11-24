@@ -26,8 +26,6 @@ This project includes six specialized commands to streamline workflow:
 
 5. **`/my-list-commands`** — Displays this list
 
-6. **`/my-notification-on`** — Turns on mobile push notifications (ntfy.sh) for this session so you get pinged when Claude needs input or finishes. Off by default in every session; only this command switches it on. For goals, use the built-in `/goal`.
-
-7. **`/my-notification-off`** — Turns the notifications off again for this session. See `docs/NOTIFICATIONS.md`.
+6. **`/my-notification-on`** — Per-task option: add it to any prompt (e.g. `/goal /my-notification-on <Bedingung>`) to get ntfy.sh push notifications for that task only. Off by default; resets automatically after the task. See `docs/NOTIFICATIONS.md`.
 
 These commands maintain PROJECT_STATUS.md as architectural memory, ensuring continuity across sessions and handoffs.

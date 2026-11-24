@@ -29,7 +29,7 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
 - **docs/PRODUCTION_STANDARDS.md** – Mandatory channel/editorial standards (positioning, family/privacy, branding concept, hook, storytelling structure, infographics catalog); consult before planning or cutting any video
 - **docs/FOOTAGE_ANALYSIS.md** – Local footage-sighting workflow (metadata/thumbnails/gallery for raw DJI clips); consult before extending `scripts/footage-analysis/`
-- **docs/NOTIFICATIONS.md** – Optional mobile push notifications (ntfy.sh) for this project; how to use `/my-notification-on` / `/my-notification-off` (off by default; run `bash scripts/test-notifications.sh` after touching the hooks)
+- **docs/NOTIFICATIONS.md** – Optional mobile push notifications (ntfy.sh) for this project; per-task option `/my-notification-on`, off by default (run `python3 scripts/test-notifications.py` after touching the hooks)
 - **.claude/skills/** – Workflow skills (slash commands) for project management (includes `/my-notification-on`)
 - **.claude/hooks/** – Notification hooks for this project only (see `docs/NOTIFICATIONS.md`); not global to other Claude Code projects
 - **src/** – Remotion compositions (React + TypeScript) for targeted B-roll/graphics only, not full video assembly
