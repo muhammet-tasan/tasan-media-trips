@@ -29,8 +29,8 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
 - **docs/PRODUCTION_STANDARDS.md** – Mandatory channel/editorial standards (positioning, family/privacy, branding concept, hook, storytelling structure, infographics catalog); consult before planning or cutting any video
 - **docs/FOOTAGE_ANALYSIS.md** – Local footage-sighting workflow (metadata/thumbnails/gallery for raw DJI clips); consult before extending `scripts/footage-analysis/`
-- **docs/NOTIFICATIONS.md** – Optional mobile push notifications (ntfy.sh) for this project; how to use `/my-goal`, `notify:on`/`notify:off`
-- **.claude/commands/** – Workflow commands for project management (includes `/my-goal`)
+- **docs/NOTIFICATIONS.md** – Optional mobile push notifications (ntfy.sh) for this project; how to use `/my-notification-on`, `notify:on`/`notify:off`
+- **.claude/commands/** – Workflow commands for project management (includes `/my-notification-on`)
 - **.claude/hooks/** – Notification hooks for this project only (see `docs/NOTIFICATIONS.md`); not global to other Claude Code projects
 - **src/** – Remotion compositions (React + TypeScript) for targeted B-roll/graphics only, not full video assembly
 - **scripts/footage-analysis/** – Standalone Python tool for sighting raw footage before a CapCut rough cut; not Remotion, not part of the composition code

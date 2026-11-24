@@ -2,7 +2,7 @@
 # TASAN Trips — notification on/off toggle (UserPromptSubmit event).
 #
 # Detects, in the raw submitted prompt text:
-#   - a prompt starting with "/my-goal"   -> turn notifications ON
+#   - a prompt starting with "/my-notification-on" -> turn notifications ON
 #   - "notify:on"  anywhere in prompt  -> turn notifications ON
 #   - "notify:off" anywhere in prompt  -> turn notifications OFF
 #
@@ -43,7 +43,7 @@ state_file="$STATE_DIR/$session_id"
 
 shopt -s nocasematch 2>/dev/null
 
-if [[ "$prompt" == /my-goal* ]] || [[ "$prompt" == *"notify:on"* ]]; then
+if [[ "$prompt" == /my-notification-on* ]] || [[ "$prompt" == *"notify:on"* ]]; then
     touch "$state_file" 2>/dev/null
     echo '{"systemMessage": "TASAN Trips: Benachrichtigungen AN (nur diese Sitzung)."}'
 elif [[ "$prompt" == *"notify:off"* ]]; then
