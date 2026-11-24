@@ -1,4 +1,4 @@
-# /project-status
+# /my-project-status
 
 Summarize current project phase, completed work, and next steps.
 

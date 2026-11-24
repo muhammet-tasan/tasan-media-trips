@@ -1,4 +1,4 @@
-# /daily-project-closeout
+# /my-daily-project-closeout
 
 Standardize end-of-session checkpoints to preserve project continuity.
 

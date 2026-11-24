@@ -18,10 +18,10 @@ CLAUDE.md              # Project documentation
 ```
 
 ## Quick Start
-- `/project-status` – Current project phase and status
-- `/continue-project` – Resume work and get next steps
-- `/daily-project-closeout` – End-of-session checkpoint
-- `/next-task` – Identify highest-impact work
-- `/list-commands` – Show all commands
+- `/my-project-status` – Current project phase and status
+- `/my-continue-project` – Resume work and get next steps
+- `/my-daily-project-closeout` – End-of-session checkpoint
+- `/my-next-task` – Identify highest-impact work
+- `/my-list-commands` – Show all commands
 
 See CLAUDE.md for full documentation.

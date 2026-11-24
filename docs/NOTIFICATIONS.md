@@ -6,7 +6,7 @@ Optional push notifications to your phone via [ntfy.sh](https://ntfy.sh), topic 
 
 | Action | How |
 |---|---|
-| Turn ON for this session | Run `/goal` (turns on automatically), **or** put `notify:on` anywhere in a normal prompt |
+| Turn ON for this session | Run `/my-goal` (turns on automatically), **or** put `notify:on` anywhere in a normal prompt |
 | Turn OFF for this session | Put `notify:off` anywhere in a normal prompt |
 | Default | **OFF** — nothing is sent unless you explicitly turn it on |
 
@@ -28,7 +28,7 @@ This is set up **only for the TASAN Trips project** (`.claude/settings.json` in 
 
 ## How it works (for future reference / debugging)
 
-- `.claude/hooks/toggle.sh` — `UserPromptSubmit` hook. Reads the submitted prompt; if it starts with `/goal` or contains `notify:on`, creates `.claude/notify-state/<session_id>`; if it contains `notify:off`, removes it. Never blocks, never modifies the prompt itself.
+- `.claude/hooks/toggle.sh` — `UserPromptSubmit` hook. Reads the submitted prompt; if it starts with `/my-goal` or contains `notify:on`, creates `.claude/notify-state/<session_id>`; if it contains `notify:off`, removes it. Never blocks, never modifies the prompt itself.
 - `.claude/hooks/ntfy-ping.sh` — `Notification`/`Stop` hook. Checks whether `.claude/notify-state/<session_id>` exists; if not, stays silent. If it exists, POSTs a short message to `https://ntfy.sh/tasan-trips` with a 5-second timeout, swallowing any failure (unreachable network, ntfy.sh down) so Claude is never blocked waiting on it.
 - Both scripts parse the hook's JSON via `python3` (no `jq` dependency — not installed on this machine).
 - The ntfy topic defaults to `tasan-trips`; override with the `TASAN_NTFY_TOPIC` environment variable if you ever need a different topic.
@@ -37,5 +37,5 @@ This is set up **only for the TASAN Trips project** (`.claude/settings.json` in 
 
 1. `Stop` fires on `/clear`/`/resume`/`/compact` too — see above.
 2. Anyone who knows the topic name `tasan-trips` can publish to or subscribe to it — ntfy.sh topics aren't access-controlled by default. The topic name is now in this committed repo. Treat it like a semi-public channel name, not a secret; if that ever becomes a problem, rename the topic (update `TASAN_NTFY_TOPIC` or the default in `ntfy-ping.sh`) and resubscribe on your phone.
-3. The `/goal` → notifications-on link depends on Claude Code passing the raw, unexpanded prompt text (`"/goal ..."`) to the `UserPromptSubmit` hook, which is standard documented behavior but wasn't separately re-verified end-to-end in a live interactive session — the plain `notify:on`/`notify:off` path was fully tested and confirmed, including a real ntfy.sh delivery. Try `/goal` once and check for the "Benachrichtigungen AN" confirmation to be sure.
+3. The `/my-goal` → notifications-on link depends on Claude Code passing the raw, unexpanded prompt text (`"/my-goal ..."`) to the `UserPromptSubmit` hook, which is standard documented behavior but wasn't separately re-verified end-to-end in a live interactive session — the plain `notify:on`/`notify:off` path was fully tested and confirmed, including a real ntfy.sh delivery. Try `/my-goal` once and check for the "Benachrichtigungen AN" confirmation to be sure.
 4. New hook configuration may need a one-time `/hooks` (reload) or a session restart to take effect, since `.claude/settings.json` didn't exist before this was set up.

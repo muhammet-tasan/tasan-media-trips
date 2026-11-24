@@ -1,4 +1,4 @@
-# /goal
+# /my-goal
 
 Define a concrete goal for this session and work toward it with mobile push
 notifications on, so you can step away from the terminal and still get
@@ -6,9 +6,9 @@ pinged (ntfy.sh, topic `tasan-trips`) when Claude needs input or finishes.
 
 ## Notifications (automatic)
 
-Invoking `/goal` turns on push notifications for **this session only** —
+Invoking `/my-goal` turns on push notifications for **this session only** —
 handled by the `UserPromptSubmit` hook (`.claude/hooks/toggle.sh`), which
-sees `/goal` as the submitted prompt and enables notifications before this
+sees `/my-goal` as the submitted prompt and enables notifications before this
 command's instructions are even processed. No separate step needed.
 
 Turn them off again any time with `notify:off` in a normal prompt (works

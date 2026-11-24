@@ -1,4 +1,4 @@
-# /continue-project
+# /my-continue-project
 
 Resume from PROJECT_STATUS.md and offer direction on next work.
 

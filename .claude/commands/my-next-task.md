@@ -1,4 +1,4 @@
-# /next-task
+# /my-next-task
 
 Identify the single highest-impact implementation step.
 
