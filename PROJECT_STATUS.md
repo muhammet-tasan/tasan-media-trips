@@ -175,6 +175,15 @@ Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cos
 - [ ] Info/B-roll planning for NaturOparC (prices, parking, visit duration, kids suitability, …)
 - [ ] Voice-over, music, watermark branding (standard documented, not yet built), final assembly and export
 
+### Rough-cut automation research (2026-11-24, nothing implemented yet)
+Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/Raw/` (outside the repo, next to it):
+- Raw clips are HEVC Main10 (`yuv420p10le`, BT.709), 4K, ~83 Mbps, AAC audio, plus DJI data streams and an MJPEG cover image. **Keyframe every 1.001 s (GOP 30)** — so stream-copy cuts (`-c copy`, no re-encode, instant, zero quality loss) are possible with at most ~1 s granularity.
+- Bundled Remotion FFmpeg (n7.1) has `-c copy`, MP4/MOV muxers, `libx264`/`libx265`/`prores_ks`/`hevc_nvenc` encoders, but no `trim`/`select` filters (not needed for input-seek + stream copy).
+- Idea: numbered single clips, each cut as **[planned start − buffer, planned end + buffer] snapped outward to keyframes**, stream-copied (map only video 0 + audio 0), so CapCut gets the original codec/quality and the exact planned in/out can still be set by hand inside the buffer. Optional low-res H.264 preview MP4 of the exact plan (re-encode, preview only). Sidecar list with each clip's planned in/out offset inside its cut file.
+- The plan's times were estimated from 2 s stills (≈ ±1–2 s), which is why a buffer is needed.
+- CapCut drafts (`%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft\<name>\draft_content.json`) are currently plain JSON, but undocumented and version-dependent — a generated draft is possible in principle, not recommended as the baseline.
+- **Raw folder drift:** `Raw/` currently holds 41 of the 54 analysed clips; **two clips used in the plan are missing: `…_0007_D.MP4` and `…_0055_D.MP4`** (the others not in `Raw/` are not in the plan). Clarify before cutting.
+
 ### Decisions Made
 - See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24 entries in the Session Log.
 
