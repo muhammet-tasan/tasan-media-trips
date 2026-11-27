@@ -86,6 +86,7 @@ Dunkler und heller Kartenstil, Ländergrenzen, vendorter MapLibre-Worker (`publi
 | `GlassPanel` — Glas-Tafel | ✅ | `src/components/GlassPanel.tsx` | Props `style` (Position/Größe), `background` (inkl. Alpha), `blur`, `saturate`, `border`, `shadow`, `radius`, `padding`, `fadeIn{at,duration}`; eigene Glas-Ebene (`backdrop-filter`, funktioniert im Render) + deckender Inhalt; Standard `rgba(250,247,235,0.24)` + 5 px Blur; Platzbedarf des Inhalts von Frame 0 → feste Größe |
 | `DarkPanel` — dunkle Tafel | ✅ | `src/components/GlassPanel.tsx` | gleiche Props wie `GlassPanel`, Standard dunkle Füllung `rgba(8,10,15,0.65)`, kein Blur (Look von Video 1, Route-Check-Theme `dark`) |
 | `PlainText` — Text ohne Tafel | ✅ | `src/components/GlassPanel.tsx` | gleiche Box/Padding wie `GlassPanel` (Text liegt an derselben Stelle), aber ohne Fläche, Blur, Rahmen und Schatten; nur `textShadow`. Im Route Check per `config.plate.enabled: false` (+ optional `plate.textShadow`) |
+| `Icon` — Linien-Icons | ✅ | `src/components/Icons.tsx` | `name` `parking` \| `bus` \| `pin`, `size`, `color`; 24er-viewBox, Strich = Farbe, keine Emojis (Route-Check-Theme `editorial`) |
 | Foto-Beats (Vollbild/Seitenlayout mit Textschutz-Verlauf, Ken Burns) | 🧪 intern | `MulhouseTripScore.tsx` (`SammlungBeat` …) | Foto + Text, Ken-Burns-Zoom 4 % |
 | Echte Alpha-Overlays für CapCut (ProRes/WebM) | 📋 | — | für Wasserzeichen/Captions nötig; Export-Preset noch nicht angelegt |
 

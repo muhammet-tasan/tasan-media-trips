@@ -7,7 +7,12 @@ import { DarkPanel, GlassPanel, PlainText } from '../components/GlassPanel';
 import { MarkerPulse } from '../components/MarkerPulse';
 import { RouteDraw } from '../components/RouteDraw';
 import { TextReveal } from '../components/TextReveal';
+import { Icon, IconName } from '../components/Icons';
 import { CLAMP, FONT, easeOutCubic } from '../components/shared';
+import { loadFont } from '@remotion/google-fonts/Inter';
+
+// Editorial theme font (Inter); loadFont registers the delayRender itself.
+const { fontFamily: INTER } = loadFont('normal', { weights: ['500', '600', '700'], subsets: ['latin', 'latin-ext'] });
 
 // ---------------------------------------------------------------------
 // Generic, config-driven Route Check. Visual design, timing logic, map
@@ -44,11 +49,11 @@ export type RouteCheckConfig = {
 	destination: { name: string; tagline?: string; /** where it is, e.g. 'in Hunawihr · bei Colmar' */ location?: string; country?: string; coords: Coords };
 	origins: RouteCheckOrigin[];
 	/** Optional practical info on the plate, revealed after the last route (e.g. parking, public transport). */
-	infoLines?: { text: string; size?: 'main' | 'detail'; /** reveal time in s (default: with the title) */ at?: number; /** fade duration in s */ fade?: number }[];
+	infoLines?: { text: string; size?: 'main' | 'detail'; /** line icon (editorial theme) */ icon?: IconName; /** reveal time in s (default: with the title) */ at?: number; /** fade duration in s */ fade?: number }[];
 	countryLabels?: { code: string; lon: number; lat: number }[];
 	cameraPadding?: { top: number; bottom: number; left: number; right: number };
-	/** 'dark' (default, TASAN dark/gold as in video 1) or 'light' (cream/green, family look). */
-	theme?: 'dark' | 'light';
+	/** 'dark' (default, TASAN dark/gold as in video 1), 'light' (cream/green, family look) or 'editorial' (Editorial Travel Map: Inter, forest green/terracotta, left-aligned info block without container, SVG icons, softened map). */
+	theme?: 'dark' | 'light' | 'editorial';
 	/** Vertical shift of the destination info plate in px (default -55 = as reference). */
 	plateOffsetY?: number;
 	/** Horizontal shift (px, negative = left) and width of the info plate (default 0 / 660). */
@@ -90,9 +95,11 @@ type Theme = {
 	routeCasing: string; routeMain: string; routeSecondary: string;
 	marker: string; label: string; labelShadow: string;
 	plateBg: string; plateBlur: number; plateSaturate: number; plateBorder?: string; plateShadow?: string; plateName: string; plateTagline: string; plateDetail: string; attribution: string; attributionBg: string; timeText: string;
+	/** editorial look: font, softened map, light text outline, left-aligned container-free info block */
+	editorial?: { font: string; mapFilter: string; halo: string; haloStroke: string; icon: string; ink: string; muted: string; hideSmallTowns: boolean };
 };
 // 'dark' = exact values of the reference (video 1). 'light' = cream/green family look.
-const THEMES: Record<'dark' | 'light', Theme> = {
+const THEMES: Record<'dark' | 'light' | 'editorial', Theme> = {
 	dark: {
 		style: 'geo/tasan-map-style.json', bg: '#0a0d13', accent: '#d4a24e', accentSoft: '#f4d78a', tag: 'rgba(220,220,220,0.55)',
 		heading: '#f5f5f5', subheading: 'rgba(255,255,255,0.5)', headingShadow: '0 2px 14px rgba(0,0,0,0.8)',
@@ -109,7 +116,21 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
 		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
 		plateBg: 'rgba(250,247,235,0.24)', plateBlur: 5, plateSaturate: 1.15, plateBorder: '1.5px solid rgba(255,255,255,0.7)', plateShadow: '0 6px 28px rgba(31,61,43,0.10)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
-		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
+			attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
+	},
+	editorial: {
+		style: 'geo/tasan-map-style-light.json', bg: '#f6f1e3', accent: '#C45E32', accentSoft: '#193B2B', tag: '#526457',
+		heading: '#193B2B', subheading: '#526457', headingShadow: '0 0 10px rgba(246,241,227,0.9)',
+		border: 'rgba(82,100,87,0.4)', countryLabel: 'rgba(25,59,43,0.2)',
+		routeCasing: 'rgba(255,255,255,0.85)', routeMain: '#C45E32', routeSecondary: 'rgba(196,94,50,0.88)',
+		marker: '#193B2B', label: '#193B2B', labelShadow: '0 0 8px rgba(246,241,227,0.9)',
+		plateBg: 'transparent', plateBlur: 0, plateSaturate: 1, plateName: '#193B2B', plateTagline: '#526457', plateDetail: '#526457',
+		attribution: 'rgba(25,59,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#C45E32',
+		editorial: {
+			font: INTER, mapFilter: 'contrast(0.9) saturate(0.85) brightness(1.04)', icon: '#193B2B', ink: '#193B2B', muted: '#526457', hideSmallTowns: true,
+			halo: '0 0 3px rgba(246,241,227,0.95), 0 0 10px rgba(246,241,227,0.9), 0 0 20px rgba(246,241,227,0.65)',
+			haloStroke: '3px rgba(246,241,227,0.7)',
+		},
 	},
 };
 
@@ -177,7 +198,9 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	const { phases } = tl;
 	const th = { ...THEMES[config.theme ?? 'dark'] };
 	if (config.mapBackground) th.bg = config.mapBackground;
-	const ps = config.plate ?? {};
+	const ed = th.editorial;
+	const FONT_FAMILY = ed?.font ?? FONT;
+	const ps = ed ? { ...config.plate, enabled: false } : (config.plate ?? {});
 	const plateBlur = ps.blur ?? th.plateBlur;
 	const dest = config.destination;
 	const infoLines = config.infoLines ?? [];
@@ -230,6 +253,9 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 
 		map.once('load', () => {
 			map.resize();
+			if (ed?.hideSmallTowns) {
+				for (const id of ['place_town', 'place_city', 'place_city_large', 'place_state']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+			}
 			if (config.mapBackground) {
 				const bgLayer = map.getStyle().layers.find((l) => l.type === 'background');
 				if (bgLayer) map.setPaintProperty(bgLayer.id, 'background-color', config.mapBackground);
@@ -290,12 +316,13 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	return (
 		<AbsoluteFill style={{ backgroundColor: th.bg }}>
 			{/* Always mounted so the ref exists for MapLibre */}
-			<div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, width: CANVAS_WIDTH, height: CANVAS_HEIGHT }} />
+			<div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, width: CANVAS_WIDTH, height: CANVAS_HEIGHT, filter: ed?.mapFilter }} />
 
 			{!ready || !map || !destPx ? null : (
 				<>
 					{/* Section heading — fades in once, stays for the whole scene */}
-					<AnimatedTitle title={config.heading} subtitle={config.subtitle} color={th.heading} subtitleColor={th.subheading} shadow={th.headingShadow} />
+					<AnimatedTitle title={config.heading} subtitle={config.subtitle} color={th.heading} subtitleColor={th.subheading} shadow={th.headingShadow}
+							{...(ed ? { fontFamily: ed.font, top: 62, titleSize: 43, titleSpacing: 2.5, subtitleSize: 22, subtitleSpacing: 1.2, titleWeight: 700 } : {})} />
 
 					{/* International borders: real Natural Earth lines, subtle light gray, below the gold routes in the hierarchy */}
 					<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
@@ -314,7 +341,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					{(config.countryLabels ?? []).map((c) => {
 						const p = map.project([c.lon, c.lat]);
 						return (
-							<div key={c.code} style={{ position: 'absolute', left: p.x, top: p.y, transform: 'translate(-50%, -50%)', fontFamily: FONT, fontSize: 30, fontWeight: 600, letterSpacing: 7, color: th.countryLabel, whiteSpace: 'nowrap' }}>
+							<div key={c.code} style={{ position: 'absolute', left: p.x, top: p.y, transform: 'translate(-50%, -50%)', fontFamily: FONT_FAMILY, fontSize: 30, fontWeight: 600, letterSpacing: 7, color: th.countryLabel, whiteSpace: 'nowrap' }}>
 								{c.code}
 							</div>
 						);
@@ -344,16 +371,16 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 						const labelOpacity = interpolate(frame, [phase.start + 16, phase.start + 32], [0, 1], CLAMP);
 						const labelY = interpolate(frame, [phase.start + 16, phase.start + 32], [10, 0], CLAMP);
 						const radius = origin.emphasis ? 10 : 7;
-						const off = origin.labelOffset ?? { x: origin.emphasis ? 100 : 30, y: origin.emphasis ? 46 : -14 };
+						const off = origin.labelOffset ?? (ed ? { x: origin.emphasis ? 26 : 30, y: origin.emphasis ? -16 : -14 } : { x: origin.emphasis ? 100 : 30, y: origin.emphasis ? 46 : -14 });
 						return (
 							<React.Fragment key={origin.key}>
 								<MarkerPulse x={px.x} y={px.y} at={phase.start} color={th.marker} radius={radius} pulse={false} fadeInFrames={10} springDelay={4} haloGap={8} haloOpacity={0.4} haloWidth={1.5} />
-								<div style={{ position: 'absolute', left: Math.round(px.x + off.x), top: Math.round(px.y + off.y), fontFamily: FONT, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: th.labelShadow, whiteSpace: 'nowrap' }}>
+								<div style={{ position: 'absolute', left: Math.round(px.x + off.x), top: Math.round(px.y + off.y), fontFamily: FONT_FAMILY, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: ed ? ed.halo : th.labelShadow, ...(ed ? { WebkitTextStroke: ed.haloStroke, paintOrder: 'stroke fill' } : {}), whiteSpace: 'nowrap' }}>
 									<div style={{ fontSize: origin.emphasis ? 30 : 26, fontWeight: origin.emphasis ? 700 : 600, color: th.label }}>
 										{origin.label}{' '}
-										{origin.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: origin.emphasis ? 22 : 19 }}>{origin.country}</span>}{' '}
-										<span style={{ color: th.tag, fontWeight: 500 }}>· Auto</span>{' '}
-										<span style={{ color: th.timeText, fontWeight: 500 }}>≈ {origin.time}</span>
+										{origin.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: ed ? 13 : origin.emphasis ? 22 : 19, letterSpacing: ed ? 1 : undefined, opacity: ed ? 0.85 : undefined }}>{origin.country}</span>}{' '}
+										<span style={{ color: th.tag, fontWeight: 500, fontSize: ed ? 20 : undefined }}>· Auto</span>{' '}
+										<span style={{ color: th.timeText, fontWeight: ed ? 600 : 500 }}>≈ {origin.time}</span>
 									</div>
 								</div>
 							</React.Fragment>
@@ -364,7 +391,62 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					<MarkerPulse x={destPx.x} y={destPx.y} at={DEST_REVEAL} color={th.accent} />
 
 					{/* Destination info plate: glass layer (own opacity) + fully opaque text blocks on top; final size from frame 0 */}
-					{(() => {
+					{ed && (
+						<div
+							style={{
+								position: 'absolute',
+								left: Math.round(CANVAS_WIDTH * 0.08),
+								top: Math.round(Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55))),
+								width: plateWidth,
+								textAlign: 'left',
+								fontFamily: ed.font,
+								textShadow: ed.halo,
+								WebkitTextStroke: ed.haloStroke,
+								paintOrder: 'stroke fill',
+							}}
+						>
+							<TextReveal at={tl.title.at} duration={tl.title.dur} style={{ fontSize: 50, fontWeight: 700, color: ed.ink, letterSpacing: -0.5, lineHeight: 1.1 }}>
+								{dest.name}
+								{dest.country && <span style={{ color: ed.muted, fontWeight: 500, fontSize: 15, letterSpacing: 1.2, marginLeft: 12, verticalAlign: 'middle' }}>{dest.country}</span>}
+							</TextReveal>
+							{dest.tagline && (
+								<TextReveal at={tl.tagline.at} duration={tl.tagline.dur} style={{ fontSize: 30, fontWeight: 500, color: ed.muted, marginTop: 8 }}>
+									{dest.tagline}
+								</TextReveal>
+							)}
+							{dest.location && (
+								<TextReveal at={tl.location.at} duration={tl.location.dur} style={{ fontSize: 24, fontWeight: 500, color: ed.muted, marginTop: 4 }}>
+									{dest.location}
+								</TextReveal>
+							)}
+							{infoLines.map((line, i) => {
+								const detail = line.size === 'detail';
+								const ICON = 32;
+								const GAP = 12;
+								return (
+									<TextReveal
+										key={i}
+										at={tl.info[i].at}
+										duration={tl.info[i].dur}
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											gap: GAP,
+											paddingLeft: detail ? ICON + GAP : 0,
+											fontSize: detail ? 24 : 30,
+											fontWeight: detail ? 500 : 600,
+											color: detail ? ed.muted : ed.ink,
+											marginTop: i === 0 ? 38 : detail ? 4 : 26,
+										}}
+									>
+										{!detail && line.icon && <Icon name={line.icon} size={ICON} color={ed.icon} />}
+										<span>{line.text}</span>
+									</TextReveal>
+								);
+							})}
+						</div>
+					)}
+					{!ed && (() => {
 						const Panel = ps.enabled === false ? PlainText : plateBlur > 0 ? GlassPanel : DarkPanel;
 						return (
 							<Panel
@@ -418,7 +500,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					})()}
 
 					{/* Required attribution, permanently visible */}
-					<div style={{ position: 'absolute', right: 24, bottom: 18, background: th.attributionBg, padding: '2px 8px', borderRadius: 6, fontFamily: FONT, fontSize: 15, color: th.attribution, textShadow: th.headingShadow }}>
+					<div style={{ position: 'absolute', right: 24, bottom: 18, background: th.attributionBg, padding: '2px 8px', borderRadius: 6, fontFamily: FONT_FAMILY, fontSize: 15, color: th.attribution, textShadow: th.headingShadow }}>
 						OpenFreeMap · © OpenMapTiles · © OpenStreetMap contributors
 					</div>
 				</>

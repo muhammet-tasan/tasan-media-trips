@@ -21,14 +21,19 @@ export const AnimatedTitle: React.FC<{
 	top?: number;
 	titleSize?: number;
 	subtitleSize?: number;
-}> = ({ title, subtitle, color, subtitleColor, shadow, fadeFrom = 6, fadeTo = 28, top = 34, titleSize = 54, subtitleSize = 21 }) => {
+	/** Optional look overrides (defaults = approved Route Check values). */
+	fontFamily?: string;
+	titleSpacing?: number;
+	subtitleSpacing?: number;
+	titleWeight?: number;
+}> = ({ title, subtitle, color, subtitleColor, shadow, fadeFrom = 6, fadeTo = 28, top = 34, titleSize = 54, subtitleSize = 21, fontFamily = FONT, titleSpacing = 5, subtitleSpacing = 2, titleWeight = 700 }) => {
 	const frame = useCurrentFrame();
 	const opacity = interpolate(frame, [fadeFrom, fadeTo], [0, 1], CLAMP);
 	return (
 		<div style={{ position: 'absolute', top, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', opacity }}>
-			<div style={{ fontFamily: FONT, fontSize: titleSize, fontWeight: 700, letterSpacing: 5, color, textShadow: shadow }}>{title}</div>
+			<div style={{ fontFamily, fontSize: titleSize, fontWeight: titleWeight, letterSpacing: titleSpacing, color, textShadow: shadow }}>{title}</div>
 			{subtitle && (
-				<div style={{ fontFamily: FONT, fontSize: subtitleSize, fontWeight: 500, letterSpacing: 2, color: subtitleColor, marginTop: 8, textShadow: shadow }}>
+				<div style={{ fontFamily, fontSize: subtitleSize, fontWeight: 500, letterSpacing: subtitleSpacing, color: subtitleColor, marginTop: 8, textShadow: shadow }}>
 					{subtitle}
 				</div>
 			)}

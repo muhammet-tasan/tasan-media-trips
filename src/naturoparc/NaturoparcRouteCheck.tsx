@@ -18,3 +18,19 @@ export const NATUROPARC_ROUTE_CHECK_NO_PLATE_CONFIG: RouteCheckConfig = {
 export const NaturoparcRouteCheckNoPlate: React.FC<RouteCheckProps> = ({ holdSeconds }) => (
 	<RouteCheck config={NATUROPARC_ROUTE_CHECK_NO_PLATE_CONFIG} routesFile="geo/naturoparc-routes.geojson" holdSeconds={holdSeconds} />
 );
+
+// Editorial Travel Map variant: theme 'editorial' (Inter, forest green/terracotta, container-free left-aligned block, SVG icons).
+// Same routes, animations, order and timing as the other variants (`at` values unchanged).
+export const NATUROPARC_ROUTE_CHECK_EDITORIAL_CONFIG: RouteCheckConfig = {
+	...(config as RouteCheckConfig),
+	theme: 'editorial',
+	infoLines: [
+		{ text: 'Kostenloser Parkplatz', icon: 'parking', at: 6.5 },
+		{ text: 'Busverbindung', icon: 'bus', at: 9 },
+		{ text: 'Linie 106 · Colmar → Hunawihr', size: 'detail', at: 10.5 },
+	],
+	destination: { ...(config as RouteCheckConfig).destination, location: 'Hunawihr · bei Colmar' },
+};
+export const NaturoparcRouteCheckEditorial: React.FC<RouteCheckProps> = ({ holdSeconds }) => (
+	<RouteCheck config={NATUROPARC_ROUTE_CHECK_EDITORIAL_CONFIG} routesFile="geo/naturoparc-routes.geojson" holdSeconds={holdSeconds} />
+);
