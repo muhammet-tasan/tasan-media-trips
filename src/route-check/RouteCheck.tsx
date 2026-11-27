@@ -51,6 +51,9 @@ export type RouteCheckConfig = {
 	theme?: 'dark' | 'light';
 	/** Vertical shift of the destination info plate in px (default -55 = as reference). */
 	plateOffsetY?: number;
+	/** Horizontal shift (px, negative = left) and width of the info plate (default 0 / 660). */
+	plateOffsetX?: number;
+	plateWidth?: number;
 };
 export type RouteCheckProps = { holdSeconds: number };
 
@@ -79,7 +82,7 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(70,95,85,0.5)', countryLabel: 'rgba(31,61,43,0.28)',
 		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
 		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
-		plateBg: 'linear-gradient(135deg, rgba(255,255,255,0.30), rgba(214,235,200,0.20))', plateGlass: 'blur(22px) saturate(1.2)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
+		plateBg: 'linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04))', plateGlass: 'blur(18px) saturate(1.25)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
 		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
 	},
 };
@@ -138,6 +141,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	const th = THEMES[config.theme ?? 'dark'];
 	const dest = config.destination;
 	const infoLines = config.infoLines ?? [];
+	const plateWidth = config.plateWidth ?? 660;
 	const cameraPadding = config.cameraPadding ?? { top: 160, bottom: 320, left: 460, right: 160 };
 
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -348,15 +352,15 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					<div
 						style={{
 							position: 'absolute',
-							left: Math.round(Math.max(40, destPx.x - 40 - 660)),
+							left: Math.round(Math.max(40, destPx.x - 40 - plateWidth + (config.plateOffsetX ?? 0))),
 							top: Math.round(Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55))),
-							width: 660,
+							width: plateWidth,
 							textAlign: 'right',
 							fontFamily: FONT,
 							background: th.plateBg,
 							backdropFilter: th.plateGlass,
 							WebkitBackdropFilter: th.plateGlass,
-							border: th.plateGlass === 'none' ? undefined : '1.5px solid rgba(255,255,255,0.65)',
+							border: th.plateGlass === 'none' ? undefined : '1.5px solid rgba(255,255,255,0.85)',
 							boxShadow: th.plateGlass === 'none' ? undefined : '0 8px 32px rgba(31,61,43,0.12)',
 							borderRadius: 16,
 							padding: '20px 30px',

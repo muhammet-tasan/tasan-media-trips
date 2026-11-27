@@ -19,7 +19,7 @@
       "time": "20 Min.",
       "labelOffset": {
         "x": -330,
-        "y": 135
+        "y": -14
       },
       "coords": {
         "lon": 7.3585,
@@ -59,7 +59,7 @@
     }
   ],
   "theme": "light",
-  "plateOffsetY": -195,
+  "plateOffsetY": -240,
   "infoLines": [
     {
       "text": "Parkplatz · kostenlos"
@@ -88,5 +88,7 @@
       "lon": 8.2,
       "lat": 47.28
     }
-  ]
+  ],
+  "plateWidth": 620,
+  "plateOffsetX": -307
 }
