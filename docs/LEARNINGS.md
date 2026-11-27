@@ -32,6 +32,11 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Schnittanleitung framegenau und in Abarbeitungsreihenfolge:** CapCut-Zeitformat `HH:MM:SS:FF`, Timeline- und Originalclip-Zeiten getrennt, Tabelle vom Ende zum Anfang, Hook zuletzt in Abspielreihenfolge; der Entwurf ändert sich zwischen Export und Anleitung — vor dem Erstellen den aktuellen Stand prüfen (hier: zwei neue Clips am Anfang verschoben alle Zeiten). *(2026-11-27 · S3)*
 - **Datenquelle = gespeicherter Entwurf, nicht der Export:** Entwurf neu einlesen, Originalclips ansehen; der Entwurf ändert sich laufend, Exporte veralten sofort. Kombinationsclips sind im Entwurf nicht lesbar (Cache kann schwarz sein) — melden statt raten. *(2026-11-27 · S3)*
 - **Handlung statt Komposition bewerten:** Lustiges Tierverhalten (z. B. Schwein kratzt sich) fällt bei 3 Frames pro Schnitt durch; relevante Szenen dicht (0,25–0,5 s) und im ganzen Originalclip sichten, nicht nur im verwendeten Ausschnitt. Fehlen Rohclips im Raw-Ordner (hier 0007, 0046–0050, 0055), das offen sagen und den Nutzer um Clipname/Zeit bitten. *(NaturOparC, 2026-11-27 · S3)*
+- **Hook: Inhalt vor Tempo:** 8–10 s, 5–7 Szenen mit variierender Länge (Anfang/Ende 2–2,5 s, Mitte ca. 1,3 s); 5,8 s mit 0,7-s-Clips wirkte zu kurz und hektisch. Stärkstes Bild zuerst, ruhige Pointe zum Markenintro. *(NaturOparC, 2026-11-27 · S3)*
+- **Auch ungenutzte Rohclips für den Hook sichten:** die stärksten Bilder (Stör-Nahaufnahme im Aquarium-Tunnel, Barsch, schwarze Schwäne) lagen nicht im Rohschnitt; Infotafeln wie die Hörstation sind kein Highlight. *(NaturOparC, 2026-11-27 · S3)*
+- **Clip-Suche per Nummer prüfen:** Dateinamen enthalten Zeitstempel; „0042“ traf `…200423_0002`. Immer den Treffer anschauen. *(2026-11-27)*
+- **Hook: höchstens zwei, verschiedene Effektübergänge, Überlappungen einrechnen.** *(NaturOparC, 2026-11-27 · S3)*
+- **Hook-Gesamt: siehe oben; Rhythmus statt 4×1,7 s:** *(NaturOparC, 2026-11-27 · S3)*
 - **Hook nicht aus dem direkt folgenden Clip nehmen:** sonst wiederholt sich dasselbe Bild nach Sekunden (hier Ziege). *(NaturOparC, 2026-11-27 · S3)*
 - **Review-Tiefe offenlegen:** ein 2-s-Raster über den Export ist keine Schnitt-für-Schnitt-Sichtung (kurze Schnitte fallen durchs Raster). Besser: ≥3 Frames pro Schnitt aus der Schnittliste, auf Kontaktbögen. *(2026-11-27 · S3)*
 - **Familiäres Ausflugsvideo, kein Tiervideo:** ruhige Umgebungsszenen kürzen statt löschen; ein Hook darf Erlebnis/Aktivität (z. B. Brücken/Trittsteine) neben Tieren zeigen; Hook-Suche über das gesamte Material, nicht nur über Clips, die schon im Schnitt sind. *(2026-11-27 · S3/S6)*
@@ -49,7 +54,7 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Bewertungen immer mit Quelle und Datum** — Google/Tripadvisor getrennt ausweisen, nie vermischen. *(Mulhouse · S8)*
 
 ## Privatsphäre (alle Stufen)
-- **Keine erkennbaren Gesichter von Familienmitgliedern** — Fokus auf Tätigkeit, Hände, Tier; im Zweifel Szene weglassen statt bedingt aufnehmen. *(PRODUCTION_STANDARDS §2 · S3/S11)*
+- **Gesichter sind nicht verboten** (fremde wie eigene, besonders von weitem oder kurz). Nur längere Nahaufnahmen der Familie vermeiden; Fokus auf Tätigkeit/Erlebnis. Nie als „nicht erlaubt“ begründen oder Szenen allein deswegen löschen/ersetzen. *(Nutzerklarstellung 2026-11-27 · PRODUCTION_STANDARDS §2 · S3/S11)*
 
 ## Footage-Analyse (S1)
 - **Technische Flags ≠ Inhalt** — ein „unscharfes“ Unterwasserbild kann inhaltlich eine starke Szene sein; getrennt bewerten. *(NaturOparC · S1)*

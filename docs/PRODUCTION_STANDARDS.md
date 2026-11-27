@@ -26,8 +26,10 @@ Visuell cineastisch, aber natürlich und authentisch.
 
 Familienmitglieder stehen grundsätzlich nicht im Mittelpunkt.
 
-Verbindlich:
-- Möglichst keine erkennbaren Gesichter von Familienmitgliedern.
+**Kein Verbot:** Erkennbare Gesichter (fremde Besucher wie auch die eigene Familie) sind erlaubt, besonders aus der Ferne oder nur kurz im Bild (Nutzerklarstellung 2026-11-27). Der Abschnitt ist eine Gestaltungspräferenz: Fokus auf Aktivität/Erlebnis statt Person. Nur *längere Nahaufnahmen* von Familienmitgliedern sind zu vermeiden; kein Grund, Szenen zu löschen oder zu ersetzen, nur weil Gesichter sichtbar sind.
+
+Präferenzen:
+- Möglichst keine längeren Nahaufnahmen erkennbarer Gesichter von Familienmitgliedern.
 - Kinder/Familienmitglieder vorzugsweise von hinten, aus Distanz, oder ohne erkennbares Gesicht.
 - Keine unnötigen Nahaufnahmen von Familienmitgliedern.
 - Familienerlebnisse dürfen gezeigt werden, Fokus liegt aber auf der Aktivität, nicht der Person.
@@ -63,6 +65,10 @@ Richtwert: ca. 6–10 Sekunden. Darf bei begründetem redaktionellem Bedarf abwe
 - Mehrere starke Bilder dürfen schnell kombiniert werden.
 - Die ersten Sekunden müssen Neugier erzeugen.
 - Kein künstliches Clickbait.
+- **Aufbau (bewährt, NaturOparC 2026-11-27):** ca. 8–10 s (nur wenn das Material es trägt) mit ca. 5–7 Szenen und **abwechslungsreichen Längen** (Anfang und Ende 2–2,5 s, Mitte 1–1,5 s, nur wenige ganz kurze Eindrücke) — nie lauter gleich lange Clips und nicht hektisch: der Hook wirkt **durch Inhalt**, nicht durch Tempo; Tiere/Objekte müssen erkennbar sein. Die ersten Sekunden besonders aufmerksamkeitsstark (stärkstes, überraschendstes Bild zuerst), das Ende führt ins Markenintro (z. B. kurzes Ausblenden zu Dunkel). Das gesamte Rohmaterial sichten (auch ungenutzte Clips), schwächere Schilder/Infotafeln nicht als Highlight nehmen. Schnell beginnen, ruhiger Höhepunkt zum Schluss, der ins Markenintro führt. Starke *Momente innerhalb* der Szenen wählen (Tierhandlung, Makro, Bewegung, andere Perspektive), mit dichten Frames im Original geprüft; keine erkennbaren Familiengesichter.
+- **Hook nicht aus dem direkt folgenden Clip nehmen** (Wiederholung nach Sekunden).
+- **Übergänge/Sound nur im Hook dynamischer:** Hard Cut als Standard, **ein bis zwei** Effektübergänge von **unterschiedlichem Typ, nicht direkt hintereinander** (Whip Pan/Swish nur bei passender Bewegungsrichtung, Überblenden als Match, Bewegungsunschärfe, dezenter Zoom; 0,2–0,3 s). Überlappungen der Übergänge in die Hook-Gesamtdauer einrechnen. Sound bewusst sparsam: ein leiser Riser über den Hook plus höchstens ein Whoosh; keine Cartoon-Geräusche. Umsetzung mit CapCut-Bordmitteln; vorher `/my-remotion-library` prüfen.
+- **Hook-Tabelle:** Nr · Originaldatei · Start/Ende im Rohclip (`HH:MM:SS:FF`, Clip-fps) · Dauer · Handlung · Übergang (mit Dauer) · optionaler Sound · Begründung (inkl. Dauerwahl). Datei `analysis/<slug>/HOOK.md`.
 - Keine unnötige Wiederholung der Hook-Highlights später im Video.
 
 ## 5. Schnitt- und Storytelling-Struktur
@@ -123,7 +129,7 @@ Verbindlich für alle Videos (seit 2026-11-24).
 - **Szenenlänge** — zu lang/zu kurz, relativ zum Inhalt (keine starren Sekundenregeln, §5).
 - **Informationsvermittlung** — wo fehlt praktische Information, wo ist sie schwer verständlich, Passung zum Voice-over.
 - **B-Roll-Platzierung** — wo eine Infografik/Karte/Titel einen echten Mehrwert hätte (Katalog §6), mit Vorschlag der Grafikart; Umsetzung in Remotion erst nach Freigabe und nach `docs/BROLL_GUIDELINES.md`.
-- **Privatsphäre (Pflichtprüfung)** — erkennbare Gesichter von Familienmitgliedern gemäß §2 melden.
+- **Privatsphäre (Pflichtprüfung)** — nur längere Nahaufnahmen von Familienmitgliedern (§2, Präferenz) anmerken; sichtbare Gesichter allein sind kein Mangel.
 
 **Arbeitsregeln (verbindlich, seit 2026-11-27):**
 - **Keine Audioanalyse.** Claude analysiert niemals Audiospuren, Lautstärke/LUFS, Hintergrundgeräusche, Musik oder Sprachqualität — auch nicht per Skript. Die gesamte Audiobearbeitung und ihre Qualitätskontrolle macht der Nutzer.
