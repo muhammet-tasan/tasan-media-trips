@@ -47,12 +47,42 @@ export type RouteCheckConfig = {
 	infoLines?: { text: string; size?: 'main' | 'detail' }[];
 	countryLabels?: { code: string; lon: number; lat: number }[];
 	cameraPadding?: { top: number; bottom: number; left: number; right: number };
+	/** 'dark' (default, TASAN dark/gold as in video 1) or 'light' (cream/green, family look). */
+	theme?: 'dark' | 'light';
+	/** Vertical shift of the destination info plate in px (default -55 = as reference). */
+	plateOffsetY?: number;
 };
 export type RouteCheckProps = { holdSeconds: number };
 
-const GOLD = '#d4a24e';
-const GOLD_SOFT = '#f4d78a';
-const COUNTRY_TAG_COLOR = 'rgba(220,220,220,0.55)';
+type Theme = {
+	style: string; bg: string; accent: string; accentSoft: string; tag: string;
+	heading: string; subheading: string; headingShadow: string;
+	border: string; countryLabel: string;
+	routeCasing: string; routeMain: string; routeSecondary: string;
+	marker: string; label: string; labelShadow: string;
+	plateBg: string; plateName: string; plateTagline: string; plateDetail: string; attribution: string; attributionBg: string; timeText: string;
+};
+// 'dark' = exact values of the reference (video 1). 'light' = cream/green family look.
+const THEMES: Record<'dark' | 'light', Theme> = {
+	dark: {
+		style: 'geo/tasan-map-style.json', bg: '#0a0d13', accent: '#d4a24e', accentSoft: '#f4d78a', tag: 'rgba(220,220,220,0.55)',
+		heading: '#f5f5f5', subheading: 'rgba(255,255,255,0.5)', headingShadow: '0 2px 14px rgba(0,0,0,0.8)',
+		border: 'rgba(195,205,215,0.55)', countryLabel: 'rgba(255,255,255,0.22)',
+		routeCasing: 'rgba(6,8,12,0.55)', routeMain: 'rgba(220,172,90,0.95)', routeSecondary: 'rgba(212,162,78,0.75)',
+		marker: '#ffffff', label: '#ffffff', labelShadow: '0 2px 10px rgba(0,0,0,0.7)',
+		plateBg: 'rgba(8,10,15,0.65)', plateName: '#ffffff', plateTagline: '#e4e4e4', plateDetail: 'rgba(255,255,255,0.68)',
+		attribution: 'rgba(255,255,255,0.55)', attributionBg: 'transparent', timeText: '#d4a24e',
+	},
+	light: {
+		style: 'geo/tasan-map-style-light.json', bg: '#f6f1e3', accent: '#d9622b', accentSoft: '#b8460f', tag: 'rgba(60,80,65,0.6)',
+		heading: '#1f3d2b', subheading: 'rgba(31,61,43,0.7)', headingShadow: '0 1px 10px rgba(246,241,227,0.95)',
+		border: 'rgba(70,95,85,0.5)', countryLabel: 'rgba(31,61,43,0.28)',
+		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
+		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
+		plateBg: 'rgba(255,252,242,0.88)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
+		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
+	},
+};
 
 // Timeline (30 fps), same rhythm as the reference: establish 2 s, destination
 // at 2 s, routes from 4 s staggered 38 frames each, optional info after the
@@ -90,6 +120,11 @@ type BorderCollection = {
 };
 type Camera = { lng: number; lat: number; zoom: number };
 
+const cameraAt = (frame: number, start: Camera, end: Camera): Camera => {
+	const t = easeOutCubic(interpolate(frame, [0, ESTABLISH_END], [0, 1], CLAMP));
+	return { lng: start.lng + (end.lng - start.lng) * t, lat: start.lat + (end.lat - start.lat) * t, zoom: start.zoom + (end.zoom - start.zoom) * t };
+};
+
 const FONT = 'Helvetica Neue, Arial, sans-serif';
 
 export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string } & RouteCheckProps> = ({
@@ -100,6 +135,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	const frame = useCurrentFrame();
 	const { fps } = useVideoConfig();
 	const { phases, infoReveal } = routeCheckTimeline(config, holdSeconds, fps);
+	const th = THEMES[config.theme ?? 'dark'];
 	const dest = config.destination;
 	const infoLines = config.infoLines ?? [];
 	const cameraPadding = config.cameraPadding ?? { top: 160, bottom: 320, left: 460, right: 160 };
@@ -110,6 +146,8 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	const startCameraRef = useRef<Camera | null>(null);
 	const lastCameraKeyRef = useRef<string>('');
 	const initialHandleRef = useRef<number | null>(null);
+	const frameRef = useRef(frame); // frame this tab starts on (renders can begin mid-video)
+	frameRef.current = frame;
 
 	const [ready, setReady] = useState(false);
 	const [, forceRerender] = useState(0);
@@ -137,7 +175,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 
 		const map = new MapLibreMap({
 			container: containerRef.current,
-			style: staticFile('geo/tasan-map-style.json'),
+			style: staticFile(th.style),
 			center: [dest.coords.lon, dest.coords.lat],
 			zoom: 9,
 			interactive: false,
@@ -155,8 +193,11 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 			const start: Camera = { lng: end.lng, lat: end.lat, zoom: end.zoom - 0.057 };
 			endCameraRef.current = end;
 			startCameraRef.current = start;
-			map.jumpTo({ center: [start.lng, start.lat], zoom: start.zoom });
-			lastCameraKeyRef.current = JSON.stringify(start);
+			// Start on the camera of the CURRENT frame, not always the start camera: a render tab
+			// that begins mid-video would otherwise show one zoomed-out frame (camera effect ran too early).
+			const first = cameraAt(frameRef.current, start, end);
+			map.jumpTo({ center: [first.lng, first.lat], zoom: first.zoom });
+			lastCameraKeyRef.current = JSON.stringify(first);
 			map.once('idle', () => {
 				setReady(true);
 				if (initialHandleRef.current !== null) continueRender(initialHandleRef.current);
@@ -179,12 +220,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 		const end = endCameraRef.current;
 		if (!map || !start || !end) return;
 
-		const t = easeOutCubic(interpolate(frame, [0, ESTABLISH_END], [0, 1], CLAMP));
-		const camera: Camera = {
-			lng: start.lng + (end.lng - start.lng) * t,
-			lat: start.lat + (end.lat - start.lat) * t,
-			zoom: start.zoom + (end.zoom - start.zoom) * t,
-		};
+		const camera = cameraAt(frame, start, end);
 		const key = JSON.stringify(camera);
 		if (key === lastCameraKeyRef.current) return;
 
@@ -209,7 +245,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	const destPx = ready && map ? map.project([dest.coords.lon, dest.coords.lat]) : null;
 
 	return (
-		<AbsoluteFill style={{ backgroundColor: '#0a0d13' }}>
+		<AbsoluteFill style={{ backgroundColor: th.bg }}>
 			{/* Always mounted so the ref exists for MapLibre */}
 			<div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, width: CANVAS_WIDTH, height: CANVAS_HEIGHT }} />
 
@@ -217,10 +253,10 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 				<>
 					{/* Section heading — fades in once, stays for the whole scene */}
 					<div style={{ position: 'absolute', top: 34, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', opacity: headingOpacity }}>
-						<div style={{ fontFamily: FONT, fontSize: 54, fontWeight: 700, letterSpacing: 5, color: '#f5f5f5', textShadow: '0 2px 14px rgba(0,0,0,0.8)' }}>
+						<div style={{ fontFamily: FONT, fontSize: 54, fontWeight: 700, letterSpacing: 5, color: th.heading, textShadow: th.headingShadow }}>
 							{config.heading}
 						</div>
-						<div style={{ fontFamily: FONT, fontSize: 21, fontWeight: 500, letterSpacing: 2, color: 'rgba(255,255,255,0.5)', marginTop: 8, textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>
+						<div style={{ fontFamily: FONT, fontSize: 21, fontWeight: 500, letterSpacing: 2, color: th.subheading, marginTop: 8, textShadow: th.headingShadow }}>
 							{config.subtitle}
 						</div>
 					</div>
@@ -234,7 +270,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 									return `M ${pts.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ')}`;
 								})
 								.join(' ');
-							return <path key={i} d={d} fill="none" stroke="rgba(195,205,215,0.55)" strokeWidth={2.3} strokeLinecap="round" strokeLinejoin="round" />;
+							return <path key={i} d={d} fill="none" stroke={th.border} strokeWidth={2.3} strokeLinecap="round" strokeLinejoin="round" />;
 						})}
 					</svg>
 
@@ -242,7 +278,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					{(config.countryLabels ?? []).map((c) => {
 						const p = map.project([c.lon, c.lat]);
 						return (
-							<div key={c.code} style={{ position: 'absolute', left: p.x, top: p.y, transform: 'translate(-50%, -50%)', fontFamily: FONT, fontSize: 30, fontWeight: 600, letterSpacing: 7, color: 'rgba(255,255,255,0.22)', whiteSpace: 'nowrap' }}>
+							<div key={c.code} style={{ position: 'absolute', left: p.x, top: p.y, transform: 'translate(-50%, -50%)', fontFamily: FONT, fontSize: 30, fontWeight: 600, letterSpacing: 7, color: th.countryLabel, whiteSpace: 'nowrap' }}>
 								{c.code}
 							</div>
 						);
@@ -260,8 +296,8 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 							const mainWidth = origin.emphasis ? 4 : 3;
 							return (
 								<React.Fragment key={origin.key}>
-									<path d={d} fill="none" stroke="rgba(6,8,12,0.55)" strokeWidth={mainWidth + 2.2} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
-									<path d={d} fill="none" stroke={origin.emphasis ? 'rgba(220,172,90,0.95)' : 'rgba(212,162,78,0.75)'} strokeWidth={mainWidth} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
+									<path d={d} fill="none" stroke={th.routeCasing} strokeWidth={mainWidth + 2.2} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
+									<path d={d} fill="none" stroke={origin.emphasis ? th.routeMain : th.routeSecondary} strokeWidth={mainWidth} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
 								</React.Fragment>
 							);
 						})}
@@ -281,16 +317,16 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 							<React.Fragment key={origin.key}>
 								<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
 									<g transform={`translate(${px.x}, ${px.y}) scale(${markerScale})`} opacity={markerOpacity}>
-										<circle r={radius} fill="#ffffff" />
-										<circle r={radius + 8} fill="none" stroke="#ffffff" strokeWidth={1.5} opacity={0.4} />
+										<circle r={radius} fill={th.marker} />
+										<circle r={radius + 8} fill="none" stroke={th.marker} strokeWidth={1.5} opacity={0.4} />
 									</g>
 								</svg>
-								<div style={{ position: 'absolute', left: px.x + off.x, top: px.y + off.y, fontFamily: FONT, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: '0 2px 10px rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>
-									<div style={{ fontSize: origin.emphasis ? 30 : 26, fontWeight: origin.emphasis ? 700 : 600, color: '#ffffff' }}>
+								<div style={{ position: 'absolute', left: px.x + off.x, top: px.y + off.y, fontFamily: FONT, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: th.labelShadow, whiteSpace: 'nowrap' }}>
+									<div style={{ fontSize: origin.emphasis ? 30 : 26, fontWeight: origin.emphasis ? 700 : 600, color: th.label }}>
 										{origin.label}{' '}
-										{origin.country && <span style={{ color: COUNTRY_TAG_COLOR, fontWeight: 500, fontSize: origin.emphasis ? 22 : 19 }}>{origin.country}</span>}{' '}
-										<span style={{ color: COUNTRY_TAG_COLOR, fontWeight: 500 }}>· Auto</span>{' '}
-										<span style={{ color: GOLD, fontWeight: 500 }}>≈ {origin.time}</span>
+										{origin.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: origin.emphasis ? 22 : 19 }}>{origin.country}</span>}{' '}
+										<span style={{ color: th.tag, fontWeight: 500 }}>· Auto</span>{' '}
+										<span style={{ color: th.timeText, fontWeight: 500 }}>≈ {origin.time}</span>
 									</div>
 								</div>
 							</React.Fragment>
@@ -300,10 +336,10 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					{/* Destination marker */}
 					<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
 						<g transform={`translate(${destPx.x}, ${destPx.y})`}>
-							<circle r={26 * destRing} fill="none" stroke={GOLD} strokeWidth={2} opacity={destRingOpacity} />
+							<circle r={26 * destRing} fill="none" stroke={th.accent} strokeWidth={2} opacity={destRingOpacity} />
 							<g transform={`scale(${destScale})`}>
-								<circle r={18} fill={GOLD} />
-								<circle r={29} fill="none" stroke={GOLD} strokeWidth={2} opacity={0.55} />
+								<circle r={18} fill={th.accent} />
+								<circle r={29} fill="none" stroke={th.accent} strokeWidth={2} opacity={0.55} />
 							</g>
 						</g>
 					</svg>
@@ -313,28 +349,28 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 						style={{
 							position: 'absolute',
 							left: Math.max(40, destPx.x - 40 - 660),
-							top: Math.min(CANVAS_HEIGHT - 380, destPx.y - 55),
+							top: Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55)),
 							width: 660,
 							textAlign: 'right',
 							fontFamily: FONT,
-							backgroundColor: 'rgba(8,10,15,0.65)',
+							backgroundColor: th.plateBg,
 							borderRadius: 16,
 							padding: '20px 30px',
 							opacity: destTitleOpacity,
 						}}
 					>
-						<div style={{ fontSize: 59, fontWeight: 700, color: '#ffffff', letterSpacing: 0.5 }}>
+						<div style={{ fontSize: 59, fontWeight: 700, color: th.plateName, letterSpacing: 0.5 }}>
 							{dest.name}{' '}
-							{dest.country && <span style={{ color: COUNTRY_TAG_COLOR, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
+							{dest.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
 						</div>
-						{dest.tagline && <div style={{ fontSize: 38, fontWeight: 500, color: '#e4e4e4', marginTop: 11 }}>{dest.tagline}</div>}
+						{dest.tagline && <div style={{ fontSize: 38, fontWeight: 500, color: th.plateTagline, marginTop: 11 }}>{dest.tagline}</div>}
 						{infoLines.map((line, i) => (
 							<div
 								key={i}
 								style={{
 									fontSize: line.size === 'detail' ? 24 : 32,
 									fontWeight: line.size === 'detail' ? 400 : 500,
-									color: line.size === 'detail' ? 'rgba(255,255,255,0.68)' : GOLD_SOFT,
+									color: line.size === 'detail' ? th.plateDetail : th.accentSoft,
 									marginTop: i === 0 ? 22 : line.size === 'detail' ? 8 : 26,
 									opacity: infoOpacity,
 								}}
@@ -345,7 +381,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					</div>
 
 					{/* Required attribution, permanently visible */}
-					<div style={{ position: 'absolute', right: 24, bottom: 18, fontFamily: FONT, fontSize: 15, color: 'rgba(255,255,255,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+					<div style={{ position: 'absolute', right: 24, bottom: 18, background: th.attributionBg, padding: '2px 8px', borderRadius: 6, fontFamily: FONT, fontSize: 15, color: th.attribution, textShadow: th.headingShadow }}>
 						OpenFreeMap · © OpenMapTiles · © OpenStreetMap contributors
 					</div>
 				</>
