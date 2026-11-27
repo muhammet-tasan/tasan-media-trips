@@ -36,7 +36,7 @@
         "lon": 7.7521,
         "lat": 48.5734
       },
-      "at": 14.5
+      "at": 15.1
     },
     {
       "key": "freiburg",
@@ -47,7 +47,7 @@
         "lon": 7.8421,
         "lat": 47.999
       },
-      "at": 16
+      "at": 17.2
     },
     {
       "key": "basel",
@@ -59,7 +59,7 @@
         "lon": 7.5886,
         "lat": 47.5596
       },
-      "at": 17.5
+      "at": 19.3
     }
   ],
   "theme": "light",
@@ -110,7 +110,7 @@
     "destinationAt": 1.5,
     "establishSeconds": 1.5,
     "fadeSeconds": 0.6,
-    "endImageAt": 19,
+    "endImageAt": 20.4,
     "plate": {
       "at": 1.5,
       "fade": 0.8
