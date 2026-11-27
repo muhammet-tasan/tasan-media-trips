@@ -44,7 +44,7 @@ export type RouteCheckConfig = {
 	destination: { name: string; tagline?: string; /** where it is, e.g. 'in Hunawihr · bei Colmar' */ location?: string; country?: string; coords: Coords };
 	origins: RouteCheckOrigin[];
 	/** Optional practical info on the plate, revealed after the last route (e.g. parking, public transport). */
-	infoLines?: { text: string; size?: 'main' | 'detail' }[];
+	infoLines?: { text: string; size?: 'main' | 'detail'; /** reveal time in s (default: with the title) */ at?: number; /** fade duration in s */ fade?: number }[];
 	countryLabels?: { code: string; lon: number; lat: number }[];
 	cameraPadding?: { top: number; bottom: number; left: number; right: number };
 	/** 'dark' (default, TASAN dark/gold as in video 1) or 'light' (cream/green, family look). */
@@ -54,6 +54,30 @@ export type RouteCheckConfig = {
 	/** Horizontal shift (px, negative = left) and width of the info plate (default 0 / 660). */
 	plateOffsetX?: number;
 	plateWidth?: number;
+	/** Map background colour (default: theme). */
+	mapBackground?: string;
+	/** Frosted-glass plate: fill colour incl. alpha, blur radius (px), saturation, border, shadow. All optional (default: theme). */
+	plate?: { background?: string; blur?: number; saturate?: number; border?: string; shadow?: string };
+	/** Timing in SECONDS: sync the reveals to the voice-over here, no code changes needed. */
+	timing?: RouteCheckTiming;
+};
+/** at = reveal time (s), fade = fade-in duration (s). */
+export type TextTiming = { at?: number; fade?: number };
+export type RouteCheckTiming = {
+	/** Destination marker (default 2). */
+	destinationAt?: number;
+	/** First origin route starts (default 4); next origins follow every `originStep` s (default 62/30). */
+	firstOriginAt?: number;
+	originStep?: number;
+	/** Default fade-in duration of all text blocks (default 0.6) incl. a small upward move. */
+	fadeSeconds?: number;
+	/** Start of the static end image; total duration = endImageAt + holdSeconds (default: after the last reveal). */
+	endImageAt?: number;
+	/** Info plate itself (default: with the title). */
+	plate?: TextTiming;
+	title?: TextTiming;
+	tagline?: TextTiming;
+	location?: TextTiming;
 };
 export type RouteCheckProps = { holdSeconds: number };
 
@@ -63,7 +87,7 @@ type Theme = {
 	border: string; countryLabel: string;
 	routeCasing: string; routeMain: string; routeSecondary: string;
 	marker: string; label: string; labelShadow: string;
-	plateBg: string; plateGlass: string; plateName: string; plateTagline: string; plateDetail: string; attribution: string; attributionBg: string; timeText: string;
+	plateBg: string; plateBlur: number; plateSaturate: number; plateBorder?: string; plateShadow?: string; plateName: string; plateTagline: string; plateDetail: string; attribution: string; attributionBg: string; timeText: string;
 };
 // 'dark' = exact values of the reference (video 1). 'light' = cream/green family look.
 const THEMES: Record<'dark' | 'light', Theme> = {
@@ -73,7 +97,7 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(195,205,215,0.55)', countryLabel: 'rgba(255,255,255,0.22)',
 		routeCasing: 'rgba(6,8,12,0.55)', routeMain: 'rgba(220,172,90,0.95)', routeSecondary: 'rgba(212,162,78,0.75)',
 		marker: '#ffffff', label: '#ffffff', labelShadow: '0 2px 10px rgba(0,0,0,0.7)',
-		plateBg: 'rgba(8,10,15,0.65)', plateGlass: 'none', plateName: '#ffffff', plateTagline: '#e4e4e4', plateDetail: 'rgba(255,255,255,0.68)',
+		plateBg: 'rgba(8,10,15,0.65)', plateBlur: 0, plateSaturate: 1, plateName: '#ffffff', plateTagline: '#e4e4e4', plateDetail: 'rgba(255,255,255,0.68)',
 		attribution: 'rgba(255,255,255,0.55)', attributionBg: 'transparent', timeText: '#d4a24e',
 	},
 	light: {
@@ -82,31 +106,48 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(70,95,85,0.5)', countryLabel: 'rgba(31,61,43,0.28)',
 		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
 		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
-		plateBg: 'linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04))', plateGlass: 'blur(18px) saturate(1.25)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
+		plateBg: 'rgba(250,247,235,0.3)', plateBlur: 6, plateSaturate: 1.15, plateBorder: '1.5px solid rgba(255,255,255,0.7)', plateShadow: '0 6px 28px rgba(31,61,43,0.10)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
 		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
 	},
 };
 
-// Timeline (30 fps): establish 2 s; destination name + location + practical info
-// fade in together at 2 s; origins follow in config order from 4 s, each one
-// followed by 1 s of calm; then a fully static hold (`holdSeconds`, free parameter).
+// Timeline (30 fps), all times configurable in seconds via config.timing (defaults below):
+// 2 s establish (map + heading) -> origins in config order (each: route draw + marker + label)
+// -> title / tagline / location / every infoLine fade in at their own `at` -> static end image
+// (`endImageAt` + `holdSeconds`). The plate keeps its final size from the start, so nothing shifts.
 const ESTABLISH_END = 60;
-const DEST_REVEAL = 60;
-const FIRST_ORIGIN = 120;
 const ORIGIN_DRAW = 24;
 const LABEL_IN = 32; // marker + label fully visible this many frames after an origin starts
-const ORIGIN_PAUSE = 30; // 1 s of calm after each origin is fully shown, then the next one starts
-const ORIGIN_STEP = LABEL_IN + ORIGIN_PAUSE;
 const HEADING_FADE_IN = [6, 28] as const;
+const RISE_PX = 10; // small upward move of fading text
+
+type Block = { at: number; dur: number };
 
 export const routeCheckTimeline = (cfg: RouteCheckConfig, holdSeconds: number, fps = 30) => {
+	const t = cfg.timing ?? {};
+	const f = (sec: number) => Math.round(sec * fps);
+	const destSec = t.destinationAt ?? 2;
+	const fadeDef = t.fadeSeconds ?? 0.6;
+	const block = (tt: TextTiming | undefined, fallbackAt: number, fallbackFade = fadeDef): Block => ({
+		at: f(tt?.at ?? fallbackAt),
+		dur: Math.max(1, f(tt?.fade ?? fallbackFade)),
+	});
+	const firstOrigin = f(t.firstOriginAt ?? 4);
+	const step = f(t.originStep ?? 62 / 30);
 	const phases = cfg.origins.map((o, i) => {
-		const start = FIRST_ORIGIN + i * ORIGIN_STEP;
+		const start = firstOrigin + i * step;
 		return { key: o.key, start, drawEnd: start + ORIGIN_DRAW, end: start + LABEL_IN };
 	});
-	const lastEnd = phases[phases.length - 1].end;
-	const duration = Math.round(lastEnd + holdSeconds * fps);
-	return { phases, infoReveal: DEST_REVEAL, duration };
+	const title = block(t.title, destSec);
+	const tagline = block(t.tagline, destSec);
+	const location = block(t.location, destSec);
+	const plate = block(t.plate, t.title?.at ?? destSec, t.title?.fade ?? fadeDef);
+	const info = (cfg.infoLines ?? []).map((l) => block({ at: l.at, fade: l.fade }, destSec));
+	const blocks = [title, tagline, location, plate, ...info];
+	const lastEnd = Math.max(phases[phases.length - 1].end, ...blocks.map((x) => x.at + x.dur));
+	const endImage = Math.max(lastEnd, t.endImageAt !== undefined ? f(t.endImageAt) : 0);
+	const duration = Math.round(endImage + holdSeconds * fps);
+	return { phases, destReveal: f(destSec), title, tagline, location, plate, info, endImage, duration };
 };
 
 const SPRING_CONFIG = { damping: 16, stiffness: 120, mass: 0.6, overshootClamping: true };
@@ -137,8 +178,13 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 }) => {
 	const frame = useCurrentFrame();
 	const { fps } = useVideoConfig();
-	const { phases, infoReveal } = routeCheckTimeline(config, holdSeconds, fps);
-	const th = THEMES[config.theme ?? 'dark'];
+	const tl = routeCheckTimeline(config, holdSeconds, fps);
+	const { phases } = tl;
+	const th = { ...THEMES[config.theme ?? 'dark'] };
+	if (config.mapBackground) th.bg = config.mapBackground;
+	const ps = config.plate ?? {};
+	const plateBlur = ps.blur ?? th.plateBlur;
+	const plateFilter = plateBlur > 0 ? `blur(${plateBlur}px) saturate(${ps.saturate ?? th.plateSaturate})` : 'none';
 	const dest = config.destination;
 	const infoLines = config.infoLines ?? [];
 	const plateWidth = config.plateWidth ?? 660;
@@ -190,6 +236,10 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 
 		map.once('load', () => {
 			map.resize();
+			if (config.mapBackground) {
+				const bgLayer = map.getStyle().layers.find((l) => l.type === 'background');
+				if (bgLayer) map.setPaintProperty(bgLayer.id, 'background-color', config.mapBackground);
+			}
 			const cam = map.cameraForBounds(bounds, { padding: cameraPadding });
 			const camCenter = cam?.center ? LngLat.convert(cam.center) : null;
 			const end: Camera = { lng: camCenter?.lng ?? dest.coords.lon, lat: camCenter?.lat ?? dest.coords.lat, zoom: cam?.zoom ?? 9.5 };
@@ -238,11 +288,16 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [frame]);
 
+	const DEST_REVEAL = tl.destReveal;
 	const destScale = spring({ frame: frame - DEST_REVEAL, fps, config: SPRING_CONFIG });
 	const destRing = interpolate(frame, [DEST_REVEAL, DEST_REVEAL + 34], [0.4, 1.5], CLAMP);
 	const destRingOpacity = interpolate(frame, [DEST_REVEAL, DEST_REVEAL + 10, DEST_REVEAL + 34], [0, 0.5, 0], CLAMP);
-	const destTitleOpacity = interpolate(frame, [DEST_REVEAL, DEST_REVEAL + 30], [0, 1], CLAMP);
-	const infoOpacity = interpolate(frame, [infoReveal, infoReveal + 30], [0, 1], CLAMP);
+	// Text block reveal: short fade-in with a minimal upward move; the layout slot is always reserved.
+	const reveal = (b: Block): React.CSSProperties => {
+		const p = easeOutCubic(interpolate(frame, [b.at, b.at + b.dur], [0, 1], CLAMP));
+		return { opacity: p, transform: p >= 1 ? undefined : `translateY(${((1 - p) * RISE_PX).toFixed(2)}px)` };
+	};
+	const platePct = interpolate(frame, [tl.plate.at, tl.plate.at + tl.plate.dur], [0, 1], CLAMP);
 	const headingOpacity = interpolate(frame, [HEADING_FADE_IN[0], HEADING_FADE_IN[1]], [0, 1], CLAMP);
 
 	const map = mapRef.current;
@@ -348,7 +403,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 						</g>
 					</svg>
 
-					{/* Destination info plate — large phone-readable text on a plate so no route line crosses it */}
+					{/* Destination info plate: glass layer (own opacity) + fully opaque text blocks on top; final size from frame 0 */}
 					<div
 						style={{
 							position: 'absolute',
@@ -357,36 +412,43 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 							width: plateWidth,
 							textAlign: 'right',
 							fontFamily: FONT,
-							background: th.plateBg,
-							backdropFilter: th.plateGlass,
-							WebkitBackdropFilter: th.plateGlass,
-							border: th.plateGlass === 'none' ? undefined : '1.5px solid rgba(255,255,255,0.85)',
-							boxShadow: th.plateGlass === 'none' ? undefined : '0 8px 32px rgba(31,61,43,0.12)',
-							borderRadius: 16,
-							padding: '20px 30px',
-							opacity: destTitleOpacity,
 						}}
 					>
-						<div style={{ fontSize: 59, fontWeight: 700, color: th.plateName, letterSpacing: 0.5 }}>
-							{dest.name}{' '}
-							{dest.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
-						</div>
-						{dest.tagline && <div style={{ fontSize: 38, fontWeight: 500, color: th.plateTagline, marginTop: 11 }}>{dest.tagline}</div>}
-						{dest.location && <div style={{ fontSize: 30, fontWeight: 500, color: th.plateDetail, marginTop: 8 }}>📍 {dest.location}</div>}
-						{infoLines.map((line, i) => (
-							<div
-								key={i}
-								style={{
-									fontSize: line.size === 'detail' ? 24 : 32,
-									fontWeight: line.size === 'detail' ? 400 : 500,
-									color: line.size === 'detail' ? th.plateDetail : th.accentSoft,
-									marginTop: i === 0 ? 22 : line.size === 'detail' ? 8 : 26,
-									opacity: infoOpacity,
-								}}
-							>
-								{line.text}
+						<div
+							style={{
+								position: 'absolute',
+								inset: 0,
+								borderRadius: 16,
+								background: ps.background ?? th.plateBg,
+								backdropFilter: plateFilter,
+								WebkitBackdropFilter: plateFilter,
+								border: plateBlur > 0 ? (ps.border ?? th.plateBorder) : undefined,
+								boxShadow: plateBlur > 0 ? (ps.shadow ?? th.plateShadow) : undefined,
+								opacity: platePct,
+							}}
+						/>
+						<div style={{ position: 'relative', padding: '20px 30px' }}>
+							<div style={{ fontSize: 59, fontWeight: 700, color: th.plateName, letterSpacing: 0.5, ...reveal(tl.title) }}>
+								{dest.name}{' '}
+								{dest.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
 							</div>
-						))}
+							{dest.tagline && <div style={{ fontSize: 38, fontWeight: 500, color: th.plateTagline, marginTop: 11, ...reveal(tl.tagline) }}>{dest.tagline}</div>}
+							{dest.location && <div style={{ fontSize: 30, fontWeight: 500, color: th.plateDetail, marginTop: 8, ...reveal(tl.location) }}>📍 {dest.location}</div>}
+							{infoLines.map((line, i) => (
+								<div
+									key={i}
+									style={{
+										fontSize: line.size === 'detail' ? 24 : 32,
+										fontWeight: line.size === 'detail' ? 400 : 500,
+										color: line.size === 'detail' ? th.plateDetail : th.accentSoft,
+										marginTop: i === 0 ? 22 : line.size === 'detail' ? 8 : 26,
+										...reveal(tl.info[i]),
+									}}
+								>
+									{line.text}
+								</div>
+							))}
+						</div>
 					</div>
 
 					{/* Required attribution, permanently visible */}

@@ -16,7 +16,7 @@ Exactly one video is Active at any time. This block is the **only** place that h
 - **Next steps (concrete):**
   1. User: refine the cut per `ROUGHCUT_REVIEW.md`; export again.
   2. Claude: review v2; then S4 narration (questions + 2–3 proposals).
-  3. After the cut and narration stand: S6 graphics plan (captions, intro/watermark, Route Check for NaturOparC, review section) → S7 build. Route Check for NaturOparC is **built and rendered** (2026-11-27): `out/naturoparc/NaturoparcRouteCheck.mp4` (14 s, light theme, `holdSeconds` configurable), generic `src/route-check/RouteCheck.tsx` + `src/naturoparc/route-check.json`; still open: final duration from narration, final time labels (currently OSRM-rounded). See `docs/BROLL_GUIDELINES.md` §13.
+  3. After the cut and narration stand: S6 graphics plan (captions, intro/watermark, Route Check for NaturOparC, review section) → S7 build. Route Check for NaturOparC is **built and rendered** (2026-11-27): `out/naturoparc/NaturoparcRouteCheck.mp4` (21 s, light theme, staggered text reveals, all timings in `route-check.json` → `timing`, end image `holdSeconds`), generic `src/route-check/RouteCheck.tsx` + `src/naturoparc/route-check.json`; still open: final duration from narration, final time labels (currently OSRM-rounded). See `docs/BROLL_GUIDELINES.md` §13.
 - **Details:** `## Video: NaturOparC` below; plan in `analysis/naturoparc/FINAL_TIMELINE_PLAN.md`.
 
 ## Video Registry
@@ -206,7 +206,7 @@ Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/
 - Short, never boring; tips and honest review for viewers. If it works, promote the pieces to channel standards (`docs/PRODUCTION_STANDARDS.md` §6).
 
 ### Route Check (2026-11-27)
-- Built early at the user's request (normally S7). Origins Basel/Freiburg/Colmar/Strasbourg as in video 1; routes real OSRM (`public/geo/naturoparc-routes.geojson`); times Basel 1 Std., Freiburg 1 Std., Colmar 20 Min., Strasbourg 50 Min. (OSRM, no traffic); destination 48.17999 N / 7.32264 E (OSM). Light theme (cream/green, `theme: light`), 14.1 s (`holdSeconds` 2.5 incl. info lines). Plate info verified 2026-11-27: parking free (tourisme-mulhouse.com listing "Free parking for cars", TripAdvisor review concurs), bus line 106 Colmar–Hunawihr (naturoparc.fr/infos-pratiques/acces; no stop name published, timetable via FLUO Grand Est). No parking price/space count shown (not confirmed).
+- Built early at the user's request (normally S7). Origins Basel/Freiburg/Colmar/Strasbourg as in video 1; routes real OSRM (`public/geo/naturoparc-routes.geojson`); times Basel 1 Std., Freiburg 1 Std., Colmar 20 Min., Strasbourg 50 Min. (OSRM, no traffic); destination 48.17999 N / 7.32264 E (OSM). Light theme (cream/green, `theme: light`), 21 s (2026-11-27: routes 2-7 s, title 7 s, tagline 9 s, location 10 s, parking 12 s, bus 15 s, end image 19 s + 2 s; glass plate 30% cream + blur 6 px). Plate info verified 2026-11-27: parking free (tourisme-mulhouse.com listing "Free parking for cars", TripAdvisor review concurs), bus line 106 Colmar–Hunawihr (naturoparc.fr/infos-pratiques/acces; no stop name published, timetable via FLUO Grand Est). No parking price/space count shown (not confirmed).
 
 ### Decisions Made
 - See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24/26 entries in the Session Log.

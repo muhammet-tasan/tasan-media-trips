@@ -62,14 +62,17 @@
   "plateOffsetY": -240,
   "infoLines": [
     {
-      "text": "Parkplatz · kostenlos"
+      "text": "Parkplatz · kostenlos",
+      "at": 12
     },
     {
-      "text": "Auch mit dem Bus ab Colmar"
+      "text": "Auch mit dem Bus ab Colmar",
+      "at": 15
     },
     {
       "text": "Linie 106 Colmar → Hunawihr",
-      "size": "detail"
+      "size": "detail",
+      "at": 16.5
     }
   ],
   "countryLabels": [
@@ -90,5 +93,33 @@
     }
   ],
   "plateWidth": 620,
-  "plateOffsetX": -307
+  "plateOffsetX": -307,
+  "mapBackground": "#f6f1e3",
+  "plate": {
+    "background": "rgba(250,247,235,0.3)",
+    "blur": 6,
+    "saturate": 1.15,
+    "border": "1.5px solid rgba(255,255,255,0.7)",
+    "shadow": "0 6px 28px rgba(31,61,43,0.10)"
+  },
+  "timing": {
+    "destinationAt": 2,
+    "firstOriginAt": 2,
+    "originStep": 1.33,
+    "fadeSeconds": 0.6,
+    "endImageAt": 19,
+    "plate": {
+      "at": 6.7,
+      "fade": 0.8
+    },
+    "title": {
+      "at": 7
+    },
+    "tagline": {
+      "at": 9
+    },
+    "location": {
+      "at": 10
+    }
+  }
 }
