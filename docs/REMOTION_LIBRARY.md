@@ -17,7 +17,7 @@ Nur **verfügbare, eigenständig nutzbare** Komponenten, ohne Technik. Neue frei
 | Animationseffekte | MarkerPulse | Ein Ortspunkt springt ein und sendet einen Puls-Ring aus (oder ruhig ohne Puls) |
 
 Status: ✅ verfügbar (konfigurierbar, wiederverwendbar) · 🧪 vorhanden, aber videospezifisch/intern (nur nach Refactoring oder als Vorlage nutzbar) · 📋 geplant (existiert nicht).
-Alle Kompositionen: 30 fps, MP4 (H.264, Remotion-Standard) über `npx remotion render src/index.ts <CompositionId> out/<slug>/<CompositionId>.mp4`; Einzelbild `npx remotion still …`. Standardformat 1920×1080 (Intro 4K). Registrierung in `src/Root.tsx`. Design-/Timing-Standards und Nutzerpräferenzen: `docs/BROLL_GUIDELINES.md` (§13 Route Check, §14 bewährte Muster).
+Alle Kompositionen: Export-Standard `PRODUCTION_STANDARDS` §10 (4K UHD, 30 fps, H.264 CRF 16, Rec. 709, AAC 48 kHz; in `remotion.config.ts`; 1080p-Szenen mit `--scale=2`), MP4 über `npx remotion render src/index.ts <CompositionId> out/<slug>/<CompositionId>.mp4`; Einzelbild `npx remotion still …`. Registrierung in `src/Root.tsx`. Design-/Timing-Standards und Nutzerpräferenzen: `docs/BROLL_GUIDELINES.md` (§13 Route Check, §14 bewährte Muster).
 
 ## 1. Vollständige Videosequenzen
 
@@ -58,8 +58,8 @@ Nicht entworfen.
 - **Einsatz:** „Standort & Anreise“ in jedem Video (S6/S7).
 - **Pfade:** Komponente `src/route-check/RouteCheck.tsx` · Config `src/<slug>/route-check.json` · Wrapper `src/<slug>/<Name>RouteCheck.tsx` · Routen `public/geo/<slug>-routes.geojson` · Stile `public/geo/tasan-map-style(-light).json` · Grenzen `public/geo/country-borders.geojson` · Erstbau `scripts/new-route-check.py`, Routen neu `scripts/fetch-routes.py <slug>`.
 - **Konfiguration** (Typ `RouteCheckConfig`, im Code dokumentiert): `heading`, `subtitle`, `destination{name,tagline,location,country,coords}`, `origins[{key,label,country,time,emphasis,coords,labelOffset,at}]`, `infoLines[{text,size,at,fade}]`, `countryLabels`, `cameraPadding`, `theme`, `mapBackground`, `plate{background,blur,saturate,border,shadow}`, `plateOffsetX/Y`, `plateWidth`, `timing{establishSeconds,destinationAt,firstOriginAt,originStep,fadeSeconds,endImageAt,plate,title,tagline,location}` (alles in Sekunden). Prop `holdSeconds` = Endbild-Dauer; Gesamtdauer = `endImageAt` + `holdSeconds` (`routeCheckTimeline()`).
-- **Beispiel:** `python3 scripts/new-route-check.py <slug> --name … --place … --heading … --subtitle … --origins "Basel|CH,…"`, dann das ausgegebene `<Composition>` (mit `calculateMetadata` über `routeCheckTimeline`) in `src/Root.tsx` einfügen; Referenz `NaturoparcRouteCheck`. Render: `npx remotion render src/index.ts NaturoparcRouteCheck out/naturoparc/NaturoparcRouteCheck.mp4` (≈ 80 s für 22 s).
-- **Format:** 1920×1080, 30 fps, MP4; deckend (kein Alpha), also als eigene B-Roll-Szene, nicht als Overlay.
+- **Beispiel:** `python3 scripts/new-route-check.py <slug> --name … --place … --heading … --subtitle … --origins "Basel|CH,…"`, dann das ausgegebene `<Composition>` (mit `calculateMetadata` über `routeCheckTimeline`) in `src/Root.tsx` einfügen; Referenz `NaturoparcRouteCheck`. Render: `npx remotion render src/index.ts NaturoparcRouteCheck out/naturoparc/NaturoparcRouteCheck.mp4 --scale=2` (4K).
+- **Format:** entworfen in 1920×1080, Ausgabe 3840×2160 mit `--scale=2` (Standard §10), 30 fps, MP4; deckend (kein Alpha), also als eigene B-Roll-Szene, nicht als Overlay.
 - **Einschränkungen:** Kacheln werden beim Rendern live von OpenFreeMap geladen (Internet nötig); Labeltexte fest deutsch/Auto (`· Auto ≈ …`, `📍`); nur Verkehrsmittel Auto; Label-Kollisionen im Endbild von Hand lösen (`labelOffset`, `countryLabels`); neue Farbpalette = Eintrag in `THEMES`; Kamera-Push-in (`cameraAt` + MapLibre `jumpTo`) ist an die Karte gebunden und bewusst Teil von `RouteCheck`. Gebaut aus `AnimatedTitle`, `TextReveal`, `GlassPanel`/`DarkPanel`, `RouteDraw`, `MarkerPulse` (§4–§7).
 - **Details/Standards:** `docs/BROLL_GUIDELINES.md` §13.
 

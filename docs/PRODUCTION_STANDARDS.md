@@ -176,3 +176,21 @@ Alle selbst entwickelten Remotion-Bausteine stehen im Katalog `docs/REMOTION_LIB
 3. Verwendung und Konfiguration dort dokumentieren (Details/Standards in `docs/BROLL_GUIDELINES.md`, nicht doppelt).
 4. Neue Erkenntnisse in `docs/LEARNINGS.md` bzw. Gestaltungspräferenzen in `BROLL_GUIDELINES` §14 festhalten (nur finale, freigegebene Stände).
 5. `/my-remotion-library` und Katalog aktuell halten (veraltete Einträge korrigieren).
+
+## 10. Export-Standard für eigenständige Remotion-Videosequenzen (verbindlich)
+
+Gilt für jede Remotion-Szene, die als eigene MP4 in CapCut importiert wird (Route Check, Intro, Trip Score …). Festgelegt in `remotion.config.ts`, daher reicht der normale Befehl:
+`npx remotion render src/index.ts <CompositionId> out/<slug>/<CompositionId>.mp4 [--scale=2]`
+
+| Eigenschaft | Standard |
+|---|---|
+| Auflösung | 3840 × 2160 (4K UHD). Auf 1920×1080 entworfene Szenen mit `--scale=2` rendern (echtes 2×-Rendering, nie fertige MP4 hochskalieren); 4K-native Kompositionen (z. B. `TasanBrandIntro`) ohne `--scale` |
+| Framerate | 30 fps (konstant) |
+| Codec | H.264 (`yuv420p`), CRF 16 (Spanne 16–18), Frames als PNG (`setVideoImageFormat('png')`) |
+| Farbraum | SDR, Rec. 709 (`bt709`), Limited Range (tv) |
+| Audio | AAC, 48 kHz (Remotion-Standard); vorhandene Sounds unverändert |
+| Kompatibilität | CapCut-Import getestet über Standardprofil (H.264/AAC, yuv420p, CFR) |
+
+- **Prüfen vor Abgabe:** `npx remotion ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate,pix_fmt,color_space,color_range,sample_rate -of default=nw=1 <mp4>`. Bestehende Dateien, die dem Standard entsprechen, nicht neu rendern.
+- **Transparente Overlays** (Alpha, Wasserzeichen/Captions) werden getrennt behandelt und nutzen diese Einstellungen nicht.
+- Design, Timing und Sounds ändern sich durch den Export-Standard nie; bei Neurender gegen die vorherige Version prüfen (Layout gleich, nur schärfer).

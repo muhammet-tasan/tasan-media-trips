@@ -267,7 +267,7 @@ Distilled from the approved Route Check (NaturOparC), the Mulhouse reference sce
 - Brand intro: composite the original Kling video, never recreate; constant crop from frame 0; background matched with `mix-blend-mode: lighten`; fade 0.5 s + 1 s hold; 4K.
 
 **Rendering and checking**
-- `npx remotion render src/index.ts <Id> out/<slug>/<Id>.mp4` (H.264, 30 fps, 1080p; intro 4K); duration from `calculateMetadata`; MapLibre scenes need internet for tiles (≈ 80 s for 22 s).
+- `npx remotion render src/index.ts <Id> out/<slug>/<Id>.mp4` (export standard `PRODUCTION_STANDARDS` §10: 4K, 30 fps, H.264 CRF 16, Rec. 709, AAC 48 kHz; add `--scale=2` for scenes designed at 1080p); duration from `calculateMetadata`; MapLibre scenes need internet for tiles (≈ 80 s for 22 s).
 - Check real MP4 frames after every reveal (`npx remotion ffmpeg -ss <t> -i <mp4> -frames:v 1 <png>`, contact sheet with PIL), not only stills: render tabs start mid-video, text can flicker ±1 px (round positions), glass must be judged on the render.
 - Windows: no `/tmp` for helper files; write scratch files to the scratchpad.
 
