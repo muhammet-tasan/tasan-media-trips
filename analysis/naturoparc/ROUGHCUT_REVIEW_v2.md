@@ -1,31 +1,22 @@
-# NaturOparC — Schnittanleitung für CapCut (Stand: Entwurf `1124`, 30 fps)
+# NaturOparC — Schnittanleitung für CapCut (Stand: gespeicherter Entwurf `1124`, 30 fps, 51 Segmente, 00:03:01:25)
 
-Alle Zeiten im CapCut-Format `HH:MM:SS:FF` (Projekt 30 fps; die verwendeten Originalclips haben 29,97 fps, die Zeiten sind wie in CapCut angezeigt). Die erste Spalte ist immer die **Timeline**; Zeiten **„im Originalclip“** stehen nur in der Spalte „Änderung“.
-**Reihenfolge = Abarbeitung:** vom Videoende zum Videoanfang, die Hook-Clips ganz zum Schluss (in Abspielreihenfolge). So bleiben die Timecodes der noch offenen Zeilen gültig. Raw-Clips: `…\capcut\2026 - Naturoparc Colmar\Raw\`.
+Datenquelle: der aktuell gespeicherte CapCut-Entwurf (neu eingelesen) und die tatsächlich verwendeten Ausschnitte der Originalclips — kein Export. Alle Zeiten `HH:MM:SS:FF` (Projekt 30 fps); erste Spalte = **Timeline**, Zeiten **„im Originalclip“** stehen nur in der Spalte „Änderung“. Reihenfolge = Abarbeitung: vom Videoende zum Anfang, Hook zuletzt. Raw: `…\capcut\2026 - Naturoparc Colmar\Raw\`.
 
-| Timecode (CapCut-Timeline) | Szene | Änderung | Dauer | Priorität |
+Nicht neu geprüft werden konnten die beiden Kombinationsclips (Holzschild „Quel bruit fait la cigogne ?“ bei 00:00:18:29 und Tunnelfenster bei 00:01:49:02): CapCut speichert ihren Inhalt nicht lesbar im Entwurf. Dafür gibt es keine Empfehlung.
+
+| Timecode (Timeline) | Szene | Änderung | Dauer | Begründung / Mehrwert |
 |---|---|---|---|---|
-| 00:02:46:02 – 00:02:49:14 | Ziege geht weg, Schwenk auf kleine Ziege im Stall | Kürzen: Schnitt setzen bei 00:02:48:17 | 00:00:02:15 | optional |
-| 00:02:42:26 – 00:02:46:02 | Ziege mit Hörnern, Hand streichelt | Verlängern: Ende bei 00:02:46:26 setzen (Originalclip `DJI_20260906222458_0054_D.MP4` läuft dann bis 00:00:04:00) | 00:00:04:00 | optional |
-| 00:02:34:15 – 00:02:39:19 | Schweinegehege, Schwein klein (zwei Einstellungen) | Beide löschen (die Einstellung danach zeigt das Schwein groß) | – | optional |
-| 00:02:14:14 – 00:02:17:02 | Enten auf dunklem Wasser, kontrastarm | Löschen | – | optional |
-| 00:02:07:29 – 00:02:10:25 | Schwäne laufen im Gras | Verlängern: Ende bei 00:02:11:14 setzen | 00:00:03:15 | optional |
-| 00:02:07:11 – 00:02:07:29 | Schwäne, Rest-Schnipsel | Löschen | – | notwendig |
-| 00:02:04:28 – 00:02:07:11 | Schwäne weit weg im Efeu | Ersetzen durch `DJI_20260906221707_0051_D.MP4`, im Originalclip 00:00:03:00 – 00:00:05:12 (Schwäne nah am Ufer) | 00:00:02:12 | optional |
-| 00:01:53:10 – 00:01:57:13 | Grünes Tunnelfenster ohne Tier | Kürzen: Schnitt setzen bei 00:01:55:10 | 00:00:02:00 | optional |
-| 00:01:50:18 – 00:01:53:10 | Otter im Unterwasserfenster | Anfang im Originalclip verschieben: `DJI_20260906213728_0037_D.MP4`, im Originalclip 00:00:02:24 – 00:00:05:15 (Otter schwimmt dort mittig); Länge bleibt | 00:00:02:21 | optional |
-| 00:01:43:23 – 00:01:46:11 | Seerosen, fast gleich wie davor | Löschen | – | optional |
-| 00:01:15:13 – 00:01:19:02 | Wiese mit fernen Vögeln | Kürzen: Schnitt setzen bei 00:01:17:13 | 00:00:02:00 | optional |
-| 00:01:07:26 – 00:01:11:08 | Wassertropfen-Schild an Efeuwand | Kürzen: Schnitt setzen bei 00:01:09:26 | 00:00:02:00 | optional |
-| 00:01:04:05 – 00:01:07:26 | Koi-Fütterung, Mädchen und Mann sichtbar | Ersetzen durch `DJI_20260906205019_0017_D.MP4`, im Originalclip 00:00:06:24 – 00:00:09:09. Bild auf ca. 160 % vergrößern und so verschieben, dass nur die untere rechte Hälfte (Hände, Fische) zu sehen ist: links keine Köpfe, oben rechts kein Mann | 00:00:02:15 | notwendig |
-| 00:01:00:10 – 00:01:04:05 | Koi-Fütterung, Kindergesichter deutlich zu sehen | Löschen | – | notwendig |
-| 00:00:57:08 – 00:01:00:10 | Enten am Ufer, fast derselbe Standpunkt wie davor | Löschen | – | optional |
-| 00:00:23:07 – 00:00:29:10 | Holzschild „Quel bruit fait la cigogne ?“ | Ende abschneiden: Schnitt setzen bei 00:00:25:22 | 00:00:02:15 | notwendig |
-| 00:00:00:00 – 00:00:23:07 | Zwei Ziegen-Clips am Anfang (neu seit dem Export, nicht Teil der Analyse) | Nur falls Platzhalter: löschen, erst nach allen Änderungen darüber (sonst verschieben sich alle Timecodes in dieser Tabelle) | – | optional |
-| 00:00:00:00 – 00:00:01:21 (neu, nach allen anderen Änderungen) | Hook: Ziege senkt die Hörner, Hand streichelt | Ganz an den Anfang einfügen: `DJI_20260906222458_0054_D.MP4`, im Originalclip 00:00:04:24 – 00:00:06:15 | 00:00:01:21 | notwendig |
-| 00:00:01:21 – 00:00:03:12 (neu, nach allen anderen Änderungen) | Hook: Schildkröte schwimmt neben den sonnenden | Direkt hinter dem vorherigen Hook-Clip einfügen: `DJI_20260906204349_0014_D.MP4`, im Originalclip 00:00:29:12 – 00:00:31:03 | 00:00:01:21 | notwendig |
-| 00:00:03:12 – 00:00:05:03 (neu, nach allen anderen Änderungen) | Hook: Holzbrücken und Trittsteine über grünem Teich | Direkt hinter dem vorherigen Hook-Clip einfügen: `DJI_20260906221910_0052_D.MP4`, im Originalclip 00:00:08:00 – 00:00:09:21 | 00:00:01:21 | notwendig |
-| 00:00:05:03 – 00:00:06:24 (neu, nach allen anderen Änderungen) | Hook: Otter schwimmt im Unterwasserfenster | Direkt hinter dem vorherigen Hook-Clip einfügen: `DJI_20260906213728_0037_D.MP4`, im Originalclip 00:00:03:00 – 00:00:04:21 | 00:00:01:21 | notwendig |
+| 00:02:10:06 – 00:02:12:24 | Enten auf dunklem Wasser, derselbe Clip läuft direkt davor | Löschen | – | Die Enten sind im dunklen Wasser kaum zu erkennen. Dieselbe Einstellung (00:02:06:17 – 00:02:10:06) zeigt sie besser. Der Übergang zur Hör-Station mit Klappen wird dadurch knapper und abwechslungsreicher. |
+| 00:02:03:03 – 00:02:03:21 | Schwäne, 0,6-Sekunden-Schnipsel zwischen zwei Teilen desselben Clips | Löschen | – | Ein 18-Frames-Fetzen wirkt wie ein Schnittfehler (Flackern), nicht wie ein Stilmittel. |
+| 00:02:00:20 – 00:02:03:03 | Schwäne winzig im Efeu, nur dunkle Punkte | Ersetzen durch `DJI_20260906221707_0051_D.MP4`, im Originalclip 00:00:03:00 – 00:00:05:12 | 00:00:02:12 | In der Szene ist ohne Erklärung nicht zu erkennen, dass es Schwäne sind. Der Ersatzclip zeigt sie groß am Ufer: bessere Pointe für Voice-over und Beschriftung. |
+| 00:01:39:15 – 00:01:42:03 | Seerosen-Teich, zweiter Ausschnitt | Löschen | – | Gleicher Standpunkt und gleiche Blätter wie 00:01:36:19 – 00:01:39:15. Die Wiederholung bringt keine neue Information, danach folgt sofort der Otter-Bereich. |
+| 00:00:59:27 – 00:01:03:18 | Koi-Fütterung, Mädchen und Mann erkennbar | Ersetzen durch `DJI_20260906205019_0017_D.MP4`, im Originalclip 00:00:06:24 – 00:00:09:09. Bild auf ca. 160 % vergrößern, nur untere rechte Hälfte (Hände, Fische) zeigen | 00:00:02:15 | Gesichter von Familienmitgliedern sind nach den Produktionsstandards (§2) nicht erlaubt. Hände und Fische transportieren die Szene ohne Gesichter. |
+| 00:00:56:02 – 00:00:59:27 | Koi-Fütterung, Kindergesichter groß im Bild | Löschen | – | Gleicher Grund (Privatsphäre §2); die Szene steht danach über die Hände-Einstellung weiter. |
+| 00:00:53:00 – 00:00:56:02 | Enten am Ufer, derselbe Standpunkt wie 00:00:49:14 – 00:00:53:00 | Löschen | – | Gleiches Bild wie davor; die Szene davor reicht, um die Enten zu zeigen. Der Übergang zur Koi-Fütterung wird dichter. |
+| 00:00:00:00 – 00:00:01:21 (neu, nach allen anderen Änderungen) | Hook: Schildkröte schwimmt zu den sonnenden Schildkröten | Ganz an den Anfang einfügen: `DJI_20260906204349_0014_D.MP4`, im Originalclip 00:00:29:12 – 00:00:31:03 | 00:00:01:21 | Das Tier-Verhalten ist sofort zu verstehen („Nachzügler“) und erzeugt ein Lächeln. Das Video braucht in den ersten Sekunden einen Reiz; der aktuelle Anfang ist eine 19-Sekunden-Ziegen-Szene ohne Vorgeschmack. |
+| 00:00:01:21 – 00:00:03:12 (neu, nach allen anderen Änderungen) | Hook: wackelige Holzbrücke und Trittsteine über grünem Teich | Direkt dahinter: `DJI_20260906221910_0052_D.MP4`, im Originalclip 00:00:08:00 – 00:00:09:21 | 00:00:01:21 | Zeigt den Abenteuer-Charakter des Ausflugs, bewegt sich stark und ist ohne Erklärung lesbar (Text: „Nicht ins Wasser fallen!“). |
+| 00:00:03:12 – 00:00:05:03 (neu, nach allen anderen Änderungen) | Hook: Otter schwimmt im Unterwasserfenster | Direkt dahinter: `DJI_20260906213728_0037_D.MP4`, im Originalclip 00:00:03:00 – 00:00:04:21 | 00:00:01:21 | Ein seltenes, besonderes Tier als dritter Reiz. Die drei Hook-Clips zeigen drei verschiedene Arten von Erlebnissen (Tier, Abenteuer, Tier unter Wasser). |
 
-Alle anderen Schnitte bleiben unverändert, auch die ruhigen Umgebungsszenen und die Schlussszene.
+**Bewusst nicht geändert:** Der Ziegen-Clip am Anfang, die Seerosen, Wiese und Wassertropfen-Schild, die Schweine-Szene, das Tunnel- und Insektenbereich, die ruhigen Waldbilder und die lange Schlussszene. Sie tragen Atmosphäre oder sind Träger für Beschriftungen. **Ziegen-Hook-Clip bewusst entfernt:** Die Hook-Aufnahme (Originalclip `…0054_D.MP4` bei 00:00:04:24) liegt jetzt im Ziegen-Clip, der direkt auf den Hook folgt — Wiederholung nach 5 Sekunden.
+
 Danach: Export, kurzes visuelles Abschlussreview (ohne Audio), nach deiner Freigabe weiter mit der Erzählung.
