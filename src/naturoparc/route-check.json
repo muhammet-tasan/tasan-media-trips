@@ -13,29 +13,6 @@
   },
   "origins": [
     {
-      "key": "basel",
-      "label": "Basel",
-      "country": "CH",
-      "time": "1 Std.",
-      "emphasis": true,
-      "coords": {
-        "lon": 7.5886,
-        "lat": 47.5596
-      },
-      "at": 13
-    },
-    {
-      "key": "freiburg",
-      "label": "Freiburg",
-      "country": "DE",
-      "time": "1 Std.",
-      "coords": {
-        "lon": 7.8421,
-        "lat": 47.999
-      },
-      "at": 14.5
-    },
-    {
       "key": "colmar",
       "label": "Colmar",
       "country": "FR",
@@ -48,7 +25,7 @@
         "lon": 7.3585,
         "lat": 48.0794
       },
-      "at": 16
+      "at": 13
     },
     {
       "key": "strasbourg",
@@ -58,6 +35,29 @@
       "coords": {
         "lon": 7.7521,
         "lat": 48.5734
+      },
+      "at": 14.5
+    },
+    {
+      "key": "freiburg",
+      "label": "Freiburg",
+      "country": "DE",
+      "time": "1 Std.",
+      "coords": {
+        "lon": 7.8421,
+        "lat": 47.999
+      },
+      "at": 16
+    },
+    {
+      "key": "basel",
+      "label": "Basel",
+      "country": "CH",
+      "time": "1 Std.",
+      "emphasis": true,
+      "coords": {
+        "lon": 7.5886,
+        "lat": 47.5596
       },
       "at": 17.5
     }
