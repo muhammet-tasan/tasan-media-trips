@@ -26,6 +26,7 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Windows:** Skript-Zwischendateien nicht nach `/tmp` schreiben (Python findet es nicht) — Scratchpad bzw. Projektpfad nutzen. *(2026-11-27)*
 
 - **Erstes Review (NaturOparC):** ohne Hook liegen die ersten ~24 s ohne klares Tier; gleichförmiger ~3-s-Rhythmus über 51 Schnitte wirkt monoton; mehrere Schnitte aus demselben Standpunkt wirken wie Wiederholung; Besuchergesichter in Nahaufnahmen früh prüfen (Koi-Szene). *(2026-11-26 · S3)*
+- **Schnittanleitung framegenau und in Abarbeitungsreihenfolge:** CapCut-Zeitformat `HH:MM:SS:FF`, Timeline- und Originalclip-Zeiten getrennt, Tabelle vom Ende zum Anfang, Hook zuletzt in Abspielreihenfolge; der Entwurf ändert sich zwischen Export und Anleitung — vor dem Erstellen den aktuellen Stand prüfen (hier: zwei neue Clips am Anfang verschoben alle Zeiten). *(2026-11-27 · S3)*
 - **Review-Tiefe offenlegen:** ein 2-s-Raster über den Export ist keine Schnitt-für-Schnitt-Sichtung (kurze Schnitte fallen durchs Raster). Besser: ≥3 Frames pro Schnitt aus der Schnittliste, auf Kontaktbögen. *(2026-11-27 · S3)*
 - **Familiäres Ausflugsvideo, kein Tiervideo:** ruhige Umgebungsszenen kürzen statt löschen; ein Hook darf Erlebnis/Aktivität (z. B. Brücken/Trittsteine) neben Tieren zeigen; Hook-Suche über das gesamte Material, nicht nur über Clips, die schon im Schnitt sind. *(2026-11-27 · S3/S6)*
 - **CapCut-Kombinationsclips verstecken die Quellclips** — für ein Review besser vorher auflösen. *(2026-11-26 · S2/S3)*

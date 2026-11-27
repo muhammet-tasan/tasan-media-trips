@@ -87,6 +87,23 @@ def find_drafts(drafts_dir, capcut_folder_name):
     return hits
 
 
+def to_timecode(seconds, fps):
+    """Seconds -> CapCut's native HH:MM:SS:FF at the given project fps (frame-exact, no decimals)."""
+    nominal = round(fps)  # 29.97 / 30 -> 30 frames per displayed second
+    total = int(round(seconds * fps))
+    ff = total % nominal
+    secs = total // nominal
+    return f"{secs // 3600:02d}:{secs % 3600 // 60:02d}:{secs % 60:02d}:{ff:02d}"
+
+
+def draft_fps(draft_dir):
+    """fps of the CapCut project (read-only), e.g. 30.0."""
+    try:
+        return float(json.load(open(os.path.join(draft_dir, "draft_content.json"), encoding="utf-8")).get("fps"))
+    except Exception:
+        return None
+
+
 def resolve(slug=None, status_file=None, repo=REPO, env=None):
     status_file = status_file or os.path.join(repo, "PROJECT_STATUS.md")
     text = read_status(status_file)
@@ -166,6 +183,7 @@ def resolve(slug=None, status_file=None, repo=REPO, env=None):
         if cand:
             out["export"], out["export_others"] = cand[0], cand[1:]
             out["notes"].append(f"export taken from CapCut's default export folder ({len(cand)} file(s) named after the draft); using the newest")
+    out["project_fps"] = draft_fps(out["draft"]) if out["draft"] else None
     if not out["draft"] and not out["export"]:
         problems.append("neither a rough-cut export nor a CapCut draft was found - the review has no input yet")
     return out

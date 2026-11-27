@@ -132,6 +132,18 @@ check("similar names are not matched", not any("projXtra" in x for x in [r["expo
 r = va.machine_paths(repo, {"LOCALAPPDATA": tmp, "TASAN_CAPCUT_DRAFTS": drafts2})
 check("default exports dir derived from drafts dir", r[2] == os.path.normpath(exp_dir))
 
+print("== frame-exact CapCut timecodes (HH:MM:SS:FF)")
+check("0 s", va.to_timecode(0, 30) == "00:00:00:00")
+check("1.7 s @30 = 1s 21f", va.to_timecode(1.7, 30) == "00:00:01:21")
+check("2.5 s @30 = 2s 15f", va.to_timecode(2.5, 30) == "00:00:02:15")
+check("163 s @30", va.to_timecode(163, 30) == "00:02:43:00")
+check("3725.5 s @30 = 1h 2m 5s 15f", va.to_timecode(3725.5, 30) == "01:02:05:15")
+check("frame field never reaches fps (29.97 clip)", all(int(va.to_timecode(t / 7.0, 29.97)[-2:]) < 30 for t in range(0, 4000)))
+dd = os.path.join(tmp, "fpsdraft")
+touch(os.path.join(dd, "draft_content.json"), text=json.dumps({"fps": 25.0}))
+check("project fps read from draft", va.draft_fps(dd) == 25.0)
+check("25 fps timecode uses 25 frames", va.to_timecode(1.48, 25) == "00:00:01:12")
+
 print("== portability: status file holds no absolute paths")
 real = open(os.path.join(HERE, "..", "PROJECT_STATUS.md"), encoding="utf-8").read()
 rows = va.asset_rows(real)

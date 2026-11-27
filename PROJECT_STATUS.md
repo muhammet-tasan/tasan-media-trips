@@ -213,6 +213,10 @@ Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/
 
 ## Session Log (all videos, newest first)
 
+**2026-11-27 [workflow / timecodes]**
+- Rules added: edit tables use CapCut-native `HH:MM:SS:FF` (project fps read from the draft, `scripts/video_assets.py` → `project_fps` / `to_timecode`, tested), timeline vs. original-clip times kept apart, rows sorted end → start (working order) with hook clips last in final playing order, standard close of the rough cut (changes → hook → export → short visual review without audio → approval → narration). In `docs/PRODUCTION_STANDARDS.md` §7, `PRODUCTION_PROCESS.md` (S3), `LEARNINGS.md`, `/my-review-roughcut`, `/my-next-task`.
+- NaturOparC edit list regenerated in this format from the current draft `1124` (it changed after the export: two new 0054 clips at the start shift all times by 00:00:23:07 — handled in the table).
+
 **2026-11-27 [workflow / review style]**
 - Permanent working rules from the user: **no audio analysis ever** (removed audio probing from `scripts/footage-analysis/analyze.py`, audio wording from process/standards/learnings/review docs; loader tolerates old `metadata.json`); **analysis stays internal, chat gets one compact action table** (Timecode | Szene | Änderung | Dauer | Priorität; full file name + start/end for new footage; no H1/row references); **only changes with clear benefit**; **family outing video — keep atmosphere** (shorten, don't delete calm scenes). Anchored in `docs/PRODUCTION_STANDARDS.md` §7, `docs/PRODUCTION_PROCESS.md`, `docs/LEARNINGS.md`, `/my-review-roughcut`, `/my-next-task`.
 - NaturOparC: final simplified edit list in `analysis/naturoparc/ROUGHCUT_REVIEW_v2.md` (hook = 4 clips with exact file names/times).
