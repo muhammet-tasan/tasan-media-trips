@@ -1,36 +1,30 @@
 ---
 name: my-remotion-library
-description: Central entry point to the project's own Remotion components - show the categorized overview, or find and reuse existing components for a task before building anything new
+description: Creative toolbox of our own Remotion building blocks - show the simple overview, or pick, combine and reuse existing components for a task before building anything new
 disable-model-invocation: true
 ---
 # /my-remotion-library
 
-Single entry point to everything we have built in Remotion (scenes, intro, maps/routes, text and info-card animations, effects, transitions, helpers). The **catalog** is `docs/REMOTION_LIBRARY.md` (single source of truth, grows with the library); this skill only reads it and routes. Do not copy catalog details into this file or into chat.
+Creative toolbox for video production, not a code inventory. The **technical reference** is `docs/REMOTION_LIBRARY.md` (paths, config, limits, plans, refactoring); this skill reads it but by default shows only the simple overview. Do not copy technical detail into this file or into the default answer.
 
 ## Process
-1. Read `docs/REMOTION_LIBRARY.md`. Open an implementation or `docs/BROLL_GUIDELINES.md` section only when a task needs that detail (catalog entries name the paths).
+1. Read `docs/REMOTION_LIBRARY.md` (the "Toolbox" table at the top drives the overview; the sections below it are the technical details).
 2. Decide the mode from the arguments:
-   - **No arguments, or "show/zeige …"** → print the compact overview (format below). For "alle Animationseffekte" / a single category: list that category's building blocks (catalog §4, §5, §7, §8) with status and path.
-   - **A task** ("erstelle ein Intro / eine Anfahrtsanimation / eine Emoji-Animation …") → run **Reuse check** below, then build.
-   - **"schlage Animationen vor …"** → run the reuse check for the described scene and answer with suggestions only (existing ✅ components first, 🧪 as template, 📋 gaps); build nothing.
-3. **Reuse check (before any code):** for every needed part, find the match in the catalog and report in 3–6 lines: **Wiederverwenden** (component + which config fields change), **Kombinieren/Erweitern** (what is combined, what small config/field is added), **Neu** (what really does not exist, and the planned file path). Prefer ✅ over 🧪 over new. For new B-roll also follow `docs/BROLL_GUIDELINES.md` §1/§12 (pre-build spec) and wait for approval on open creative decisions.
-4. **Build by the binding architecture rules** (`docs/PRODUCTION_STANDARDS.md` §9): generic component separated from project content, texts/colours/positions/sizes/timing in a config (`src/<slug>/<name>.json`) or props, combine/extend instead of copy, existing videos unaffected (their reference files stay untouched; verify frame-identical if a shared component changes), no over-engineering.
-5. **After the user approves the result** run the maintenance checklist from `PRODUCTION_STANDARDS` §9 (reusability check → catalog entry → usage/config → learnings → keep skill/catalog current) before committing. This is automatic — the user does not have to ask.
+   - **No arguments, or "show/zeige …"** → print the **simple overview** (format below) and nothing else.
+   - **Details requested** ("Details zu GlassPanel", "wie konfiguriere ich …", "Pfad von …") → show that component's technical entry from the catalog (path, options, example, limits). Only then technical info is allowed.
+   - **A task** ("kombiniere TextReveal mit GlassPanel", "erstelle ein Intro / eine humorvolle Animation …", "welche Komponenten passen hier?") → **Reuse check**, then (unless only asked for suggestions) build.
+3. **Reuse check (before any code):** in 3–6 plain-language lines: **Wiederverwenden** (which toolbox components, what changes via options), **Kombinieren** (how they work together), **Neu** (what does not exist yet, and whether it should become its own reusable component). Prefer existing components; planned items count as "Neu". For a new B-roll scene also follow `docs/BROLL_GUIDELINES.md` §1/§12 (pre-build spec) and wait for approval on open creative decisions. "Welche Komponenten passen hier am besten?" / "schlage Animationen vor" → suggestions only, build nothing.
+4. **Build by the binding architecture rules** (`docs/PRODUCTION_STANDARDS.md` §9): small independent components in `src/components/`, scene = combination + config (`src/<slug>/<name>.json`), no project content in generic code, existing videos stay identical (verify by comparing renders if a shared component is touched), no trivial wrappers.
+5. **After the user approves the result** run the maintenance checklist from `PRODUCTION_STANDARDS` §9: check which parts are independently reusable (split them out), register in the catalog (Toolbox table + technical entry), document usage, note learnings, commit. Automatic — the user does not have to ask.
 
-## Overview format (no arguments)
-German, compact, no entry details. One line per item: `Status Name — ein Satz · Pfad`. Order = catalog sections 1–10:
-```
-## Remotion-Bibliothek (✅ verfügbar · 🧪 intern/videospezifisch · 📋 geplant)
-**Vollständige Sequenzen** …   **Intro/Outro** …   **Karten & Routen** …
-**Titel/Text** …   **Infokarten/Overlays** …   **Emojis/Illustrationen** …
-**Effekte** …   **Übergänge** …   **Soundeffekte** …   **Helfer/Skripte** …
-Offenes Refactoring: <1 Zeile, Verweis auf Katalog §11>
-Nutzung: `/my-remotion-library <Aufgabe>` · Details: `docs/REMOTION_LIBRARY.md`
-```
+## Simple overview (no arguments) — exact rules
+- German. Only categories that contain something, in this order: **Szenen · Titel und Textanimationen · Designelemente · Animationseffekte · Emojis und Illustrationen · Übergänge · Soundeffekte**.
+- One line per component: `**Name** — kurze, verständliche Beschreibung`. Taken from the catalog's Toolbox table (it contains exactly the standalone, usable components).
+- **Not shown:** file paths, parameters, status emojis, render commands, planned features, project-specific implementations, internal helpers, scripts, refactoring notes.
+- End with one line: `Nutzung: /my-remotion-library <Aufgabe> (z. B. „kombiniere TextReveal mit GlassPanel“) · „Details zu <Name>“ für die Technik.`
 
 ## Rules
 - Library first: never write a new component before the reuse check; never silently duplicate an existing one.
-- Never change an approved animation visually unless the user asks; shared-component changes must keep older videos identical.
+- Never change an approved animation visually unless the user asks; refactorings must render identically (compare against the previous render).
 - Never analyze audio; sound effects/mixing are the user's job (`LEARNINGS.md` → Ton).
-- Keep the catalog current: new/changed component → catalog entry in the same commit. Fix stale entries when found (trust the code).
-- Refactoring needs are documented in catalog §11, not done pre-emptively (extract on the second consumer).
+- Keep the catalog current: new/changed component → Toolbox table + technical entry in the same commit; fix stale entries when found (trust the code).

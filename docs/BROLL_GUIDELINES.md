@@ -272,4 +272,4 @@ Distilled from the approved Route Check (NaturOparC), the Mulhouse reference sce
 - Windows: no `/tmp` for helper files; write scratch files to the scratchpad.
 
 **Reuse**
-- New destination → Route Check config + `new-route-check.py`; new scene types follow the architecture rules in `PRODUCTION_STANDARDS` §9. Known refactoring candidates (shared primitives, glass plate, reveal, TripScore config): `REMOTION_LIBRARY.md` §11.
+- New destination → Route Check config + `new-route-check.py`; new scenes are combinations of the standalone components in `src/components/` (TextReveal, AnimatedTitle, GlassPanel/DarkPanel, RouteDraw, MarkerPulse) plus config — architecture rules in `PRODUCTION_STANDARDS` §9. Remaining refactoring candidates: `REMOTION_LIBRARY.md` §11.

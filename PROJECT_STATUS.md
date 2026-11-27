@@ -344,7 +344,7 @@ Local-only tool for sighting raw DJI Osmo Pocket 3 footage before building a Cap
 - Dense-frame extraction (every 0.5s instead of 2s) for a specific clip/range is the pattern for "might be between the samples" moments — it found a real otter sighting completely invisible at the standard 2s interval
 
 ## Shared Tooling: Remotion Library
-- `docs/REMOTION_LIBRARY.md` = catalog of all own Remotion components (status ✅/🧪/📋, paths, config, limits, refactoring list); entry skill `/my-remotion-library`. Binding rule (`PRODUCTION_STANDARDS` §9): check the library first, build new things as separate configurable components, register every user-approved component in the catalog before committing. Established 2026-11-27.
+- `docs/REMOTION_LIBRARY.md` = catalog of all own Remotion components (status ✅/🧪/📋, paths, config, limits, refactoring list); entry skill `/my-remotion-library`. Binding rule (`PRODUCTION_STANDARDS` §9): check the library first, build new things as separate configurable components, register every user-approved component in the catalog before committing. Standalone components in `src/components/` (TextReveal, AnimatedTitle, GlassPanel/DarkPanel, RouteDraw, MarkerPulse, split out of `RouteCheck` 2026-11-27, render-identical); `/my-remotion-library` shows only the simple "Toolbox" overview by default. Established 2026-11-27.
 
 ## Shared Tooling: Notifications
 

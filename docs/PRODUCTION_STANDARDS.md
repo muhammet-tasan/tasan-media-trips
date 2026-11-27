@@ -161,12 +161,12 @@ Alle selbst entwickelten Remotion-Bausteine stehen im Katalog `docs/REMOTION_LIB
 **Architekturgrundsätze für jede neue Animation, Szene und jeden Effekt:**
 - Eigene, wiederverwendbare Komponente; generischer Code getrennt von Videoinhalt. Keine Ortsnamen, Texte oder Videodaten im generischen Code — Inhalt in `src/<slug>/<name>.json` bzw. Props, dünner Wrapper pro Video.
 - Texte, Farben, Positionen, Größen, Dauer und Timing konfigurierbar, soweit sinnvoll (Zeiten in Sekunden, damit sie am Voice-over ausgerichtet werden können).
-- Bestehende Komponenten kombinieren/erweitern statt kopieren; komplexe Szenen (Intro, Route Check, Review-Abschnitt) aus wiederverwendbaren Bausteinen aufbauen, aber ohne Vorab-Abstraktion: erst extrahieren, wenn ein zweiter Verbraucher da ist; Bedarf in Katalog §11 notieren.
+- Gestalterische Elemente (Text-Reveal, Titel, Panel, Linien-/Marker-Effekt, Emoji-/Illustrationsbausteine …) als **eigenständige, einzeln nutzbare und kombinierbare Komponenten** in `src/components/` bauen; Szenen sind Kombinationen daraus plus Config. Bestehende Komponenten kombinieren/erweitern statt kopieren. Herauslösen lohnt, sobald dadurch echte Unabhängigkeit entsteht (nicht erst beim zweiten Verbraucher); keine Wrapper oder Komponenten für triviale interne Hilfsfunktionen; Rest-Bedarf in Katalog §11 notieren.
 - Freigegebene Videos dürfen sich nie unbeabsichtigt ändern: Referenzdateien (z. B. `MulhouseRouteCheck.tsx`) bleiben unberührt; bei Änderung einer gemeinsamen Komponente bildgleiche Verifikation der älteren Nutzung.
 
 **Nach jeder vom Nutzer freigegebenen Komponente (automatisch, vor dem Commit):**
-1. Wiederverwendbarkeit prüfen (Inhalt aus dem Code in Config? Dauer/Farben/Texte einstellbar?).
-2. Im Katalog `docs/REMOTION_LIBRARY.md` registrieren bzw. aktualisieren (Status ✅/🧪/📋, Pfad, Konfiguration, Beispiel, Format, Einschränkungen).
+1. Wiederverwendbarkeit prüfen (Inhalt aus dem Code in Config? Dauer/Farben/Texte einstellbar? Welche Teile sind unabhängig nutzbar und sollten eigene Komponenten werden?) — Herauslösen nur mit bildgleichem Ergebnis (Render vorher/nachher vergleichen).
+2. Im Katalog `docs/REMOTION_LIBRARY.md` registrieren bzw. aktualisieren: eigenständig nutzbare Komponente = Zeile in der **Toolbox** (Kategorie, Name, ein Satz Klartext — das zeigt `/my-remotion-library`) plus technischer Eintrag (Status ✅/🧪/📋, Pfad, Konfiguration, Beispiel, Format, Einschränkungen).
 3. Verwendung und Konfiguration dort dokumentieren (Details/Standards in `docs/BROLL_GUIDELINES.md`, nicht doppelt).
 4. Neue Erkenntnisse in `docs/LEARNINGS.md` bzw. Gestaltungspräferenzen in `BROLL_GUIDELINES` §14 festhalten (nur finale, freigegebene Stände).
 5. `/my-remotion-library` und Katalog aktuell halten (veraltete Einträge korrigieren).

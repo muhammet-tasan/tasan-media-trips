@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-	AbsoluteFill,
-	continueRender,
-	delayRender,
-	interpolate,
-	spring,
-	staticFile,
-	useCurrentFrame,
-	useVideoConfig,
-} from 'remotion';
+import { AbsoluteFill, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { LngLat, LngLatBounds, Map as MapLibreMap, config as maplibreConfig } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { AnimatedTitle } from '../components/AnimatedTitle';
+import { DarkPanel, GlassPanel } from '../components/GlassPanel';
+import { MarkerPulse } from '../components/MarkerPulse';
+import { RouteDraw } from '../components/RouteDraw';
+import { TextReveal } from '../components/TextReveal';
+import { CLAMP, FONT, easeOutCubic } from '../components/shared';
 
 // ---------------------------------------------------------------------
 // Generic, config-driven Route Check. Visual design, timing logic, map
@@ -19,7 +16,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 // stays untouched so video 1 renders exactly as before). Per video only
 // a RouteCheckConfig JSON (src/<slug>/route-check.json) and the cached
 // routes file public/geo/<slug>-routes.geojson (scripts/fetch-routes.py)
-// are needed. Basemap: MapLibre + OpenFreeMap; borders: Natural Earth
+// are needed. Reusable parts live in src/components/ (AnimatedTitle, TextReveal,
+// GlassPanel/DarkPanel, RouteDraw, MarkerPulse). Basemap: MapLibre + OpenFreeMap; borders: Natural Earth
 // (public/geo/country-borders.geojson); routes: OSRM, cached locally.
 // ---------------------------------------------------------------------
 
@@ -121,8 +119,6 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 // (`endImageAt` + `holdSeconds`). The plate keeps its final size from the start, so nothing shifts.
 const ORIGIN_DRAW = 24;
 const LABEL_IN = 32; // marker + label fully visible this many frames after an origin starts
-const HEADING_FADE_IN = [6, 28] as const;
-const RISE_PX = 10; // small upward move of fading text
 
 type Block = { at: number; dur: number };
 
@@ -154,9 +150,6 @@ export const routeCheckTimeline = (cfg: RouteCheckConfig, holdSeconds: number, f
 	return { establish, phases, destReveal: f(destSec), title, tagline, location, plate, info, endImage, duration };
 };
 
-const SPRING_CONFIG = { damping: 16, stiffness: 120, mass: 0.6, overshootClamping: true };
-const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
-const CLAMP = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
 type RouteCollection = {
 	type: 'FeatureCollection';
@@ -173,8 +166,6 @@ const cameraAt = (frame: number, start: Camera, end: Camera, establish: number):
 	return { lng: start.lng + (end.lng - start.lng) * t, lat: start.lat + (end.lat - start.lat) * t, zoom: start.zoom + (end.zoom - start.zoom) * t };
 };
 
-const FONT = 'Helvetica Neue, Arial, sans-serif';
-
 export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string } & RouteCheckProps> = ({
 	config,
 	routesFile,
@@ -188,7 +179,6 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	if (config.mapBackground) th.bg = config.mapBackground;
 	const ps = config.plate ?? {};
 	const plateBlur = ps.blur ?? th.plateBlur;
-	const plateFilter = plateBlur > 0 ? `blur(${plateBlur}px) saturate(${ps.saturate ?? th.plateSaturate})` : 'none';
 	const dest = config.destination;
 	const infoLines = config.infoLines ?? [];
 	const plateWidth = config.plateWidth ?? 660;
@@ -293,16 +283,6 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	}, [frame]);
 
 	const DEST_REVEAL = tl.destReveal;
-	const destScale = spring({ frame: frame - DEST_REVEAL, fps, config: SPRING_CONFIG });
-	const destRing = interpolate(frame, [DEST_REVEAL, DEST_REVEAL + 34], [0.4, 1.5], CLAMP);
-	const destRingOpacity = interpolate(frame, [DEST_REVEAL, DEST_REVEAL + 10, DEST_REVEAL + 34], [0, 0.5, 0], CLAMP);
-	// Text block reveal: short fade-in with a minimal upward move; the layout slot is always reserved.
-	const reveal = (b: Block): React.CSSProperties => {
-		const p = easeOutCubic(interpolate(frame, [b.at, b.at + b.dur], [0, 1], CLAMP));
-		return { opacity: p, transform: p >= 1 ? undefined : `translateY(${((1 - p) * RISE_PX).toFixed(2)}px)` };
-	};
-	const platePct = interpolate(frame, [tl.plate.at, tl.plate.at + tl.plate.dur], [0, 1], CLAMP);
-	const headingOpacity = interpolate(frame, [HEADING_FADE_IN[0], HEADING_FADE_IN[1]], [0, 1], CLAMP);
 
 	const map = mapRef.current;
 	const destPx = ready && map ? map.project([dest.coords.lon, dest.coords.lat]) : null;
@@ -315,14 +295,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 			{!ready || !map || !destPx ? null : (
 				<>
 					{/* Section heading — fades in once, stays for the whole scene */}
-					<div style={{ position: 'absolute', top: 34, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', opacity: headingOpacity }}>
-						<div style={{ fontFamily: FONT, fontSize: 54, fontWeight: 700, letterSpacing: 5, color: th.heading, textShadow: th.headingShadow }}>
-							{config.heading}
-						</div>
-						<div style={{ fontFamily: FONT, fontSize: 21, fontWeight: 500, letterSpacing: 2, color: th.subheading, marginTop: 8, textShadow: th.headingShadow }}>
-							{config.subtitle}
-						</div>
-					</div>
+					<AnimatedTitle title={config.heading} subtitle={config.subtitle} color={th.heading} subtitleColor={th.subheading} shadow={th.headingShadow} />
 
 					{/* International borders: real Natural Earth lines, subtle light gray, below the gold routes in the hierarchy */}
 					<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
@@ -348,42 +321,33 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					})}
 
 					{/* Route lines: real OSRM road geometry, drawn on with a reveal */}
-					<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-						{config.origins.map((origin, i) => {
-							const phase = phases[i];
-							const feature = routes?.features.find((f) => f.properties.origin === origin.key);
-							if (!feature) return null;
-							const progress = interpolate(frame, [phase.start, phase.drawEnd], [0, 1], CLAMP);
-							const points = feature.geometry.coordinates.map(([lon, lat]) => map.project([lon, lat]));
-							const d = `M ${points.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ')}`;
-							const mainWidth = origin.emphasis ? 4 : 3;
-							return (
-								<React.Fragment key={origin.key}>
-									<path d={d} fill="none" stroke={th.routeCasing} strokeWidth={mainWidth + 2.2} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
-									<path d={d} fill="none" stroke={origin.emphasis ? th.routeMain : th.routeSecondary} strokeWidth={mainWidth} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
-								</React.Fragment>
-							);
-						})}
-					</svg>
+					{config.origins.map((origin, i) => {
+						const feature = routes?.features.find((f) => f.properties.origin === origin.key);
+						if (!feature) return null;
+						return (
+							<RouteDraw
+								key={origin.key}
+								points={feature.geometry.coordinates.map(([lon, lat]) => map.project([lon, lat]))}
+								start={phases[i].start}
+								end={phases[i].drawEnd}
+								color={origin.emphasis ? th.routeMain : th.routeSecondary}
+								casingColor={th.routeCasing}
+								width={origin.emphasis ? 4 : 3}
+							/>
+						);
+					})}
 
 					{/* Origin markers + labels */}
 					{config.origins.map((origin, i) => {
 						const phase = phases[i];
 						const px = map.project([origin.coords.lon, origin.coords.lat]);
-						const markerScale = spring({ frame: frame - phase.start - 4, fps, config: SPRING_CONFIG });
-						const markerOpacity = interpolate(frame, [phase.start, phase.start + 10], [0, 1], CLAMP);
 						const labelOpacity = interpolate(frame, [phase.start + 16, phase.start + 32], [0, 1], CLAMP);
 						const labelY = interpolate(frame, [phase.start + 16, phase.start + 32], [10, 0], CLAMP);
 						const radius = origin.emphasis ? 10 : 7;
 						const off = origin.labelOffset ?? { x: origin.emphasis ? 100 : 30, y: origin.emphasis ? 46 : -14 };
 						return (
 							<React.Fragment key={origin.key}>
-								<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-									<g transform={`translate(${px.x}, ${px.y}) scale(${markerScale})`} opacity={markerOpacity}>
-										<circle r={radius} fill={th.marker} />
-										<circle r={radius + 8} fill="none" stroke={th.marker} strokeWidth={1.5} opacity={0.4} />
-									</g>
-								</svg>
+								<MarkerPulse x={px.x} y={px.y} at={phase.start} color={th.marker} radius={radius} pulse={false} fadeInFrames={10} springDelay={4} haloGap={8} haloOpacity={0.4} haloWidth={1.5} />
 								<div style={{ position: 'absolute', left: Math.round(px.x + off.x), top: Math.round(px.y + off.y), fontFamily: FONT, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: th.labelShadow, whiteSpace: 'nowrap' }}>
 									<div style={{ fontSize: origin.emphasis ? 30 : 26, fontWeight: origin.emphasis ? 700 : 600, color: th.label }}>
 										{origin.label}{' '}
@@ -397,63 +361,60 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					})}
 
 					{/* Destination marker */}
-					<svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-						<g transform={`translate(${destPx.x}, ${destPx.y})`}>
-							<circle r={26 * destRing} fill="none" stroke={th.accent} strokeWidth={2} opacity={destRingOpacity} />
-							<g transform={`scale(${destScale})`}>
-								<circle r={18} fill={th.accent} />
-								<circle r={29} fill="none" stroke={th.accent} strokeWidth={2} opacity={0.55} />
-							</g>
-						</g>
-					</svg>
+					<MarkerPulse x={destPx.x} y={destPx.y} at={DEST_REVEAL} color={th.accent} />
 
 					{/* Destination info plate: glass layer (own opacity) + fully opaque text blocks on top; final size from frame 0 */}
-					<div
-						style={{
-							position: 'absolute',
-							left: Math.round(Math.max(40, destPx.x - 40 - plateWidth + (config.plateOffsetX ?? 0))),
-							top: Math.round(Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55))),
-							width: plateWidth,
-							textAlign: 'right',
-							fontFamily: FONT,
-						}}
-					>
-						<div
-							style={{
-								position: 'absolute',
-								inset: 0,
-								borderRadius: 16,
-								background: ps.background ?? th.plateBg,
-								backdropFilter: plateFilter,
-								WebkitBackdropFilter: plateFilter,
-								border: plateBlur > 0 ? (ps.border ?? th.plateBorder) : undefined,
-								boxShadow: plateBlur > 0 ? (ps.shadow ?? th.plateShadow) : undefined,
-								opacity: platePct,
-							}}
-						/>
-						<div style={{ position: 'relative', padding: '20px 30px' }}>
-							<div style={{ fontSize: 59, fontWeight: 700, color: th.plateName, letterSpacing: 0.5, ...reveal(tl.title) }}>
-								{dest.name}{' '}
-								{dest.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
-							</div>
-							{dest.tagline && <div style={{ fontSize: 38, fontWeight: 500, color: th.plateTagline, marginTop: 11, ...reveal(tl.tagline) }}>{dest.tagline}</div>}
-							{dest.location && <div style={{ fontSize: 30, fontWeight: 500, color: th.plateDetail, marginTop: 8, ...reveal(tl.location) }}>📍 {dest.location}</div>}
-							{infoLines.map((line, i) => (
-								<div
-									key={i}
-									style={{
-										fontSize: line.size === 'detail' ? 24 : 32,
-										fontWeight: line.size === 'detail' ? 400 : 500,
-										color: line.size === 'detail' ? th.plateDetail : th.accentSoft,
-										marginTop: i === 0 ? 22 : line.size === 'detail' ? 8 : 26,
-										...reveal(tl.info[i]),
-									}}
-								>
-									{line.text}
-								</div>
-							))}
-						</div>
-					</div>
+					{(() => {
+						const Panel = plateBlur > 0 ? GlassPanel : DarkPanel;
+						return (
+							<Panel
+								style={{
+									position: 'absolute',
+									left: Math.round(Math.max(40, destPx.x - 40 - plateWidth + (config.plateOffsetX ?? 0))),
+									top: Math.round(Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55))),
+									width: plateWidth,
+									textAlign: 'right',
+									fontFamily: FONT,
+								}}
+								background={ps.background ?? th.plateBg}
+								blur={plateBlur}
+								saturate={ps.saturate ?? th.plateSaturate}
+								border={plateBlur > 0 ? (ps.border ?? th.plateBorder) : undefined}
+								shadow={plateBlur > 0 ? (ps.shadow ?? th.plateShadow) : undefined}
+								fadeIn={{ at: tl.plate.at, duration: tl.plate.dur }}
+							>
+								<TextReveal at={tl.title.at} duration={tl.title.dur} style={{ fontSize: 59, fontWeight: 700, color: th.plateName, letterSpacing: 0.5 }}>
+									{dest.name}{' '}
+									{dest.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
+								</TextReveal>
+								{dest.tagline && (
+									<TextReveal at={tl.tagline.at} duration={tl.tagline.dur} style={{ fontSize: 38, fontWeight: 500, color: th.plateTagline, marginTop: 11 }}>
+										{dest.tagline}
+									</TextReveal>
+								)}
+								{dest.location && (
+									<TextReveal at={tl.location.at} duration={tl.location.dur} style={{ fontSize: 30, fontWeight: 500, color: th.plateDetail, marginTop: 8 }}>
+										📍 {dest.location}
+									</TextReveal>
+								)}
+								{infoLines.map((line, i) => (
+									<TextReveal
+										key={i}
+										at={tl.info[i].at}
+										duration={tl.info[i].dur}
+										style={{
+											fontSize: line.size === 'detail' ? 24 : 32,
+											fontWeight: line.size === 'detail' ? 400 : 500,
+											color: line.size === 'detail' ? th.plateDetail : th.accentSoft,
+											marginTop: i === 0 ? 22 : line.size === 'detail' ? 8 : 26,
+										}}
+									>
+										{line.text}
+									</TextReveal>
+								))}
+							</Panel>
+						);
+					})()}
 
 					{/* Required attribution, permanently visible */}
 					<div style={{ position: 'absolute', right: 24, bottom: 18, background: th.attributionBg, padding: '2px 8px', borderRadius: 6, fontFamily: FONT, fontSize: 15, color: th.attribution, textShadow: th.headingShadow }}>
