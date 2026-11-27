@@ -41,7 +41,7 @@ export type RouteCheckOrigin = {
 export type RouteCheckConfig = {
 	heading: string;
 	subtitle: string;
-	destination: { name: string; tagline?: string; country?: string; coords: Coords };
+	destination: { name: string; tagline?: string; /** where it is, e.g. 'in Hunawihr · bei Colmar' */ location?: string; country?: string; coords: Coords };
 	origins: RouteCheckOrigin[];
 	/** Optional practical info on the plate, revealed after the last route (e.g. parking, public transport). */
 	infoLines?: { text: string; size?: 'main' | 'detail' }[];
@@ -60,7 +60,7 @@ type Theme = {
 	border: string; countryLabel: string;
 	routeCasing: string; routeMain: string; routeSecondary: string;
 	marker: string; label: string; labelShadow: string;
-	plateBg: string; plateName: string; plateTagline: string; plateDetail: string; attribution: string; attributionBg: string; timeText: string;
+	plateBg: string; plateGlass: string; plateName: string; plateTagline: string; plateDetail: string; attribution: string; attributionBg: string; timeText: string;
 };
 // 'dark' = exact values of the reference (video 1). 'light' = cream/green family look.
 const THEMES: Record<'dark' | 'light', Theme> = {
@@ -70,7 +70,7 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(195,205,215,0.55)', countryLabel: 'rgba(255,255,255,0.22)',
 		routeCasing: 'rgba(6,8,12,0.55)', routeMain: 'rgba(220,172,90,0.95)', routeSecondary: 'rgba(212,162,78,0.75)',
 		marker: '#ffffff', label: '#ffffff', labelShadow: '0 2px 10px rgba(0,0,0,0.7)',
-		plateBg: 'rgba(8,10,15,0.65)', plateName: '#ffffff', plateTagline: '#e4e4e4', plateDetail: 'rgba(255,255,255,0.68)',
+		plateBg: 'rgba(8,10,15,0.65)', plateGlass: 'none', plateName: '#ffffff', plateTagline: '#e4e4e4', plateDetail: 'rgba(255,255,255,0.68)',
 		attribution: 'rgba(255,255,255,0.55)', attributionBg: 'transparent', timeText: '#d4a24e',
 	},
 	light: {
@@ -79,7 +79,7 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(70,95,85,0.5)', countryLabel: 'rgba(31,61,43,0.28)',
 		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
 		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
-		plateBg: 'rgba(255,252,242,0.88)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
+		plateBg: 'rgba(255,252,242,0.34)', plateGlass: 'blur(16px) saturate(1.15)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
 		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
 	},
 };
@@ -354,6 +354,10 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 							textAlign: 'right',
 							fontFamily: FONT,
 							backgroundColor: th.plateBg,
+							backdropFilter: th.plateGlass,
+							WebkitBackdropFilter: th.plateGlass,
+							border: th.plateGlass === 'none' ? undefined : '1.5px solid rgba(255,255,255,0.65)',
+							boxShadow: th.plateGlass === 'none' ? undefined : '0 8px 32px rgba(31,61,43,0.12)',
 							borderRadius: 16,
 							padding: '20px 30px',
 							opacity: destTitleOpacity,
@@ -364,6 +368,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 							{dest.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: 30 }}>{dest.country}</span>}
 						</div>
 						{dest.tagline && <div style={{ fontSize: 38, fontWeight: 500, color: th.plateTagline, marginTop: 11 }}>{dest.tagline}</div>}
+						{dest.location && <div style={{ fontSize: 30, fontWeight: 500, color: th.plateDetail, marginTop: 8 }}>📍 {dest.location}</div>}
 						{infoLines.map((line, i) => (
 							<div
 								key={i}
