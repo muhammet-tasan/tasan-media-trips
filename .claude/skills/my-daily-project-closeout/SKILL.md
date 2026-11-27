@@ -7,7 +7,14 @@ disable-model-invocation: true
 
 Standardize end-of-session checkpoints to preserve project continuity.
 
-## Workflow (Step 0 + six steps)
+Several Claude sessions may work in this directory at once. The binding rules (re-read before editing, additive edits, no foreign changes touched, no `git add .`/`-A`/`commit -a`, explicit staging, own hunks only) live in `CLAUDE.md` → "Parallel Claude sessions" — follow them in every step below.
+
+## Workflow (Step -1, Step 0 + six steps)
+
+### -1. Parallel-session check (always before anything else)
+- Run `git status --short`. Entries you did not write this session (other areas, other videos, files modified recently without your edits) = **possibly another active session**. If unsure, ask the user once: "Arbeiten noch andere Sessions?"
+- **Other sessions possibly still active → LIGHT closeout only:** finish and commit your own subject-matter work (explicit paths / own hunks), add your own learnings additively (`docs/LEARNINGS.md`, Remotion catalog entry), and report what you left open. Do **not** rewrite the `## ▶ Active Video` block, flip registry statuses, add the consolidated session-log entry, run the structure cleanup, or touch foreign changes. Say: "Voller Closeout erst, wenn die parallelen Sessions fertig sind." (You may add a short additive note under your video's section if it is purely your own facts.)
+- **Working tree contains only your changes (or the user confirms all other sessions are done) → FULL closeout:** continue with steps 0–6. Foreign changes that remain are committed in the joint closeout only after checking they are complete and attributable; never revert them.
 
 ### 0. Identify the video worked on (always first)
 - Determine which video this session actually worked on from evidence: files changed (`git status`, `git diff --stat`), paths touched (`src/<slug>/`, `analysis/<slug>/`, `out/<slug>/`) and the conversation. Never assume it is the video that was marked active.
@@ -50,8 +57,9 @@ Add one entry to `## Session Log (all videos, newest first)` at the top, tagged 
 - [ ] .gitignore is up to date
 
 ### 5. Git Preparation
-- Review staged changes with `git diff --staged`
-- Stage intentional work only (avoid auto-staging everything)
+- Stage explicit paths only (never `git add .`/`-A`, never `commit -a`); in files shared with another session stage only your own hunks
+- Review the actually staged changes with `git diff --cached` (and `git status --short` afterwards) before committing; commit only clearly attributable own changes
+- Never use destructive git commands to clear foreign changes
 - Craft commit message: summary + why
 - Do NOT push automatically; wait for explicit user confirmation
 
@@ -69,6 +77,7 @@ Present a summary table:
 
 | Step | Status | Notes |
 |------|--------|-------|
+| Mode | ✓ | [full closeout / light (parallel sessions active): what was left open] |
 | Video identified | ✓ | [slug, switched/unchanged] |
 | Status updated | ✓ | [Active block + registry + video section] |
 | Logged session | ✓ | [brief note] |

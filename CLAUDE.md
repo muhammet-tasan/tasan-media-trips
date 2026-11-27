@@ -43,6 +43,14 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 - **scripts/footage-analysis/** – Standalone Python tool for sighting raw footage before a CapCut rough cut; not Remotion, not part of the composition code
 - **public/** – Static assets and video files
 
+### Parallel Claude sessions (binding, central rule)
+Several Claude Code sessions often work in this same working directory at once. Every session and skill follows these rules (skills reference this section instead of repeating it):
+- At the start of a task run `git status --short`; treat all pre-existing changes as **potentially another session's**.
+- Re-read a shared document (PROJECT_STATUS.md, docs/*, skills, CLAUDE.md) immediately before editing it; prefer targeted, additive edits over rewriting whole files.
+- Never overwrite, revert or discard another session's changes; never use destructive git commands (`checkout --`, `restore`, `reset --hard`, `clean`, `stash`) to remove foreign changes.
+- No `git add .`, `git add -A` or `git commit -a`. Stage explicit paths; check `git diff --cached` before every commit; commit only changes clearly your own. A file containing several sessions' changes: stage only your own hunks (e.g. build the blob from HEAD + your lines with `git hash-object`/`git update-index`) or leave it to the joint closeout.
+- A session may finish and commit its own subject-matter work at any time, but must **not consolidate the whole project** (Active Video block, registry, session log, structure cleanup) while other sessions are still working — see `/my-daily-project-closeout`.
+
 ### Principles
 - **No automatic git push** – Stage changes intentionally
 - **Meaningful checkpoints** – Preserve architectural reasoning
