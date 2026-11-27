@@ -28,11 +28,11 @@ export const Root: React.FC = () => {
 			<Composition
 				id="NaturoparcRouteCheck"
 				component={NaturoparcRouteCheck}
-				defaultProps={{ holdSeconds: 2.5 }}
+				defaultProps={{ holdSeconds: 2.75 }}
 				calculateMetadata={({ props }) => ({
 					durationInFrames: routeCheckTimeline(NATUROPARC_ROUTE_CHECK_CONFIG, props.holdSeconds).duration,
 				})}
-				durationInFrames={422}
+				durationInFrames={421}
 				fps={30}
 				width={1920}
 				height={1080}

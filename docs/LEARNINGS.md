@@ -24,6 +24,7 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 
 - **Route Check ist jetzt konfigurierbar** — `src/route-check/RouteCheck.tsx` + `route-check.json` + `scripts/new-route-check.py` (Gerüst) / `fetch-routes.py`; neues Ziel = Skript laufen lassen + Label-Kollisionen im Endbild prüfen; Dauer per `holdSeconds`. Fakten wie Parkpreis/ÖPNV nur eintragen, wenn verifiziert. *(NaturOparC, 2026-11-27 · S7)*
 - **Remotion-Render startet Tabs mitten im Video:** Kamera-Zustand beim Karten-Setup aus dem *aktuellen* Frame berechnen, nicht immer den Start-Frame (sonst ein herausgezoomtes Einzelbild); Stills und MP4-Frame gegeneinander prüfen. Hintergrund pro Video über `theme` (hell/cremig für familiäre Videos). *(NaturOparC, 2026-11-27 · S7)*
+- **Overlay-Text flackert ±1 px im Render:** Positionen (`left/top`) auf ganze Pixel runden; Prüfung: Textrahmen über ~300 MP4-Frames messen (PIL) statt nur Standbilder ansehen. Glas-Effekt (`backdrop-filter`) wirkt auf heller Karte nur mit leicht getönter, sehr transparenter Fläche. *(NaturOparC, 2026-11-27 · S7)*
 - **Windows:** Skript-Zwischendateien nicht nach `/tmp` schreiben (Python findet es nicht) — Scratchpad bzw. Projektpfad nutzen. *(2026-11-27)*
 
 - **Erstes Review (NaturOparC):** ohne Hook liegen die ersten ~24 s ohne klares Tier; gleichförmiger ~3-s-Rhythmus über 51 Schnitte wirkt monoton; mehrere Schnitte aus demselben Standpunkt wirken wie Wiederholung; Besuchergesichter in Nahaufnahmen früh prüfen (Koi-Szene). *(2026-11-26 · S3)*

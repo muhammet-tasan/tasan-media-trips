@@ -79,31 +79,31 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(70,95,85,0.5)', countryLabel: 'rgba(31,61,43,0.28)',
 		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
 		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
-		plateBg: 'rgba(255,252,242,0.34)', plateGlass: 'blur(16px) saturate(1.15)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
+		plateBg: 'linear-gradient(135deg, rgba(255,255,255,0.30), rgba(214,235,200,0.20))', plateGlass: 'blur(22px) saturate(1.2)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
 		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
 	},
 };
 
-// Timeline (30 fps), same rhythm as the reference: establish 2 s, destination
-// at 2 s, routes from 4 s staggered 38 frames each, optional info after the
-// last route, then a fully static hold. `holdSeconds` is the free parameter.
+// Timeline (30 fps): establish 2 s; destination name + location + practical info
+// fade in together at 2 s; origins follow in config order from 4 s, each one
+// followed by 1 s of calm; then a fully static hold (`holdSeconds`, free parameter).
 const ESTABLISH_END = 60;
 const DEST_REVEAL = 60;
 const FIRST_ORIGIN = 120;
-const ORIGIN_STEP = 38;
 const ORIGIN_DRAW = 24;
-const ORIGIN_SETTLE = 38;
+const LABEL_IN = 32; // marker + label fully visible this many frames after an origin starts
+const ORIGIN_PAUSE = 30; // 1 s of calm after each origin is fully shown, then the next one starts
+const ORIGIN_STEP = LABEL_IN + ORIGIN_PAUSE;
 const HEADING_FADE_IN = [6, 28] as const;
-const INFO_EXTRA_FRAMES = 75; // extra reading time when info lines exist
 
 export const routeCheckTimeline = (cfg: RouteCheckConfig, holdSeconds: number, fps = 30) => {
 	const phases = cfg.origins.map((o, i) => {
 		const start = FIRST_ORIGIN + i * ORIGIN_STEP;
-		return { key: o.key, start, drawEnd: start + ORIGIN_DRAW, end: start + ORIGIN_SETTLE };
+		return { key: o.key, start, drawEnd: start + ORIGIN_DRAW, end: start + LABEL_IN };
 	});
 	const lastEnd = phases[phases.length - 1].end;
-	const duration = Math.round(lastEnd + (cfg.infoLines?.length ? INFO_EXTRA_FRAMES : 0) + holdSeconds * fps);
-	return { phases, infoReveal: lastEnd, duration };
+	const duration = Math.round(lastEnd + holdSeconds * fps);
+	return { phases, infoReveal: DEST_REVEAL, duration };
 };
 
 const SPRING_CONFIG = { damping: 16, stiffness: 120, mass: 0.6, overshootClamping: true };
@@ -321,7 +321,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 										<circle r={radius + 8} fill="none" stroke={th.marker} strokeWidth={1.5} opacity={0.4} />
 									</g>
 								</svg>
-								<div style={{ position: 'absolute', left: px.x + off.x, top: px.y + off.y, fontFamily: FONT, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: th.labelShadow, whiteSpace: 'nowrap' }}>
+								<div style={{ position: 'absolute', left: Math.round(px.x + off.x), top: Math.round(px.y + off.y), fontFamily: FONT, opacity: labelOpacity, transform: `translateY(${labelY}px)`, textShadow: th.labelShadow, whiteSpace: 'nowrap' }}>
 									<div style={{ fontSize: origin.emphasis ? 30 : 26, fontWeight: origin.emphasis ? 700 : 600, color: th.label }}>
 										{origin.label}{' '}
 										{origin.country && <span style={{ color: th.tag, fontWeight: 500, fontSize: origin.emphasis ? 22 : 19 }}>{origin.country}</span>}{' '}
@@ -348,12 +348,12 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 					<div
 						style={{
 							position: 'absolute',
-							left: Math.max(40, destPx.x - 40 - 660),
-							top: Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55)),
+							left: Math.round(Math.max(40, destPx.x - 40 - 660)),
+							top: Math.round(Math.min(CANVAS_HEIGHT - 380, destPx.y + (config.plateOffsetY ?? -55))),
 							width: 660,
 							textAlign: 'right',
 							fontFamily: FONT,
-							backgroundColor: th.plateBg,
+							background: th.plateBg,
 							backdropFilter: th.plateGlass,
 							WebkitBackdropFilter: th.plateGlass,
 							border: th.plateGlass === 'none' ? undefined : '1.5px solid rgba(255,255,255,0.65)',
