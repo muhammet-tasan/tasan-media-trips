@@ -37,6 +37,8 @@ export type RouteCheckOrigin = {
 	emphasis?: boolean; // primary origin: bigger line/label
 	coords: Coords;
 	labelOffset?: { x: number; y: number }; // override default label position (px from marker)
+	/** Reveal time in s (default: firstOriginAt + index * originStep). */
+	at?: number;
 };
 export type RouteCheckConfig = {
 	heading: string;
@@ -67,6 +69,8 @@ export type RouteCheckTiming = {
 	/** Destination marker (default 2). */
 	destinationAt?: number;
 	/** First origin route starts (default 4); next origins follow every `originStep` s (default 62/30). */
+	/** Map + heading only until then; the camera push-in ends here (default 2). Keep <= first text reveal so the plate does not drift. */
+	establishSeconds?: number;
 	firstOriginAt?: number;
 	originStep?: number;
 	/** Default fade-in duration of all text blocks (default 0.6) incl. a small upward move. */
@@ -106,7 +110,7 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 		border: 'rgba(70,95,85,0.5)', countryLabel: 'rgba(31,61,43,0.28)',
 		routeCasing: 'rgba(255,255,255,0.9)', routeMain: 'rgba(217,98,43,1)', routeSecondary: 'rgba(217,98,43,0.88)',
 		marker: '#1f3d2b', label: '#1f3d2b', labelShadow: '0 1px 8px rgba(246,241,227,0.95)',
-		plateBg: 'rgba(250,247,235,0.3)', plateBlur: 6, plateSaturate: 1.15, plateBorder: '1.5px solid rgba(255,255,255,0.7)', plateShadow: '0 6px 28px rgba(31,61,43,0.10)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
+		plateBg: 'rgba(250,247,235,0.24)', plateBlur: 5, plateSaturate: 1.15, plateBorder: '1.5px solid rgba(255,255,255,0.7)', plateShadow: '0 6px 28px rgba(31,61,43,0.10)', plateName: '#1f3d2b', plateTagline: '#2f5a40', plateDetail: 'rgba(31,61,43,0.75)',
 		attribution: 'rgba(31,61,43,0.75)', attributionBg: 'rgba(246,241,227,0.85)', timeText: '#b8460f',
 	},
 };
@@ -115,7 +119,6 @@ const THEMES: Record<'dark' | 'light', Theme> = {
 // 2 s establish (map + heading) -> origins in config order (each: route draw + marker + label)
 // -> title / tagline / location / every infoLine fade in at their own `at` -> static end image
 // (`endImageAt` + `holdSeconds`). The plate keeps its final size from the start, so nothing shifts.
-const ESTABLISH_END = 60;
 const ORIGIN_DRAW = 24;
 const LABEL_IN = 32; // marker + label fully visible this many frames after an origin starts
 const HEADING_FADE_IN = [6, 28] as const;
@@ -132,10 +135,11 @@ export const routeCheckTimeline = (cfg: RouteCheckConfig, holdSeconds: number, f
 		at: f(tt?.at ?? fallbackAt),
 		dur: Math.max(1, f(tt?.fade ?? fallbackFade)),
 	});
+	const establish = f(t.establishSeconds ?? 2);
 	const firstOrigin = f(t.firstOriginAt ?? 4);
 	const step = f(t.originStep ?? 62 / 30);
 	const phases = cfg.origins.map((o, i) => {
-		const start = firstOrigin + i * step;
+		const start = o.at !== undefined ? f(o.at) : firstOrigin + i * step;
 		return { key: o.key, start, drawEnd: start + ORIGIN_DRAW, end: start + LABEL_IN };
 	});
 	const title = block(t.title, destSec);
@@ -147,7 +151,7 @@ export const routeCheckTimeline = (cfg: RouteCheckConfig, holdSeconds: number, f
 	const lastEnd = Math.max(phases[phases.length - 1].end, ...blocks.map((x) => x.at + x.dur));
 	const endImage = Math.max(lastEnd, t.endImageAt !== undefined ? f(t.endImageAt) : 0);
 	const duration = Math.round(endImage + holdSeconds * fps);
-	return { phases, destReveal: f(destSec), title, tagline, location, plate, info, endImage, duration };
+	return { establish, phases, destReveal: f(destSec), title, tagline, location, plate, info, endImage, duration };
 };
 
 const SPRING_CONFIG = { damping: 16, stiffness: 120, mass: 0.6, overshootClamping: true };
@@ -164,8 +168,8 @@ type BorderCollection = {
 };
 type Camera = { lng: number; lat: number; zoom: number };
 
-const cameraAt = (frame: number, start: Camera, end: Camera): Camera => {
-	const t = easeOutCubic(interpolate(frame, [0, ESTABLISH_END], [0, 1], CLAMP));
+const cameraAt = (frame: number, start: Camera, end: Camera, establish: number): Camera => {
+	const t = easeOutCubic(interpolate(frame, [0, establish], [0, 1], CLAMP));
 	return { lng: start.lng + (end.lng - start.lng) * t, lat: start.lat + (end.lat - start.lat) * t, zoom: start.zoom + (end.zoom - start.zoom) * t };
 };
 
@@ -249,7 +253,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 			startCameraRef.current = start;
 			// Start on the camera of the CURRENT frame, not always the start camera: a render tab
 			// that begins mid-video would otherwise show one zoomed-out frame (camera effect ran too early).
-			const first = cameraAt(frameRef.current, start, end);
+			const first = cameraAt(frameRef.current, start, end, tl.establish);
 			map.jumpTo({ center: [first.lng, first.lat], zoom: first.zoom });
 			lastCameraKeyRef.current = JSON.stringify(first);
 			map.once('idle', () => {
@@ -274,7 +278,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 		const end = endCameraRef.current;
 		if (!map || !start || !end) return;
 
-		const camera = cameraAt(frame, start, end);
+		const camera = cameraAt(frame, start, end, tl.establish);
 		const key = JSON.stringify(camera);
 		if (key === lastCameraKeyRef.current) return;
 

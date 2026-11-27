@@ -13,6 +13,29 @@
   },
   "origins": [
     {
+      "key": "basel",
+      "label": "Basel",
+      "country": "CH",
+      "time": "1 Std.",
+      "emphasis": true,
+      "coords": {
+        "lon": 7.5886,
+        "lat": 47.5596
+      },
+      "at": 13
+    },
+    {
+      "key": "freiburg",
+      "label": "Freiburg",
+      "country": "DE",
+      "time": "1 Std.",
+      "coords": {
+        "lon": 7.8421,
+        "lat": 47.999
+      },
+      "at": 14.5
+    },
+    {
       "key": "colmar",
       "label": "Colmar",
       "country": "FR",
@@ -24,28 +47,8 @@
       "coords": {
         "lon": 7.3585,
         "lat": 48.0794
-      }
-    },
-    {
-      "key": "basel",
-      "label": "Basel",
-      "country": "CH",
-      "time": "1 Std.",
-      "emphasis": true,
-      "coords": {
-        "lon": 7.5886,
-        "lat": 47.5596
-      }
-    },
-    {
-      "key": "freiburg",
-      "label": "Freiburg",
-      "country": "DE",
-      "time": "1 Std.",
-      "coords": {
-        "lon": 7.8421,
-        "lat": 47.999
-      }
+      },
+      "at": 16
     },
     {
       "key": "strasbourg",
@@ -55,7 +58,8 @@
       "coords": {
         "lon": 7.7521,
         "lat": 48.5734
-      }
+      },
+      "at": 17.5
     }
   ],
   "theme": "light",
@@ -63,16 +67,16 @@
   "infoLines": [
     {
       "text": "Parkplatz · kostenlos",
-      "at": 12
+      "at": 6.5
     },
     {
       "text": "Auch mit dem Bus ab Colmar",
-      "at": 15
+      "at": 9
     },
     {
       "text": "Linie 106 Colmar → Hunawihr",
       "size": "detail",
-      "at": 16.5
+      "at": 10.5
     }
   ],
   "countryLabels": [
@@ -96,30 +100,29 @@
   "plateOffsetX": -307,
   "mapBackground": "#f6f1e3",
   "plate": {
-    "background": "rgba(250,247,235,0.3)",
-    "blur": 6,
+    "background": "rgba(250,247,235,0.24)",
+    "blur": 5,
     "saturate": 1.15,
     "border": "1.5px solid rgba(255,255,255,0.7)",
     "shadow": "0 6px 28px rgba(31,61,43,0.10)"
   },
   "timing": {
-    "destinationAt": 2,
-    "firstOriginAt": 2,
-    "originStep": 1.33,
+    "destinationAt": 1.5,
+    "establishSeconds": 1.5,
     "fadeSeconds": 0.6,
     "endImageAt": 19,
     "plate": {
-      "at": 6.7,
+      "at": 1.5,
       "fade": 0.8
     },
     "title": {
-      "at": 7
+      "at": 1.5
     },
     "tagline": {
-      "at": 9
+      "at": 3.5
     },
     "location": {
-      "at": 10
+      "at": 5
     }
   }
 }
