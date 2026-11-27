@@ -1,7 +1,7 @@
 # NaturOparC — Schnittanleitung für CapCut (Stand: Entwurf `1124`, 30 fps)
 
 Alle Zeiten im CapCut-Format `HH:MM:SS:FF` (Projekt 30 fps; die verwendeten Originalclips haben 29,97 fps, die Zeiten sind wie in CapCut angezeigt). Die erste Spalte ist immer die **Timeline**; Zeiten **„im Originalclip“** stehen nur in der Spalte „Änderung“.
-**Reihenfolge = Abarbeitung:** vom Videoende zum Videoanfang, die Hook-Clips ganz zum Schluss (in Abspielreihenfolge). So bleiben die Timecodes der noch offenen Zeilen gültig. Raw-Clips: `…\capcut6 - Naturoparc Colmar\Raw\`.
+**Reihenfolge = Abarbeitung:** vom Videoende zum Videoanfang, die Hook-Clips ganz zum Schluss (in Abspielreihenfolge). So bleiben die Timecodes der noch offenen Zeilen gültig. Raw-Clips: `…\capcut\2026 - Naturoparc Colmar\Raw\`.
 
 | Timecode (CapCut-Timeline) | Szene | Änderung | Dauer | Priorität |
 |---|---|---|---|---|
