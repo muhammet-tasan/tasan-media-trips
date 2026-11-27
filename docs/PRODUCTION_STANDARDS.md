@@ -97,6 +97,8 @@ Der kanonische Katalog der Remotion-B-roll-Grafiktypen und ihre Design-/Timing-S
 - TASAN Trip Score
 - weitere nützliche Reiseziel-Infos nach Bedarf
 
+**Pilot NaturOparC (2026-11-26, bei Bewährung Standard):** Szenen-Captions mit Emojis/kurzen Texten/Illustrationen für Humor und Orientierung, TASAN-Intro zwischen Szenen mit anschließend wanderndem Logo-Wasserzeichen (§3), Google-Review-Abschnitt (Top-5-Kommentare) plus Fazit des Autors über der letzten langen Szene.
+
 Nicht jede Grafik muss in jedem Video erscheinen — Auswahl nach tatsächlichem Informationswert.
 
 Anforderungen: einheitlich gestaltet, professionell und minimalistisch, gut lesbar, unterstützt den Film statt ihn zu unterbrechen, nach Möglichkeit über passendem Videomaterial eingeblendet. Google-Bewertungen müssen nachvollziehbar und korrekt wiedergegeben werden.

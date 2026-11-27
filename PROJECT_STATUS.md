@@ -9,13 +9,14 @@ Exactly one video is Active at any time. This block is the **only** place that h
 
 - **Slug:** `naturoparc`
 - **Title:** NaturOparC (Hunawihr, Elsass — Tier-/Naturpark)
-- **Phase:** Editing — **user is creating the rough cut in CapCut** (Claude reviews it afterwards); footage analysis, content review and the editorial plan are done
-- **Resume point:** Waiting for the user's CapCut rough cut. When it exists (export MP4 and/or CapCut draft read-only), run `/my-review-roughcut` → `analysis/naturoparc/ROUGHCUT_REVIEW.md`. `analysis/naturoparc/FINAL_TIMELINE_PLAN.md/.csv` stays as an optional reference of Claude's earlier editorial suggestion, not a task list.
-- **Last decisions:** Hook = quick animal flash-cuts (~8s), no staircase climb; no recognizable family faces (`docs/PRODUCTION_STANDARDS.md` §2); watermark branding is a placeholder only, `TasanBrandIntro` not used; plan totals ~162s of raw clips vs. ~240s target, the gap is intentionally left for voice-over, info graphics and holds.
+- **Phase:** Editing — user's rough cut exists (CapCut draft `1124`; reviewed export `1124(1).mp4`, 2:55, 51 cuts; newer unreviewed export `1124(2).mp4` from 2026-11-27); Claude's review v1 delivered
+- **Process step:** S3 — Rohschnitt-Review v1 geliefert (`analysis/naturoparc/ROUGHCUT_REVIEW.md`); Nutzer überarbeitet den Schnitt → Review v2 → bei "Schnitt steht" weiter mit S4 (Erzählung). Stufen: `docs/PRODUCTION_PROCESS.md`
+- **Resume point:** User refines the cut using the review (hook, trims, koi-scene privacy fix); then `/my-review-roughcut` again (v2). Afterwards S4: Claude asks which narration style and offers 2–3 options (`/my-next-task` handles this).
+- **Last decisions:** Hook = quick animal highlights (not a staircase climb); no recognizable family faces (§2) — review found faces in the koi scene (0:38–0:46); watermark/branding standard documented, not built; plan reference `FINAL_TIMELINE_PLAN.md` is optional. Creative direction for this video (user, 2026-11-26): fun, family-style scene captions (emojis, short texts, illustrations/symbols, built in Remotion); TASAN intro shown between scenes; logo floats into a corner and stays as watermark; Route Check like the first video; ending = Google-review comments section over the last long scene + the user's verdict (Fazit). See `## Video: NaturOparC` → Creative direction.
 - **Next steps (concrete):**
-  1. User: create the rough cut in CapCut (scene selection is theirs); export a preview MP4 when ready.
-  2. Claude: `/my-review-roughcut` on that cut → time-based suggestions (`analysis/naturoparc/ROUGHCUT_REVIEW.md`), incl. overlooked scenes from the raw footage via the footage-analysis outputs and a privacy check (`docs/PRODUCTION_STANDARDS.md` §2).
-  3. User refines the cut; then plan voice-over, then identify B-roll gaps (Route Check / Planning Check / Trip Score) — Remotion only after a concrete gap shows up. Two plan clips (`…_0007_D.MP4`, `…_0055_D.MP4`) are missing from the `Raw/` folder; irrelevant unless the user wants them.
+  1. User: refine the cut per `ROUGHCUT_REVIEW.md`; export again.
+  2. Claude: review v2; then S4 narration (questions + 2–3 proposals).
+  3. After the cut and narration stand: S6 graphics plan (captions, intro/watermark, Route Check for NaturOparC, review section) → S7 build. Route Check is a reference implementation hard-wired to Mulhouse and `public/geo/routes.geojson` only holds Mulhouse routes — NaturOparC needs its own spec/adaptation (`docs/BROLL_GUIDELINES.md` §11/§12).
 - **Details:** `## Video: NaturOparC` below; plan in `analysis/naturoparc/FINAL_TIMELINE_PLAN.md`.
 
 ## Video Registry
@@ -24,18 +25,18 @@ Status values: **active** (exactly one) · **paused** · **done** (published) ·
 
 | Slug | Title | Status | Phase / state | Details |
 |---|---|---|---|---|
-| `naturoparc` | NaturOparC | **active** | CapCut rough cut next | `## Video: NaturOparC`, `analysis/naturoparc/` |
+| `naturoparc` | NaturOparC | **active** | S3 — rough-cut review v1 delivered, user refining (newer export `1124(2)` exists, 2026-11-27, not yet reviewed) | `## Video: NaturOparC`, `analysis/naturoparc/` |
 | `mulhouse-automobile-museum` | Mulhouse Automobile Museum | done | Completed (confirmed by user 2026-11-24); history and B-roll assets kept in its section | `## Video: Mulhouse Automobile Museum`, `src/mulhouse-automobile-museum/` |
 
 *Status evidence (2026-11-24): the newest commits (2026-11-22…24) are all NaturOparC analysis/plan work; the last Mulhouse-specific commit was 2026-09-13. The user confirmed on 2026-11-24 that Mulhouse is fully completed (`done`), not paused. Earlier today this was wrongly inferred as "paused" from git history alone — see Lessons Learned.*
 
 ## Video Assets (portable)
 
-Maps each video slug to **folder names only** — no absolute paths, so this file is identical on every PC. `scripts/video_assets.py` (used by `/my-review-roughcut`) resolves the machine-specific paths: CapCut root = env `TASAN_CAPCUT_ROOT`, else optional gitignored `.claude/local.json` (`capcut_root`, `capcut_drafts_dir`), else the default `<repo>/../capcut`; drafts dir = CapCut's standard location (env `TASAN_CAPCUT_DRAFTS` to override). Analysis folder is always `analysis/<slug>/`. Standard CapCut folder layout (from `2026 - Template`): `Raw/`, `Export/`, `Audio/`, `CapCut/`, `Thumbnail/`. Leave `Draft` empty to auto-match the CapCut draft by the footage paths in its media pool; fill it in when several drafts reference the same footage. **Add a row for every new video** (closeout step 0).
+Maps each video slug to **folder names only** — no absolute paths, so this file is identical on every PC. `scripts/video_assets.py` (used by `/my-review-roughcut`) resolves the machine-specific paths: CapCut root = env `TASAN_CAPCUT_ROOT`, else optional gitignored `.claude/local.json` (`capcut_root`, `capcut_drafts_dir`), else the default `<repo>/../capcut`; drafts dir = CapCut's standard location (env `TASAN_CAPCUT_DRAFTS` to override); exports are looked up in the video's `Export/` folder first, then in CapCut's default export folder (`<CapCut>/Videos`, env `TASAN_CAPCUT_EXPORTS`) by draft name (`<draft>.mp4`, `<draft>(1).mp4`). Analysis folder is always `analysis/<slug>/`. Standard CapCut folder layout (from `2026 - Template`): `Raw/`, `Export/`, `Audio/`, `CapCut/`, `Thumbnail/`. Leave `Draft` empty to auto-match the CapCut draft by the footage paths in its media pool; fill it in when several drafts reference the same footage. **Add a row for every new video** (closeout step 0).
 
 | Slug | CapCut folder | Raw | Export | Draft |
 |---|---|---|---|---|
-| `naturoparc` | `2026 - Naturoparc Colmar` | `Raw` | `Export` | `1122` |
+| `naturoparc` | `2026 - Naturoparc Colmar` | `Raw` | `Export` | `1124` |
 | `mulhouse-automobile-museum` | `2026 - Musee Automobile Mulhouse` | `video input` | `video ouput` | `Musee Automobile Mulhouse` |
 
 ## Project Overview
@@ -197,10 +198,22 @@ Findings, verified on the real raw files in `../capcut/2026 - Naturoparc Colmar/
 - CapCut drafts (`%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft\<name>\draft_content.json`) are currently plain JSON, but undocumented and version-dependent — a generated draft is possible in principle, not recommended as the baseline.
 - **Raw folder drift:** `Raw/` currently holds 41 of the 54 analysed clips; **two clips used in the plan are missing: `…_0007_D.MP4` and `…_0055_D.MP4`** (the others not in `Raw/` are not in the plan). Clarify before cutting.
 
+### Creative direction (user, 2026-11-26) — NaturOparC pilot of the channel's own flair
+- **Scene captions:** fun, family-style short descriptions per scene with emojis, text, illustrations/symbols (Remotion); ideas from the review: "Wo ist der Otter?" search-picture caption, "Mitmach-Station" tags.
+- **TASAN intro between scenes**, then the **logo floats into a corner and stays as a permanent watermark** (matches the documented watermark standard `docs/PRODUCTION_STANDARDS.md` §3; not built yet).
+- **Ending:** Google-review comments section over the last long scene (26.9 s parking-lot scene) + the user's verdict (Fazit). Top-5 comments by process stage S8.
+- **Route Check:** same look as the first video; needs adaptation for NaturOparC (origins, routes, texts), see Next steps.
+- Short, never boring; tips and honest review for viewers. If it works, promote the pieces to channel standards (`docs/PRODUCTION_STANDARDS.md` §6).
+
 ### Decisions Made
-- See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24 entries in the Session Log.
+- See `## ▶ Active Video` → Last decisions, and the 2026-11-23/24/26 entries in the Session Log.
 
 ## Session Log (all videos, newest first)
+
+**2026-11-26 [naturoparc / process]**
+- Defined the fixed production process (`docs/PRODUCTION_PROCESS.md`, stages S0–S12) and started the cross-video learnings file (`docs/LEARNINGS.md`, seeded from Mulhouse and NaturOparC). `/my-next-task` is now the process navigator (reads the process, evidence in the project and the learnings); closeout adds the **Process step** and a learnings step.
+- Resolver: finds the CapCut export also in CapCut's default export folder (`%LOCALAPPDATA%\CapCut\Videos\<draft>.mp4`); NaturOparC draft is `1124`.
+- First review of the user's rough cut written: `analysis/naturoparc/ROUGHCUT_REVIEW.md` (main findings: no hook in the first 24 s, uniform ~3 s rhythm, koi scene shows recognizable faces, weak/duplicate shots, audio −30.3 LUFS with LRA 20.7).
 
 **2026-11-24 [tooling / video assets]**
 - `/my-review-roughcut` no longer asks for paths: new portable table `## Video Assets (portable)` (slug → CapCut folder name, raw/export subfolders, optional draft name; names only) + `scripts/video_assets.py` resolves machine-specific paths (env `TASAN_CAPCUT_ROOT`/`TASAN_CAPCUT_DRAFTS`, optional gitignored `.claude/local.json`, default `<repo>/../capcut`), finds the newest export, auto-matches the CapCut draft by its media paths, and reports `problems` (exit 2) only when something is missing/ambiguous. No new committed config file. Tested with `python3 scripts/test-video-assets.py` (fixtures, incl. a second-PC root).

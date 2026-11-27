@@ -27,6 +27,8 @@ Shared infrastructure (`public/geo/`, `public/maplibre/`) stays where it is, not
 ### Key Files
 - **PROJECT_STATUS.md** – Persistent project memory (Active Video block, Video Registry, per-video sections, session log, lessons learned); updated at session end by `/my-daily-project-closeout`
 - **docs/BROLL_GUIDELINES.md** – Mandatory reusable B-roll design/timing/hierarchy standards; consult before any new B-roll
+- **docs/PRODUCTION_PROCESS.md** – The fixed production process (stages S0–S12, who does what, how each stage is recognized as done); `/my-next-task` navigates by it; applies to every video
+- **docs/LEARNINGS.md** – Cross-video learnings, tips and tricks; extended at every closeout and retro (S12), read before each stage
 - **docs/PRODUCTION_STANDARDS.md** – Mandatory channel/editorial standards (positioning, family/privacy, branding concept, hook, storytelling structure, infographics catalog); consult before planning or cutting any video
 - **docs/FOOTAGE_ANALYSIS.md** – Supporting footage-sighting tool (metadata/thumbnails/gallery for raw DJI clips; §10: finding overlooked scenes); consult before extending `scripts/footage-analysis/`
 - **PROJECT_STATUS.md → `## Video Assets (portable)`** – per-video mapping slug → CapCut folder name/raw/export/draft (names only, no absolute paths); `scripts/video_assets.py` resolves the machine-specific paths (env `TASAN_CAPCUT_ROOT`, optional gitignored `.claude/local.json`). Add a row for every new video. Tests: `python3 scripts/test-video-assets.py`

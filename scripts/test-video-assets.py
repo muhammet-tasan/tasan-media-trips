@@ -115,6 +115,23 @@ os.remove(os.path.join(repo, ".claude", "local.json"))
 r = va.machine_paths(repo, {"LOCALAPPDATA": tmp})
 check("default root is <repo>/../capcut", r[0] == os.path.normpath(os.path.join(tmp, "capcut")))
 
+print("== CapCut default export folder (files named after the draft)")
+exp_dir = os.path.join(tmp, "CapCut", "Videos")
+drafts2 = os.path.join(tmp, "CapCut", "User Data", "Projects", "com.lveditor.draft")
+env2 = {"TASAN_CAPCUT_ROOT": root, "TASAN_CAPCUT_DRAFTS": drafts2, "LOCALAPPDATA": tmp}
+meta(drafts2, "projX", "2026 - A")
+touch(os.path.join(root, "2026 - A", "Export", "ignored.txt"))
+for f in os.listdir(os.path.join(root, "2026 - A", "Export")):
+    os.remove(os.path.join(root, "2026 - A", "Export", f))
+touch(os.path.join(exp_dir, "projX.mp4"), age=100)
+touch(os.path.join(exp_dir, "projX(1).mp4"), age=0)
+touch(os.path.join(exp_dir, "projXtra.mp4"))
+r = va.resolve(None, status_file=status, repo=repo, env=env2)
+check("export found via draft name in CapCut default folder", r["export"] and r["export"].endswith("projX(1).mp4") and len(r["export_others"]) == 1)
+check("similar names are not matched", not any("projXtra" in x for x in [r["export"]] + r["export_others"]))
+r = va.machine_paths(repo, {"LOCALAPPDATA": tmp, "TASAN_CAPCUT_DRAFTS": drafts2})
+check("default exports dir derived from drafts dir", r[2] == os.path.normpath(exp_dir))
+
 print("== portability: status file holds no absolute paths")
 real = open(os.path.join(HERE, "..", "PROJECT_STATUS.md"), encoding="utf-8").read()
 rows = va.asset_rows(real)

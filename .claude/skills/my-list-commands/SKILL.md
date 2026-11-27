@@ -15,7 +15,7 @@ This project includes seven specialized commands to streamline workflow:
 
 2. **`/my-continue-project`** — Resumes the active video at its exact work step (reads PROJECT_STATUS.md, checks git history)
 
-3. **`/my-next-task`** — Identifies the single highest-impact implementation step to prioritize
+3. **`/my-next-task`** — Process navigator: tells the next stage of the fixed production process (`docs/PRODUCTION_PROCESS.md`) for the active video, who does it, asks the stage's questions and relevant learnings
 
 4. **`/my-daily-project-closeout`** — Executes standardized end-of-session checkpoint:
    - Updates PROJECT_STATUS.md with session progress

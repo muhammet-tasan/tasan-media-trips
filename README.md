@@ -21,7 +21,7 @@ CLAUDE.md              # Project documentation
 - `/my-project-status` – Active video first, then other videos
 - `/my-continue-project` – Resume the active video at its exact step
 - `/my-daily-project-closeout` – End-of-session checkpoint
-- `/my-next-task` – Identify highest-impact work
+- `/my-next-task` – Next step of the production process for the active video
 - `/my-notification-on` – Per-task option for mobile push notifications (combine, e.g. `/goal /my-notification-on …`; off by default)
 - `/my-review-roughcut` – Review your CapCut rough cut with time-based suggestions
 - `/my-list-commands` – Show all commands

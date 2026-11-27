@@ -5,7 +5,7 @@ Portable part (committed): the table `## Video Assets (portable)` in PROJECT_STA
 slug -> folder NAMES (never absolute paths).
 Machine-specific part (never committed) is resolved here, in this order:
   1. env  TASAN_CAPCUT_ROOT / TASAN_CAPCUT_DRAFTS
-  2. optional, gitignored  .claude/local.json  {"capcut_root": "...", "capcut_drafts_dir": "..."}
+  2. optional, gitignored  .claude/local.json  {"capcut_root": "...", "capcut_drafts_dir": "...", "capcut_exports_dir": "..."}
   3. defaults: capcut root = <repo>/../capcut (sibling of the repo), drafts dir = CapCut's
      standard location on Windows/macOS.
 So on a second PC nothing needs configuring if the folder layout matches; otherwise set the env
@@ -62,7 +62,10 @@ def machine_paths(repo=REPO, env=None):
             drafts = os.path.expanduser("~/Movies/CapCut/User Data/Projects/com.lveditor.draft")
         else:
             drafts = os.path.join(env.get("LOCALAPPDATA", ""), "CapCut", "User Data", "Projects", "com.lveditor.draft")
-    return os.path.normpath(root), os.path.normpath(drafts)
+    exports = env.get("TASAN_CAPCUT_EXPORTS") or local.get("capcut_exports_dir")
+    if not exports:  # CapCut default export folder: <CapCut>/Videos, sibling of "User Data"
+        exports = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(drafts))), "Videos")
+    return os.path.normpath(root), os.path.normpath(drafts), os.path.normpath(exports)
 
 
 def find_drafts(drafts_dir, capcut_folder_name):
@@ -98,7 +101,7 @@ def resolve(slug=None, status_file=None, repo=REPO, env=None):
         problems.append(f"slug '{slug}' has no row in '## Video Assets (portable)' in PROJECT_STATUS.md")
         return out
 
-    root, drafts_dir = machine_paths(repo, env)
+    root, drafts_dir, exports_dir = machine_paths(repo, env)
     out["capcut_root"], out["capcut_drafts_dir"] = root, drafts_dir
 
     # analysis folder (inside the repo, portable by convention)
@@ -154,6 +157,15 @@ def resolve(slug=None, status_file=None, repo=REPO, env=None):
         elif len(hits) > 1:
             problems.append(f"{len(hits)} CapCut drafts reference this video's footage ({', '.join(hits)}); "
                             f"enter the right one in the 'Draft' column of the table")
+    # CapCut's default export folder: files named after the draft ("<draft>.mp4", "<draft>(1).mp4")
+    if not out["export"] and out["draft"] and os.path.isdir(exports_dir):
+        stem = os.path.basename(out["draft"]).lower()
+        cand = sorted((os.path.join(exports_dir, f) for f in os.listdir(exports_dir)
+                       if f.lower().endswith(VIDEO_EXT) and re.fullmatch(re.escape(stem) + r"(\(\d+\))?\.[a-z0-9]+", f.lower())),
+                      key=os.path.getmtime, reverse=True)
+        if cand:
+            out["export"], out["export_others"] = cand[0], cand[1:]
+            out["notes"].append(f"export taken from CapCut's default export folder ({len(cand)} file(s) named after the draft); using the newest")
     if not out["draft"] and not out["export"]:
         problems.append("neither a rough-cut export nor a CapCut draft was found - the review has no input yet")
     return out

@@ -17,6 +17,7 @@ Standardize end-of-session checkpoints to preserve project continuity.
 ### 1. Status Documentation (single source of truth, no duplicates)
 Update `PROJECT_STATUS.md` in these places only:
 - `## ▶ Active Video`: **Phase**, **Resume point** (exactly where the next session starts), **Last decisions** (decisions made this session, with the why), **Next steps (concrete)** — 1–3 actionable steps that name files/commands, not vague topics
+- **Process step** in the Active Video block (stage number from `docs/PRODUCTION_PROCESS.md`, e.g. `S3 — Review v1 offen`), so `/my-next-task` and `/my-continue-project` start at the right stage
 - `## Video Registry`: status + one-line state for the video worked on (and any video whose status changed)
 - The worked-on video's `## Video: <title>` section: tick/add checklist items, record decisions and gotchas specific to that video
 - `**Last Updated:**` date in the header
@@ -31,6 +32,7 @@ Add one entry to `## Session Log (all videos, newest first)` at the top, tagged 
 - Lessons learned or gotchas discovered
 
 ### 3. Standards Extraction
+- **Learnings:** add every new insight, tip or trick from this session to `docs/LEARNINGS.md` (format and category headings there; one line each, with source and process stage). Skip nothing that would save time next video.
 - Document any successful patterns found
 - Note anti-patterns to avoid
 - Update CLAUDE.md if new guidance emerged (rules only — never a list of videos or their status)
