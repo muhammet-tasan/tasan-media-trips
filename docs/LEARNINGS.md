@@ -26,6 +26,8 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Windows:** Skript-Zwischendateien nicht nach `/tmp` schreiben (Python findet es nicht) — Scratchpad bzw. Projektpfad nutzen. *(2026-11-27)*
 
 - **Erstes Review (NaturOparC):** ohne Hook liegen die ersten ~24 s ohne klares Tier; gleichförmiger ~3-s-Rhythmus über 51 Schnitte wirkt monoton; mehrere Schnitte aus demselben Standpunkt wirken wie Wiederholung; Besuchergesichter in Nahaufnahmen früh prüfen (Koi-Szene). *(2026-11-26 · S3)*
+- **Review-Tiefe offenlegen:** ein 2-s-Raster über den Export ist keine Schnitt-für-Schnitt-Sichtung (kurze Schnitte fallen durchs Raster). Besser: ≥3 Frames pro Schnitt aus der Schnittliste, auf Kontaktbögen. *(2026-11-27 · S3)*
+- **Familiäres Ausflugsvideo, kein Tiervideo:** ruhige Umgebungsszenen kürzen statt löschen; ein Hook darf Erlebnis/Aktivität (z. B. Brücken/Trittsteine) neben Tieren zeigen; Hook-Suche über das gesamte Material, nicht nur über Clips, die schon im Schnitt sind. *(2026-11-27 · S3/S6)*
 - **CapCut-Kombinationsclips verstecken die Quellclips** — für ein Review besser vorher auflösen. *(2026-11-26 · S2/S3)*
 
 ## Branding (S6/S7)
@@ -33,7 +35,7 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Wasserzeichen-Reveal statt eigener Intro-Block** — Logo erscheint über laufender Aufnahme und wandert in eine Ecke; unterbricht die Geschichte nicht (Standard §3, noch nicht gebaut). *(2026-11-23 · S6)*
 
 ## Ton (S9)
-- **Rohschnitt-Ton war −30 LUFS mit 20 LU Lautheitsspanne** — Clips angleichen, bevor Voice-over und Musik dazukommen; Ziel YouTube ca. −14 LUFS. *(NaturOparC, 2026-11-26 · S9)*
+- **Ton ist Sache des Nutzers:** Claude analysiert niemals Audio (Pegel, Lautheit, Geräusche, Musik, Sprache) und baut dafür keine Messungen in Skripte oder Reviews ein. *(Nutzerentscheidung, 2026-11-27 · alle Stufen)*
 - **Natürliches Umgebungsgeräusch gezielt nutzen**, Musik unter Sprache ducken, Platz für Sprecher lassen. *(Mulhouse · S9)*
 
 ## Recherche & Daten (S0/S8)
@@ -48,6 +50,7 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Ehrlich „nicht bestätigt“ sagen** (z. B. Tierart bei großer Entfernung) statt raten. *(NaturOparC · S1)*
 
 ## Werkzeuge & Prozess
+- **Arbeitsstil:** Analyse gründlich, aber intern; im Chat nur die eine Schnittanleitung als Tabelle (Timecode | Szene | Änderung | Dauer | Priorität), ohne Kürzel und Zeilenverweise, mit vollständigem Dateinamen + Start/Ende bei neuem Material. *(2026-11-27)*
 - **Projektgedächtnis:** Active-Video-Block + Registry + je Video ein Abschnitt; Skills lesen generisch und prüfen gegen Git; keine Videonamen in Skills/CLAUDE.md. *(2026-11-24)*
 - **Git-Historie kann „pausiert“ nicht von „fertig“ unterscheiden** — Status beim Nutzer erfragen. *(2026-11-24)*
 - **Benachrichtigungen sind eine Auftrags-Option** (`/my-notification-on` im Prompt), standardmäßig aus, per Hook erzwungen — nicht über Prompt-Anweisungen. *(2026-11-24)*

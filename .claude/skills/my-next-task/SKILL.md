@@ -20,6 +20,7 @@ Process navigator: the user should never have to work out which step is due. Wor
 5. End with: "Soll ich loslegen?" and, when confirmed, run the step (e.g. `/my-review-roughcut` logic for S3). Update `Process step`/resume point in `PROJECT_STATUS.md` only after the step is actually done.
 
 ## Rules
+- Never analyze audio (levels, loudness, noise, music, speech); audio is the user's job. Keep answers compact — no technical analysis reports.
 - Never propose building the rough cut or CapCut projects (user cuts, Claude reviews).
 - Do not skip ahead: S6/S7 graphics only after the cut stands and the narration exists, unless the user explicitly overrides.
 - Stay within the active video unless asked.

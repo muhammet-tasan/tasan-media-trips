@@ -25,7 +25,7 @@ Three scripts, run in order, all under `scripts/footage-analysis/`:
 
 1. **`analyze.py --source <raw-footage-folder> --slug <project-slug> [--limit N]`**
    - **Discover** — walks the source folder for `.mp4`/`.mov`, skips `.LRF` proxy sidecars. DJI's `DJI_<timestamp>_<seq>_D.MP4` naming already sorts chronologically by filename, so no extra ordering logic is needed.
-   - **Probe (ffprobe)** — duration, resolution, fps, video/audio codec, bit rate, audio sample rate/channels, file size, camera tag, creation time. DJI files carry an embedded MJPEG cover-art stream alongside the real HEVC video stream (`disposition.attached_pic`) — the script explicitly skips it so metadata always reflects the real video stream, not the cover thumbnail.
+   - **Probe (ffprobe)** — duration, resolution, fps, video codec, bit rate, file size, camera tag, creation time. DJI files carry an embedded MJPEG cover-art stream alongside the real HEVC video stream (`disposition.attached_pic`) — the script explicitly skips it so metadata always reflects the real video stream, not the cover thumbnail.
    - **Thumbnails (ffmpeg)** — one JPEG every ~2s (minimum 3 per clip, for clips too short for that interval), scaled to 480px wide. Written to `analysis/<slug>/thumbs/<clip-name>/t_<seconds>.jpg`.
    - **Gallery (HTML)** — one static `analysis/<slug>/gallery.html`, no server, no JS framework. One section per clip: technical metadata header, thumbnail row with timestamp captions. If `detect.py` (below) has already run, each thumbnail also gets small colored badges for whatever technical flags apply near that timestamp. Every metadata/flag field is explicitly labeled as a technical measurement, never implied to be content understanding (see §4).
    - `--rebuild-gallery-only` (no `--source` needed) re-renders `gallery.html` from the existing `metadata.json` + `events/` — used after running `detect.py`, so the slow probe/thumbnail pass isn't repeated just to pick up new flags.
@@ -38,7 +38,7 @@ Outputs live under `analysis/<slug>/`, which is **gitignored** — large and ful
 
 Two different kinds of "analysis" happen here, and they are never blended into one undifferentiated judgment:
 
-- **Technical measurements** (ffprobe/ffmpeg/Python): duration, resolution, fps, codec, audio levels, brightness/motion-difference proxies once §5 is built. 100% reproducible, pure signal processing — no understanding of what's actually in frame.
+- **Technical measurements** (ffprobe/ffmpeg/Python): duration, resolution, fps, codec, brightness/motion-difference proxies once §5 is built. 100% reproducible, pure signal processing — no understanding of what's actually in frame.
 - **Actual image content** (what's visible — a stork in frame, a good establishing shot, a shaky pan): this is done by **Claude, on request**, looking directly at the generated thumbnails in an active session. There is no local vision model and no cloud vision API wired into the pipeline — adding one was considered and rejected for this project's scale (a ~4-minute video from ~20 minutes of raw footage) as unnecessary complexity. Claude's content judgments, when given, are always labeled as editorial/content assessment, never mixed into the technical fields. First real use (NaturOparC, all 54 clips): see §6.5.
 
 ## 5. Scene-change / static-section / quality detection (`detect.py`)
@@ -92,7 +92,7 @@ Because these three are genuine editorial work product rather than derived/regen
 2. DJI gimbal footage is adversarial for motion heuristics — solved with per-clip relative thresholds instead of global constants (§5), but still expect further calibration as more/different footage goes through this.
 3. `blurry` means "less edge detail than this clip's own typical frame," not necessarily true optical focus blur — a soft close-up can trigger it without being out of focus (§5).
 4. No automatic CapCut project import — output is a list/gallery for a human (or Claude) to act on.
-5. Audio analysis is level-only (`silencedetect` is available in the bundled FFmpeg) — things like wind noise or speech intelligibility need actual listening.
+5. **No audio analysis, by decision (2026-11-27):** this tool and every review ignore audio tracks completely (levels, loudness, noise, music, speech). Audio editing and its quality control are done by the user.
 6. Heuristic suggestions are a draft, not an editorial judgment — `editlist.csv` rows are a starting point, not a cut.
 7. Edit-list start/end is always the whole clip, not a sub-clip trim — 2s-spaced thumbnails aren't frame-accurate enough to claim precise in/out points (§6).
 8. Species/content identification from thumbnails has real limits — murky water, distance, and 480px resolution sometimes make a confident call impossible. The honest answer is "plausible, not confirmed" (and the editorial write-up says so explicitly), not a guess dressed up as fact.

@@ -112,7 +112,7 @@ Verbindlich für alle Videos (seit 2026-11-24).
 - **Claude:** analysiert den Rohschnitt und liefert konkrete, **zeitbasierte** Verbesserungsvorschläge. Entscheidungen bleiben beim Nutzer.
 
 **Eingaben für das Review** werden **automatisch gefunden** (`scripts/video_assets.py`, Zuordnung pro Video in `PROJECT_STATUS.md` → `## Video Assets (portable)`: nur Ordnernamen; maschinenspezifische Pfade kommen aus Umgebungsvariable `TASAN_CAPCUT_ROOT`, optional der gitignorierten `.claude/local.json`, sonst `<Repo>/../capcut`). Nachgefragt wird nur, wenn etwas fehlt oder nicht eindeutig ist. Reihenfolge der Zuverlässigkeit:
-1. Export des Rohschnitts als MP4 (niedrige Auflösung genügt) — Claude sichtet ihn über zeitgestempelte Frames/Kontaktbögen (`scripts/footage-analysis/`) und, soweit verfügbar, den Ton.
+1. Export des Rohschnitts als MP4 (niedrige Auflösung genügt) — Claude sichtet ihn über zeitgestempelte Frames/Kontaktbögen (`scripts/footage-analysis/`) (nur Bild — **keine Audioanalyse**, siehe unten).
 2. Optional: der CapCut-Entwurf (`draft_content.json`) **nur lesend** — liefert exakte Schnittliste (Quellclip, Ein-/Ausstieg, Timeline-Position). Format undokumentiert (siehe `docs/CAPCUT_DRAFT_RESEARCH.md`); nie schreiben, nie bestehende Entwürfe verändern.
 3. Optional: Voice-over-Skript/Stichpunkte, Zielvorgabe zur Länge.
 
@@ -124,6 +124,16 @@ Verbindlich für alle Videos (seit 2026-11-24).
 - **Informationsvermittlung** — wo fehlt praktische Information, wo ist sie schwer verständlich, Passung zum Voice-over.
 - **B-Roll-Platzierung** — wo eine Infografik/Karte/Titel einen echten Mehrwert hätte (Katalog §6), mit Vorschlag der Grafikart; Umsetzung in Remotion erst nach Freigabe und nach `docs/BROLL_GUIDELINES.md`.
 - **Privatsphäre (Pflichtprüfung)** — erkennbare Gesichter von Familienmitgliedern gemäß §2 melden.
+
+**Arbeitsregeln (verbindlich, seit 2026-11-27):**
+- **Keine Audioanalyse.** Claude analysiert niemals Audiospuren, Lautstärke/LUFS, Hintergrundgeräusche, Musik oder Sprachqualität — auch nicht per Skript. Die gesamte Audiobearbeitung und ihre Qualitätskontrolle macht der Nutzer.
+- **Analyse intern, Ergebnis kompakt.** Die visuelle Analyse läuft gründlich im Hintergrund; im Chat gibt es keine technischen Berichte (keine Frame-/Stichproben-Statistiken, Messwerte, Methodenbeschreibungen).
+- **Eine einzige Schnittanleitung als Tabelle** mit den Spalten **Timecode (aktuelle CapCut-Timeline) | Szene | Änderung | Dauer | Priorität**. Wird neues Originalmaterial eingefügt, steht in der Spalte „Änderung“ der vollständige Dateiname plus Start und Ende im Originalclip. Keine Kürzel (H1, Z. 12) und keine Verweise auf andere Zeilen — jede Zeile ist für sich verständlich und umsetzbar.
+- **Nur Änderungen mit deutlichem Mehrwert.** Atmosphäre und Besuchserlebnis zählen mit (siehe unten); was nichts bringt, wird nicht aufgelistet.
+
+**Prüftiefe:** jeder Schnitt wird anhand von mindestens 3 Bildern (Anfang/Mitte/Ende) gesichtet, nicht nur nach festem Zeitraster; Hook-/Ersatzvorschläge berücksichtigen das gesamte Originalmaterial, mit vollständigem Dateinamen und exakten Start-/Endzeiten im Rohclip. Das Review nennt, wie gesichtet wurde.
+
+**Atmosphäre erhalten:** TASAN Trips ist ein familiäres Ausflugsvideo (§1) — ruhige Umgebungs- und Stimmungsszenen werden gekürzt statt gelöscht; löschen nur bei Dopplung, geringem Bildinhalt oder erkennbaren Gesichtern.
 
 **Ausgabeformat** (`analysis/<slug>/ROUGHCUT_REVIEW.md`, bei Wiederholung versioniert, z. B. `ROUGHCUT_REVIEW_v2.md`): kurze Gesamteinschätzung (Länge, Struktur, 3 wichtigste Hebel), danach eine Tabelle `Timecode | Dimension | Beobachtung | Vorschlag | Priorität (Hoch/Mittel/Niedrig)`. Beobachtungen nennen, was tatsächlich zu sehen/hören war; Unsicheres wird als "nicht bestätigt" markiert, nicht geraten.
 

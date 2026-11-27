@@ -1,7 +1,7 @@
 # NaturOparC — Rohschnitt-Review v1
 
 **Grundlage:** CapCut-Export `1124(1).mp4` (854×480, 30 fps, **2:55,7**, 51 Schnitte; Export vom 26.11. 00:16), Schnittliste aus dem CapCut-Entwurf `1124` (nur gelesen). Der ältere Export `1124.mp4` (3:36) wurde nicht verwendet.
-**Wie geprüft:** 87 Standbilder (alle 2 s, Kontaktbögen), Schnittliste (Längen, Quellclips), Lautheitsmessung des Tons. **Nicht gehört:** den Ton habe ich nur gemessen, nicht angehört; Aussagen zu Geräuschen sind "nicht bestätigt". Bei 480p sind Schilder/Texte nicht lesbar. Die Clips "Kombinationsclip1/2" (0:00–0:06 und 1:30–1:37) sind in CapCut zusammengefasst; deren Quellmaterial ist aus dem Entwurf nicht ablesbar.
+**Wie geprüft:** 87 Standbilder (alle 2 s, Kontaktbögen), Schnittliste (Längen, Quellclips), Bild nur — Audio wird nicht analysiert (Nutzerentscheidung). Bei 480p sind Schilder/Texte nicht lesbar. Die Clips "Kombinationsclip1/2" (0:00–0:06 und 1:30–1:37) sind in CapCut zusammengefasst; deren Quellmaterial ist aus dem Entwurf nicht ablesbar.
 
 ## Gesamteinschätzung
 - **Länge/Rhythmus:** 2:55 reine Clips (Ziel ca. 4:00 inkl. Grafiken/Voice-over — passt, Luft für ca. 60 s Grafiken und Haltezeiten). Median 2,9 s je Schnitt, fast alle zwischen 2 und 4 s: **gleichförmiger "Metronom"-Rhythmus**, keine schnelle Sequenz, kein bewusster langer Moment (außer dem letzten, 26,9 s).
@@ -29,12 +29,11 @@
 | 1:38–1:44 | Dramaturgie | Aussichtsplattform/Weidenpanorama (drei Schnitte, 7,5 s), bei 1:42,5 ist ein **Storchennest** zu sehen — das Thema des Eröffnungsschilds. | Storchennest bewusst hervorheben (Zoom/Caption) und mit dem Anfangsschild verknüpfen (Storchen-Geschichte als roter Faden). Der "Panorama-Reveal" (0039@0:44–0:50, im Plan Hoch) ist ungenutzt. | Mittel |
 | 1:44–1:50 | Szenenlänge | Schwarzschwäne in Efeuwiese (2,4 + **0,6** + 2,9 s). Der 0,6-s-Schnitt bei 1:46,7 wirkt wie ein Rest. | 0,6-s-Fragment entfernen oder mit Nachbarschnitt verbinden. | Mittel |
 | 1:50–1:56 | Bildqualität | Enten auf grünbraunem Wasser von oben, geringer Kontrast. | Kürzen auf 2 s; sonst Kontrast anheben. | Niedrig |
-| 1:56–2:02 | Informationsvermittlung | Holz-Klangpfosten mit Metallscheiben (Hand im Bild). Interaktives Element, ohne Erklärung. | Mit Ton-Gag kombinieren (Antwort auf die "Quel bruit fait la cigogne?"-Frage?). Ton prüfen. | Mittel |
+| 1:56–2:02 | Informationsvermittlung | Holz-Klangpfosten mit Metallscheiben (Hand im Bild). Interaktives Element, ohne Erklärung. | Mit Ton-Gag kombinieren (Antwort auf die "Quel bruit fait la cigogne?"-Frage?). | Mittel |
 | 2:02–2:11 | Szenenlänge / Rhythmus | Barfuß-/Sinnespfad und Holzbrücken: gute schnelle Schnitte (je ~1,9 s) in 2:06–2:11 — der einzige Moment mit variiertem Tempo. | Beibehalten, als Muster für schnellere Sequenzen nutzen. | Niedrig |
 | 2:11–2:22 | Szenenlänge | Schweinegehege: vier Schnitte (10,4 s) aus demselben Clip, Tier klein, Totale. | Auf 1–2 Schnitte reduzieren oder näher heranzoomen. | Mittel |
 | 2:22–2:28 | Dramaturgie | Ziege mit Hörnern + Hand: **stark**, Interaktion. | Hook-Kandidat; Hand ist ok (kein Gesicht). | Hoch |
 | 2:28,8–2:55,7 | Dramaturgie / Info | **26,9 s** Schlussszene: Weg zurück, dann Parkplatz mit Bus, Autos und Bergen, ruhiger Schwenk. Für das geplante Bewertungs-/Fazit-Overlay geeignet (ruhig, wenig Ablenkung), visuell aber ohne Höhepunkt. | Als Hintergrund fürs Overlay beibehalten; evtl. gegen eine schönere Schlussaufnahme (Panorama von der Plattform, Sonnenuntergang?) tauschen. Auf lesbare Kennzeichen achten (4K: ggf. unkenntlich machen). | Mittel |
-| gesamt | Ton | Integrierte Lautheit **−30,3 LUFS**, True Peak −6,1 dBTP, Lautheitsspanne **20,7 LU** (sehr groß). YouTube-Ziel ca. −14 LUFS. Keine Stille ≥0,8 s. | Original-Ton pro Clip angleichen (starke Pegelunterschiede), später unter Voice-over absenken; zuhören auf Wind/Handling-Geräusche. | Mittel |
 
 ## Übersehene Szenen aus dem Rohmaterial (Hoch/Mittel laut Sichtung, im Schnitt kaum genutzt)
 Vorschläge, Entscheidung bei dir. Der Raw-Ordner enthält nur 41 der 54 Clips; die jeweiligen Dateien liegen vor.

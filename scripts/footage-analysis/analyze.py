@@ -31,7 +31,7 @@ import json
 import math
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from fractions import Fraction
 from pathlib import Path
 
@@ -64,9 +64,6 @@ class ClipMetadata:
     fps: float | None
     fps_raw: str | None
     bit_rate: int | None
-    audio_codec: str | None
-    audio_sample_rate: int | None
-    audio_channels: int | None
     thumbnails: list[dict] = field(default_factory=list)
 
 
@@ -132,7 +129,6 @@ def probe_clip(path: Path) -> ClipMetadata:
         (s for s in streams if s.get("codec_type") == "video" and not s.get("disposition", {}).get("attached_pic")),
         None,
     )
-    audio = next((s for s in streams if s.get("codec_type") == "audio"), None)
 
     duration_s = float(fmt.get("duration") or (video or {}).get("duration") or 0.0)
     tags = fmt.get("tags", {})
@@ -150,9 +146,6 @@ def probe_clip(path: Path) -> ClipMetadata:
         fps=parse_fps((video or {}).get("r_frame_rate")),
         fps_raw=(video or {}).get("r_frame_rate"),
         bit_rate=int(fmt.get("bit_rate")) if fmt.get("bit_rate") else None,
-        audio_codec=(audio or {}).get("codec_name"),
-        audio_sample_rate=int(audio["sample_rate"]) if audio and audio.get("sample_rate") else None,
-        audio_channels=(audio or {}).get("channels"),
     )
 
 
@@ -266,7 +259,6 @@ def build_gallery_html(clips: list[ClipMetadata], out_dir: Path, slug: str) -> s
             <span>{clip.width}×{clip.height}</span>
             <span>{clip.fps:.2f} fps</span>
             <span>{html.escape(clip.video_codec or "?")}</span>
-            <span>{html.escape(clip.audio_codec or "–")} {clip.audio_channels or ""}ch {clip.audio_sample_rate or ""}Hz</span>
             <span>{format_size(clip.size_bytes)}</span>
             <span class="label">rein technisch — keine Bildinhalts-Analyse</span>
           </div>
@@ -315,7 +307,8 @@ def build_gallery_html(clips: list[ClipMetadata], out_dir: Path, slug: str) -> s
 
 def clips_from_metadata_json(metadata_path: Path) -> list[ClipMetadata]:
     raw = json.loads(metadata_path.read_text(encoding="utf-8"))
-    return [ClipMetadata(**entry) for entry in raw]
+    known = {f.name for f in fields(ClipMetadata)}  # tolerate older metadata.json files (e.g. removed audio_* keys)
+    return [ClipMetadata(**{k: v for k, v in entry.items() if k in known}) for entry in raw]
 
 
 def main() -> None:
