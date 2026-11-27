@@ -9,3 +9,12 @@ export const NaturoparcRouteCheck: React.FC<RouteCheckProps> = ({ holdSeconds })
 );
 
 export const NATUROPARC_ROUTE_CHECK_CONFIG = config as RouteCheckConfig;
+
+// Alternative without text container: same config, `plate.enabled: false` (text directly on the map, text-shadow only).
+export const NATUROPARC_ROUTE_CHECK_NO_PLATE_CONFIG: RouteCheckConfig = {
+	...(config as RouteCheckConfig),
+	plate: { ...(config as RouteCheckConfig).plate, enabled: false, textShadow: '0 0 3px rgba(246,241,227,0.95), 0 0 9px rgba(246,241,227,0.95), 0 0 18px rgba(246,241,227,0.75)' },
+};
+export const NaturoparcRouteCheckNoPlate: React.FC<RouteCheckProps> = ({ holdSeconds }) => (
+	<RouteCheck config={NATUROPARC_ROUTE_CHECK_NO_PLATE_CONFIG} routesFile="geo/naturoparc-routes.geojson" holdSeconds={holdSeconds} />
+);

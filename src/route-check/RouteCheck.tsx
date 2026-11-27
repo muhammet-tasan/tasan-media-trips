@@ -3,7 +3,7 @@ import { AbsoluteFill, continueRender, delayRender, interpolate, staticFile, use
 import { LngLat, LngLatBounds, Map as MapLibreMap, config as maplibreConfig } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { AnimatedTitle } from '../components/AnimatedTitle';
-import { DarkPanel, GlassPanel } from '../components/GlassPanel';
+import { DarkPanel, GlassPanel, PlainText } from '../components/GlassPanel';
 import { MarkerPulse } from '../components/MarkerPulse';
 import { RouteDraw } from '../components/RouteDraw';
 import { TextReveal } from '../components/TextReveal';
@@ -57,7 +57,7 @@ export type RouteCheckConfig = {
 	/** Map background colour (default: theme). */
 	mapBackground?: string;
 	/** Frosted-glass plate: fill colour incl. alpha, blur radius (px), saturation, border, shadow. All optional (default: theme). */
-	plate?: { background?: string; blur?: number; saturate?: number; border?: string; shadow?: string };
+	plate?: { /** false = no container at all (no fill, glass, border, shadow): text sits directly on the map with a text shadow. Default true. */ enabled?: boolean; /** text-shadow used when enabled=false (default: theme label shadow) */ textShadow?: string; background?: string; blur?: number; saturate?: number; border?: string; shadow?: string };
 	/** Timing in SECONDS: sync the reveals to the voice-over here, no code changes needed. */
 	timing?: RouteCheckTiming;
 };
@@ -365,7 +365,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 
 					{/* Destination info plate: glass layer (own opacity) + fully opaque text blocks on top; final size from frame 0 */}
 					{(() => {
-						const Panel = plateBlur > 0 ? GlassPanel : DarkPanel;
+						const Panel = ps.enabled === false ? PlainText : plateBlur > 0 ? GlassPanel : DarkPanel;
 						return (
 							<Panel
 								style={{
@@ -382,6 +382,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 								border={plateBlur > 0 ? (ps.border ?? th.plateBorder) : undefined}
 								shadow={plateBlur > 0 ? (ps.shadow ?? th.plateShadow) : undefined}
 								fadeIn={{ at: tl.plate.at, duration: tl.plate.dur }}
+								textShadow={ps.textShadow ?? th.labelShadow}
 							>
 								<TextReveal at={tl.title.at} duration={tl.title.dur} style={{ fontSize: 59, fontWeight: 700, color: th.plateName, letterSpacing: 0.5 }}>
 									{dest.name}{' '}

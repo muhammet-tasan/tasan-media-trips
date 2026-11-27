@@ -16,6 +16,8 @@ export type PanelProps = {
 	padding?: string;
 	/** Fades the panel surface in (frames); content has its own timing (e.g. TextReveal). */
 	fadeIn?: { at: number; duration: number };
+	/** Only used by PlainText: text-shadow for readability without a container. */
+	textShadow?: string;
 	children?: React.ReactNode;
 };
 
@@ -60,6 +62,17 @@ export const GlassPanel: React.FC<PanelProps> = ({
 		</div>
 	);
 };
+
+/**
+ * Container-free variant with the same API and the same box/padding as GlassPanel, so the text sits at
+ * exactly the same position: no fill, blur, border or shadow box — only a subtle text-shadow.
+ * Used when the plate is switched off in the config (`plate.enabled: false`).
+ */
+export const PlainText: React.FC<PanelProps> = ({ style, padding = '20px 30px', textShadow, children }) => (
+	<div style={style}>
+		<div style={{ position: 'relative', padding, textShadow }}>{children}</div>
+	</div>
+);
 
 /** Dark, non-blurred panel (TASAN dark/gold look of Video 1): same API as GlassPanel, dark fill, no blur. */
 export const DarkPanel: React.FC<PanelProps> = (props) => <GlassPanel background="rgba(8,10,15,0.65)" blur={0} {...props} />;
