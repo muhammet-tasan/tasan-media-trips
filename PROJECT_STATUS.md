@@ -1,6 +1,6 @@
 # TASAN MEDIA Trips — Project Status
 
-**Last Updated:** 2026-11-24
+**Last Updated:** 2026-11-27
 **How to read this file:** (1) `## ▶ Active Video` is the single resume point. (2) `## Video Registry` lists every video and its status. (3) Details per video live in their own `## Video: …` section. Shared tooling and the cross-video log come after. The skills `/my-project-status`, `/my-continue-project`, `/my-next-task` and `/my-daily-project-closeout` read this structure — keep the headings and field names below intact.
 
 ## ▶ Active Video
@@ -11,7 +11,7 @@ Exactly one video is Active at any time. This block is the **only** place that h
 - **Title:** NaturOparC (Hunawihr, Elsass — Tier-/Naturpark)
 - **Phase:** Editing — user's rough cut exists (CapCut draft `1124`; reviewed export `1124(1).mp4`, 2:55, 51 cuts; newer unreviewed export `1124(2).mp4` from 2026-11-27); Claude's review v1 delivered
 - **Process step:** S3 — Rohschnitt-Review v1 geliefert (`analysis/naturoparc/ROUGHCUT_REVIEW.md`); Nutzer überarbeitet den Schnitt → Review v2 → bei "Schnitt steht" weiter mit S4 (Erzählung). Stufen: `docs/PRODUCTION_PROCESS.md`
-- **Resume point:** (2026-11-27) User works through `analysis/naturoparc/ROUGHCUT_REVIEW_v2.md` (concrete CapCut edit list + 4-clip hook, based on draft/export `1124(2)`); then re-export → review v2. Earlier: User refines the cut using the review (hook, trims, koi-scene privacy fix); then `/my-review-roughcut` again (v2). Afterwards S4: Claude asks which narration style and offers 2–3 options (`/my-next-task` handles this).
+- **Resume point:** (2026-11-27) User works through `analysis/naturoparc/ROUGHCUT_REVIEW_v2.md` (5 deletions/replacements, source = saved CapCut draft) and inserts the 9 s hook from `analysis/naturoparc/HOOK.md` last (Stör, Brücke, Otter, Barsch, Schwäne, Schildkröte; 2 effect transitions). Funny moments in `analysis/naturoparc/CREATIVE_MOMENTS.md` (pig-scratching moment not found; raw clips 0007, 0046–0050, 0055 missing — ask user). Then re-export → short visual review → S4 narration.
 - **Last decisions:** Hook = quick animal highlights (not a staircase climb); no recognizable family faces (§2) — review found faces in the koi scene (0:38–0:46); watermark/branding standard documented, not built; plan reference `FINAL_TIMELINE_PLAN.md` is optional. Creative direction for this video (user, 2026-11-26): fun, family-style scene captions (emojis, short texts, illustrations/symbols, built in Remotion); TASAN intro shown between scenes; logo floats into a corner and stays as watermark; Route Check like the first video; ending = Google-review comments section over the last long scene + the user's verdict (Fazit). See `## Video: NaturOparC` → Creative direction.
 - **Next steps (concrete):**
   1. User: refine the cut per `ROUGHCUT_REVIEW.md`; export again.
