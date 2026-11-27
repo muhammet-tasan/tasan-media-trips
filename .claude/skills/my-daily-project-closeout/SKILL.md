@@ -33,6 +33,7 @@ Add one entry to `## Session Log (all videos, newest first)` at the top, tagged 
 
 ### 3. Standards Extraction
 - **Learnings:** add every new insight, tip or trick from this session to `docs/LEARNINGS.md` (format and category headings there; one line each, with source and process stage). Skip nothing that would save time next video.
+- **Remotion library:** a component built/changed this session and approved by the user → is it registered in `docs/REMOTION_LIBRARY.md` (status, path, config, limits)? If not, add it now (`PRODUCTION_STANDARDS` §9)
 - Document any successful patterns found
 - Note anti-patterns to avoid
 - Update CLAUDE.md if new guidance emerged (rules only — never a list of videos or their status)

@@ -22,6 +22,7 @@ Process navigator: the user should never have to work out which step is due. Wor
 ## Rules
 - Never analyze audio (levels, loudness, noise, music, speech); audio is the user's job. Keep answers compact — no technical analysis reports.
 - S3 ends with the standard close (changes bottom-up → hook → new export → short visual review without audio → user approval → S4 narration); after the approval go straight to the narration questions.
+- Remotion graphics (S6/S7): check `/my-remotion-library` (`docs/REMOTION_LIBRARY.md`) first, reuse/extend before building new; after the user approves a component register it in the catalog (`PRODUCTION_STANDARDS` §9).
 - Never propose building the rough cut or CapCut projects (user cuts, Claude reviews).
 - Do not skip ahead: S6/S7 graphics only after the cut stands and the narration exists, unless the user explicitly overrides.
 - Stay within the active video unless asked.

@@ -241,3 +241,35 @@ New destination = `python3 scripts/new-route-check.py <slug> --name … --place 
 - **Theme per video:** `"theme": "dark"` (default, = video 1) or `"light"` (cream/green, orange routes; uses `public/geo/tasan-map-style-light.json`). New palettes = add an entry to `THEMES` in `RouteCheck.tsx`. Light theme plate is frosted glass: a separate glass layer (own opacity, **never** `opacity` on the text wrapper) with `config.plate` `{background, blur, saturate, border, shadow}`; `config.mapBackground` sets the map colour. `backdrop-filter` works in the Remotion MP4 render (verified: without blur the map labels cut through the text). NaturOparC: `rgba(250,247,235,0.24)` + blur 5 px — a cream fill above ~0.4 looks like a solid box on a cream map, blur 0 hurts readability. Overlay text positions are rounded to whole pixels — fractional `left/top` made text flicker ±1 px between render tabs. `destination.location` adds a "📍 where is it" line (e.g. `in Hunawihr · bei Colmar`) — always fill it so viewers know where the place is. `plateOffsetX`/`plateOffsetY`/`plateWidth` position the info plate (NaturOparC: top-left, so the nearest origin's label can sit right next to its marker). `plateOffsetY` shifts the info plate (default -55); with 3+ info lines use about -170 and move the neighbouring label via `labelOffset`.
 - **Practical info (`infoLines`, parking/transit) only with verified facts** — leave empty rather than guess; the plate then shows name + tagline only.
 - Possible later cleanup: migrate `MulhouseRouteCheck` onto `RouteCheck` and verify frame-identical output before replacing it.
+
+## 14. Approved patterns and user preferences (from approved implementations)
+
+Distilled from the approved Route Check (NaturOparC), the Mulhouse reference scenes and the TASAN intro — final states only, not discarded iterations. Catalog of components: `docs/REMOTION_LIBRARY.md`; Route Check specifics: §13.
+
+**Design decisions that worked**
+- Real basemap + real routes, borders as a subtle separate layer, strong route casing; destination in the accent colour, everything else calmer (§3, §7).
+- Theme per video: dark/gold for the car museum, light cream/green + orange routes for the family park. Map background, plate fill and blur are config, not code.
+- Info plate: large phone-readable text on a plate so no route crosses it; place it where the map beneath is richest and away from the nearest origin label (NaturOparC: top-left, Colmar label directly beside its marker).
+- Always tell viewers *where* the place is (location line "in Hunawihr · bei Colmar") in addition to the heading.
+- Only verified practical facts (parking, bus line); leave out instead of guessing.
+
+**User preferences (from corrections)**
+- Text appears calmly: fade + minimal rise only, never sideways movement or jitter; once shown, text stays and never shifts (reserve the final layout from frame 0).
+- Glass plate: "lightly tinted glass pane, not a milky-white surface" — map structures must stay recognisable behind it, text fully opaque. Approved light values: `rgba(250,247,235,0.24)` + 5 px blur + soft white border + faint shadow. 0.45 alpha / 8 px looked like a solid box; no blur let map labels cut through the text.
+- Order is story-driven and configurable: practical info first, then origins in the user's order, each with ~1 s of calm so the narrator can speak. The user syncs to the voice-over afterwards, so *every* reveal time is a config value in seconds.
+- Duration is decided late (from narration): total length is config + `holdSeconds`, never hard-wired.
+- Iteration style: small, precise changes; keep everything else (design, glass, durations, other animations) untouched when one thing is changed.
+
+**Timing and easing (approved values)**
+- Text/camera ease: `easeOutCubic`; text fade 0.6 s + 10 px rise; heading fade 0.2–0.9 s; camera push-in ≈ 4 % zoom over ≤ 1.5–2 s, no pan, must be finished before the first text appears.
+- Markers: spring `{damping 16, stiffness 120, mass 0.6, overshootClamping}` + ring pulse; route draw 24 frames; origin label in 32 frames; ≈ 1 s calm after each origin.
+- Phases not total duration: enter/hold/exit, transitions 0.5–0.9 s, readable holds ≥ 3.5 s, completely static end image (§8; TripScore).
+- Brand intro: composite the original Kling video, never recreate; constant crop from frame 0; background matched with `mix-blend-mode: lighten`; fade 0.5 s + 1 s hold; 4K.
+
+**Rendering and checking**
+- `npx remotion render src/index.ts <Id> out/<slug>/<Id>.mp4` (H.264, 30 fps, 1080p; intro 4K); duration from `calculateMetadata`; MapLibre scenes need internet for tiles (≈ 80 s for 22 s).
+- Check real MP4 frames after every reveal (`npx remotion ffmpeg -ss <t> -i <mp4> -frames:v 1 <png>`, contact sheet with PIL), not only stills: render tabs start mid-video, text can flicker ±1 px (round positions), glass must be judged on the render.
+- Windows: no `/tmp` for helper files; write scratch files to the scratchpad.
+
+**Reuse**
+- New destination → Route Check config + `new-route-check.py`; new scene types follow the architecture rules in `PRODUCTION_STANDARDS` §9. Known refactoring candidates (shared primitives, glass plate, reveal, TripScore config): `REMOTION_LIBRARY.md` §11.
