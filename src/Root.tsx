@@ -2,6 +2,8 @@ import React from 'react';
 import { Composition } from 'remotion';
 import { MulhouseRouteCheck } from './mulhouse-automobile-museum/MulhouseRouteCheck';
 import { MulhouseTripScore, MULHOUSE_TRIP_SCORE_DURATION } from './mulhouse-automobile-museum/MulhouseTripScore';
+import { NaturoparcRouteCheck, NATUROPARC_ROUTE_CHECK_CONFIG } from './naturoparc/NaturoparcRouteCheck';
+import { routeCheckTimeline } from './route-check/RouteCheck';
 import { TasanBrandIntro, INTRO_DURATION } from './brand/TasanBrandIntro';
 
 export const Root: React.FC = () => {
@@ -19,6 +21,18 @@ export const Root: React.FC = () => {
 				id="MulhouseRouteCheck"
 				component={MulhouseRouteCheck}
 				durationInFrames={480}
+				fps={30}
+				width={1920}
+				height={1080}
+			/>
+			<Composition
+				id="NaturoparcRouteCheck"
+				component={NaturoparcRouteCheck}
+				defaultProps={{ holdSeconds: 5 }}
+				calculateMetadata={({ props }) => ({
+					durationInFrames: routeCheckTimeline(NATUROPARC_ROUTE_CHECK_CONFIG, props.holdSeconds).duration,
+				})}
+				durationInFrames={420}
 				fps={30}
 				width={1920}
 				height={1080}

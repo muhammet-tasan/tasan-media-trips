@@ -2,6 +2,8 @@
 
 **Reference implementation:** `src/mulhouse-automobile-museum/MulhouseRouteCheck.tsx` is the current reference implementation for geographic Route Check B-rolls. Consult it alongside this document before building a new one of the same type.
 
+**For every new destination use the config-driven `src/route-check/RouteCheck.tsx`** (same design as the reference, destination/origins/texts in `src/<slug>/route-check.json`, routes via `python3 scripts/fetch-routes.py <slug>` → `public/geo/<slug>-routes.geojson`, thin wrapper `src/<slug>/<Name>RouteCheck.tsx`, composition with `holdSeconds` prop in `src/Root.tsx`). First use: `src/naturoparc/`. `MulhouseRouteCheck.tsx` stays untouched so video 1 renders unchanged; see §13.
+
 ## 1. General workflow
 
 Before coding a new B-roll, define:
@@ -228,3 +230,13 @@ ASSETS / SOURCES
 REFERENCE TEMPLATE
 
 Wait for approval if major creative decisions are still unresolved.
+
+## 13. Config-driven Route Check (since NaturOparC)
+
+New destination = `python3 scripts/new-route-check.py <slug> --name … --place … --heading … --subtitle … --origins "Basel|CH,…"` (geocodes, fetches real OSRM routes, fills rounded times, writes `route-check.json` + wrapper, prints the `<Composition>` to paste into `src/Root.tsx`), then render the final frame and fix collisions by hand. No changes to `RouteCheck.tsx` needed. Manual equivalent: `route-check.json` + `fetch-routes.py <slug>` + 5-line wrapper + one `<Composition>`.
+
+- **Duration is a prop:** `holdSeconds` (default 5) = static reading hold; total = 4 s intro + 38 frames per origin + hold (+2.5 s if `infoLines` exist). Studio/CLI: `--props='{"holdSeconds":8}'`. Set it from the final narration.
+- **Times:** `time` labels are free text. `fetch-routes.py` prints OSRM car durations (no traffic) — round them, or overwrite with researched values (Mulhouse used the user's own figures).
+- **Label collisions are per-destination:** use `labelOffset` per origin and `countryLabels` positions; check the final frame for labels on borders/other labels/routes (NaturOparC needed 2 fixes: Colmar label moved left of the route, country labels moved off place names/Basel label).
+- **Practical info (`infoLines`, parking/transit) only with verified facts** — leave empty rather than guess; the plate then shows name + tagline only.
+- Possible later cleanup: migrate `MulhouseRouteCheck` onto `RouteCheck` and verify frame-identical output before replacing it.

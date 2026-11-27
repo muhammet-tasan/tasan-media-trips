@@ -16,7 +16,7 @@ Exactly one video is Active at any time. This block is the **only** place that h
 - **Next steps (concrete):**
   1. User: refine the cut per `ROUGHCUT_REVIEW.md`; export again.
   2. Claude: review v2; then S4 narration (questions + 2–3 proposals).
-  3. After the cut and narration stand: S6 graphics plan (captions, intro/watermark, Route Check for NaturOparC, review section) → S7 build. Route Check is a reference implementation hard-wired to Mulhouse and `public/geo/routes.geojson` only holds Mulhouse routes — NaturOparC needs its own spec/adaptation (`docs/BROLL_GUIDELINES.md` §11/§12).
+  3. After the cut and narration stand: S6 graphics plan (captions, intro/watermark, Route Check for NaturOparC, review section) → S7 build. Route Check for NaturOparC is **built and rendered** (2026-11-27): `out/naturoparc/NaturoparcRouteCheck.mp4` (14 s, `holdSeconds` configurable), generic `src/route-check/RouteCheck.tsx` + `src/naturoparc/route-check.json`; still open: parking/transit `infoLines` (unverified, left empty), final duration from narration, final time labels (currently OSRM-rounded). See `docs/BROLL_GUIDELINES.md` §13.
 - **Details:** `## Video: NaturOparC` below; plan in `analysis/naturoparc/FINAL_TIMELINE_PLAN.md`.
 
 ## Video Registry
@@ -138,6 +138,9 @@ Goal for this first video: not a complex cinematic production — a minimal, cle
 
 ### Blocked/In Progress
 Awaiting Phase 1 (CapCut visual cleanup pass) before remaining B-roll needs (Cost Check, Trip Check, Planning Check) can be finalized against the actual edit. `TasanBrandIntro.mp4` needs a re-render before import, since its current render predates the latest lighten-blend fix.
+
+### Route Check (2026-11-27)
+- Built early at the user's request (normally S7). Origins Basel/Freiburg/Colmar/Strasbourg as in video 1; routes real OSRM (`public/geo/naturoparc-routes.geojson`); times Basel 1 Std., Freiburg 1 Std., Colmar 20 Min., Strasbourg 50 Min. (OSRM, no traffic); destination 48.17999 N / 7.32264 E (OSM). No parking/transit info: not verified (search found no confirmed price/stop).
 
 ### Decisions Made
 - Keep Remotion minimal initially (no complex state management)

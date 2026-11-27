@@ -1,0 +1,22 @@
+{
+  "heading": "ANFAHRT ZUM NATURPARK",
+  "subtitle": "Hunawihr · Elsass · Frankreich",
+  "destination": {
+    "name": "NaturOparC",
+    "tagline": "Tier- und Naturpark",
+    "country": "FR",
+    "coords": { "lon": 7.32264, "lat": 48.17999 }
+  },
+  "origins": [
+    { "key": "basel", "label": "Basel", "country": "CH", "time": "1 Std.", "emphasis": true, "coords": { "lon": 7.5886, "lat": 47.5596 } },
+    { "key": "freiburg", "label": "Freiburg", "country": "DE", "time": "1 Std.", "coords": { "lon": 7.8421, "lat": 47.999 } },
+    { "key": "colmar", "label": "Colmar", "country": "FR", "time": "20 Min.", "labelOffset": { "x": -330, "y": 58 }, "coords": { "lon": 7.3585, "lat": 48.0794 } },
+    { "key": "strasbourg", "label": "Strasbourg", "country": "FR", "time": "50 Min.", "coords": { "lon": 7.7521, "lat": 48.5734 } }
+  ],
+  "infoLines": [],
+  "countryLabels": [
+    { "code": "FRANKREICH", "lon": 6.8, "lat": 47.78 },
+    { "code": "DEUTSCHLAND", "lon": 8.4, "lat": 48.2 },
+    { "code": "SCHWEIZ", "lon": 8.2, "lat": 47.28 }
+  ]
+}

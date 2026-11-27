@@ -22,6 +22,9 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 - **Score wird berechnet, nie hartkodiert; Community-Bewertungen nur als Kontext** — verhindert, dass die Endzahl von den Teilnoten abdriftet. *(MulhouseTripScore · S8)*
 - **Route Check ist Referenz, kein Baukasten** — `MulhouseRouteCheck.tsx` hat Städte/Herkunftsorte/Texte fest eingebaut, `public/geo/routes.geojson` enthält nur Mulhouse-Routen; für jedes neue Ziel: Pre-Build-Spezifikation (BROLL §12), Routen neu holen, anpassen. Wenn ein zweites Ziel gebaut ist, Gemeinsames in eine parametrisierte Komponente heben. *(2026-11-26 · S6/S7)*
 
+- **Route Check ist jetzt konfigurierbar** — `src/route-check/RouteCheck.tsx` + `route-check.json` + `scripts/new-route-check.py` (Gerüst) / `fetch-routes.py`; neues Ziel = Skript laufen lassen + Label-Kollisionen im Endbild prüfen; Dauer per `holdSeconds`. Fakten wie Parkpreis/ÖPNV nur eintragen, wenn verifiziert. *(NaturOparC, 2026-11-27 · S7)*
+- **Windows:** Skript-Zwischendateien nicht nach `/tmp` schreiben (Python findet es nicht) — Scratchpad bzw. Projektpfad nutzen. *(2026-11-27)*
+
 - **Erstes Review (NaturOparC):** ohne Hook liegen die ersten ~24 s ohne klares Tier; gleichförmiger ~3-s-Rhythmus über 51 Schnitte wirkt monoton; mehrere Schnitte aus demselben Standpunkt wirken wie Wiederholung; Besuchergesichter in Nahaufnahmen früh prüfen (Koi-Szene). *(2026-11-26 · S3)*
 - **CapCut-Kombinationsclips verstecken die Quellclips** — für ein Review besser vorher auflösen. *(2026-11-26 · S2/S3)*
 
