@@ -52,7 +52,7 @@ export type RouteCheckConfig = {
 	infoLines?: { text: string; size?: 'main' | 'detail'; /** line icon (editorial theme) */ icon?: IconName; /** reveal time in s (default: with the title) */ at?: number; /** fade duration in s */ fade?: number }[];
 	countryLabels?: { code: string; lon: number; lat: number }[];
 	cameraPadding?: { top: number; bottom: number; left: number; right: number };
-	/** 'dark' (default, TASAN dark/gold as in video 1), 'light' (cream/green, family look) or 'editorial' (Editorial Travel Map: Inter, forest green/terracotta, left-aligned info block without container, SVG icons, softened map). */
+	/** 'editorial' (default = standard design: Editorial Travel Map: Inter, forest green/terracotta, left-aligned info block without container, SVG icons, softened map), 'light' (cream/green with glass plate) or 'dark' (TASAN dark/gold as in video 1). */
 	theme?: 'dark' | 'light' | 'editorial';
 	/** Vertical shift of the destination info plate in px (default -55 = as reference). */
 	plateOffsetY?: number;
@@ -196,7 +196,7 @@ export const RouteCheck: React.FC<{ config: RouteCheckConfig; routesFile: string
 	const { fps } = useVideoConfig();
 	const tl = routeCheckTimeline(config, holdSeconds, fps);
 	const { phases } = tl;
-	const th = { ...THEMES[config.theme ?? 'dark'] };
+	const th = { ...THEMES[config.theme ?? 'editorial'] };
 	if (config.mapBackground) th.bg = config.mapBackground;
 	const ed = th.editorial;
 	const FONT_FAMILY = ed?.font ?? FONT;

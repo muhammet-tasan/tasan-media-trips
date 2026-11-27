@@ -7,7 +7,7 @@ Nur **verfügbare, eigenständig nutzbare** Komponenten, ohne Technik. Neue frei
 
 | Kategorie | Name | Was sie macht |
 |---|---|---|
-| Szenen | RouteCheck | Anfahrts-Szene mit echter Karte, Routen, Fahrzeiten und Infotafel (Parkplatz, Bus); hell oder dunkel, alle Zeiten einstellbar |
+| Szenen | RouteCheck | Anfahrts-Szene mit echter Karte, Routen, Fahrzeiten und Infotafel (Parkplatz, Bus); Standard-Design «Editorial Travel Map» (grün/terrakotta, ohne Tafel, mit Linien-Icons), hell/dunkel als Altbestand, alle Zeiten einstellbar |
 | Szenen | TasanBrandIntro | Das animierte TASAN-Logo-Intro in 4K, sanft ausgeblendet |
 | Titel und Textanimationen | AnimatedTitle | Große Überschrift mit Untertitel, die einmal sanft einblendet und stehen bleibt |
 | Titel und Textanimationen | TextReveal | Beliebiger Text blendet ruhig ein und steigt dabei minimal nach oben |
@@ -28,6 +28,7 @@ Alle Kompositionen: Export-Standard `PRODUCTION_STANDARDS` §10 (4K UHD, 30 fps,
 - **Konfiguration:** keine; Inhalte sind Konstanten am Dateianfang (`COMMUNITY_RATINGS`, `FINAL_CATEGORIES`, `QUOTE_LINES`, `IMAGES`, Texte). Score wird berechnet, nie hartkodiert.
 - **Einschränkungen:** komplett Mulhouse-spezifisch (Texte, Fotos, Noten), 1092 Zeilen in einer Datei; Dark/Gold fest.
 - **Beispiel:** `npx remotion render src/index.ts MulhouseTripScore out/<slug>/MulhouseTripScore.mp4`
+- **Standard-Design (final, 2026-11-27):** Theme `editorial` ist der Default: Inter, Waldgrün/Graugrün/Terrakotta, linksbündiger Infoblock bei 8 % Breite ohne Container, `Icon`-SVGs, abgeschwächte Karte ohne Orts-Beschriftungen. Details und Maße: `BROLL_GUIDELINES` §14; Referenz-Config `NATUROPARC_ROUTE_CHECK_EDITORIAL_CONFIG` (`src/naturoparc/NaturoparcRouteCheck.tsx`, Composition `NaturoparcRouteCheckEditorial`).
 - **Wiederverwendbare Teile (intern):** Beat-System, Sterne, Count-up, Hintergrund → siehe §4, §6, §7, §8 und Refactoring-Liste.
 
 ### 📋 Weitere Sequenzen (Katalog `PRODUCTION_STANDARDS` §6)
@@ -57,10 +58,10 @@ Nicht entworfen.
 - **Was:** Echte Karte (MapLibre + OpenFreeMap), echte OSRM-Routen, Natural-Earth-Ländergrenzen, Ziel-Marker, Herkunftsorte mit Route/Fahrzeit, Infotafel (Glas) mit Titel, Untertitel, Ort, Parkplatz/ÖPNV; Kamera-Push-in; Themes `dark` (= Video 1) und `light` (creme/grün, familiär).
 - **Einsatz:** „Standort & Anreise“ in jedem Video (S6/S7).
 - **Pfade:** Komponente `src/route-check/RouteCheck.tsx` · Config `src/<slug>/route-check.json` · Wrapper `src/<slug>/<Name>RouteCheck.tsx` · Routen `public/geo/<slug>-routes.geojson` · Stile `public/geo/tasan-map-style(-light).json` · Grenzen `public/geo/country-borders.geojson` · Erstbau `scripts/new-route-check.py`, Routen neu `scripts/fetch-routes.py <slug>`.
-- **Konfiguration** (Typ `RouteCheckConfig`, im Code dokumentiert): `heading`, `subtitle`, `destination{name,tagline,location,country,coords}`, `origins[{key,label,country,time,emphasis,coords,labelOffset,at}]`, `infoLines[{text,size,at,fade}]`, `countryLabels`, `cameraPadding`, `theme`, `mapBackground`, `plate{background,blur,saturate,border,shadow}`, `plateOffsetX/Y`, `plateWidth`, `timing{establishSeconds,destinationAt,firstOriginAt,originStep,fadeSeconds,endImageAt,plate,title,tagline,location}` (alles in Sekunden). Prop `holdSeconds` = Endbild-Dauer; Gesamtdauer = `endImageAt` + `holdSeconds` (`routeCheckTimeline()`).
+- **Konfiguration** (Typ `RouteCheckConfig`, im Code dokumentiert): `heading`, `subtitle`, `destination{name,tagline,location,country,coords}`, `origins[{key,label,country,time,emphasis,coords,labelOffset,at}]`, `infoLines[{text,size,at,fade}]`, `countryLabels`, `cameraPadding`, `theme` (Standard `editorial`; `light`/`dark` = Altbestand), `infoLines[].icon` (`parking`/`bus`), `mapBackground`, `plate{background,blur,saturate,border,shadow}`, `plateOffsetX/Y`, `plateWidth`, `timing{establishSeconds,destinationAt,firstOriginAt,originStep,fadeSeconds,endImageAt,plate,title,tagline,location}` (alles in Sekunden). Prop `holdSeconds` = Endbild-Dauer; Gesamtdauer = `endImageAt` + `holdSeconds` (`routeCheckTimeline()`).
 - **Beispiel:** `python3 scripts/new-route-check.py <slug> --name … --place … --heading … --subtitle … --origins "Basel|CH,…"`, dann das ausgegebene `<Composition>` (mit `calculateMetadata` über `routeCheckTimeline`) in `src/Root.tsx` einfügen; Referenz `NaturoparcRouteCheck`. Render: `npx remotion render src/index.ts NaturoparcRouteCheck out/naturoparc/NaturoparcRouteCheck.mp4 --scale=2` (4K).
 - **Format:** entworfen in 1920×1080, Ausgabe 3840×2160 mit `--scale=2` (Standard §10), 30 fps, MP4; deckend (kein Alpha), also als eigene B-Roll-Szene, nicht als Overlay.
-- **Einschränkungen:** Kacheln werden beim Rendern live von OpenFreeMap geladen (Internet nötig); Labeltexte fest deutsch/Auto (`· Auto ≈ …`, `📍`); nur Verkehrsmittel Auto; Label-Kollisionen im Endbild von Hand lösen (`labelOffset`, `countryLabels`); neue Farbpalette = Eintrag in `THEMES`; Kamera-Push-in (`cameraAt` + MapLibre `jumpTo`) ist an die Karte gebunden und bewusst Teil von `RouteCheck`. Gebaut aus `AnimatedTitle`, `TextReveal`, `GlassPanel`/`DarkPanel`, `RouteDraw`, `MarkerPulse` (§4–§7).
+- **Einschränkungen:** Kacheln werden beim Rendern live von OpenFreeMap geladen (Internet nötig); Labeltexte fest deutsch/Auto (Emoji-Pin nur noch in light/dark) (`· Auto ≈ …`, `📍`); nur Verkehrsmittel Auto; Label-Kollisionen im Endbild von Hand lösen (`labelOffset`, `countryLabels`); neue Farbpalette = Eintrag in `THEMES`; Kamera-Push-in (`cameraAt` + MapLibre `jumpTo`) ist an die Karte gebunden und bewusst Teil von `RouteCheck`. Gebaut aus `AnimatedTitle`, `TextReveal`, `GlassPanel`/`DarkPanel`, `RouteDraw`, `MarkerPulse` (§4–§7).
 - **Details/Standards:** `docs/BROLL_GUIDELINES.md` §13.
 
 ### 🧪 MulhouseRouteCheck — Referenzimplementierung Video 1

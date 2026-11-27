@@ -194,3 +194,8 @@ Gilt für jede Remotion-Szene, die als eigene MP4 in CapCut importiert wird (Rou
 - **Prüfen vor Abgabe:** `npx remotion ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate,pix_fmt,color_space,color_range,sample_rate -of default=nw=1 <mp4>`. Bestehende Dateien, die dem Standard entsprechen, nicht neu rendern.
 - **Transparente Overlays** (Alpha, Wasserzeichen/Captions) werden getrennt behandelt und nutzen diese Einstellungen nicht.
 - Design, Timing und Sounds ändern sich durch den Export-Standard nie; bei Neurender gegen die vorherige Version prüfen (Layout gleich, nur schärfer).
+
+
+## 11. Route-Check-Designstandard (verbindlich)
+
+Jeder neue Route Check nutzt standardmäßig das Theme **`editorial`** («Editorial Travel Map», final abgenommen 2026-11-27): Inter, Waldgrün `#193B2B` für Titel/Ortsnamen/Icons, Graugrün `#526457` für Sekundärtext, Terrakotta `#C45E32` nur für Routen, Fahrzeiten und Zielmarker; Infoblock ohne Container/Milchglas, linksbündig bei 8 % der Breite, SVG-Linien-Icons statt Emojis, helle Textkontur statt Tafel, abgeschwächte Karte ohne Orts-Labels. Abweichung (`light`/`dark`) nur mit dokumentiertem Grund. Maße und Begründung: `docs/BROLL_GUIDELINES.md` §14; Komponente: `docs/REMOTION_LIBRARY.md` (RouteCheck, Icon). Export: §10.

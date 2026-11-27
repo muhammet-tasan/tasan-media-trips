@@ -16,6 +16,10 @@ Format: `- **Learning** — Warum/Wie. *(Quelle, Datum · Stufe)*`
 
 ## Grafiken & Remotion (S6/S7)
 - **Route Check: echte Karte, echte Routen** — MapLibre + OpenFreeMap, OSRM-Routen lokal gecacht, Ländergrenzen als eigene Ebene; keine gezeichneten Phantasie-Karten. *(Mulhouse · S7)*
+- **Route Check «Editorial Travel Map» ist der Standard** — eine Schriftfamilie (Inter), Grün trägt Inhalt/Icons, Terrakotta nur die Routen-Geschichte, Länderkürzel winzig (13 px); lieber Karten-Labels ausblenden und helle Textkontur nutzen als eine Tafel dahinterlegen. *(NaturOparC · S7)*
+- **Keine farbigen Emojis im Layout** — SVG-Linien-Icons (`src/components/Icons.tsx`) wirken ruhiger und lassen sich in Markenfarbe färben; der Standort-Pin als Emoji (rosa) brach die Palette. *(NaturOparC · S7)*
+- **Container-freier Text braucht Entrümpelung der Karte** — Kontrast der Karte leicht senken (`contrast(0.9) saturate(0.85)`), Orts-/Städte-Labels der Basemap ausblenden (eigene Herkunftslabels sagen das Nötige), sonst kollidieren Kartenbeschriftung und Text. *(NaturOparC · S7)*
+- **Variante per Config statt Fork** — `plate.enabled:false` bzw. Theme-Wechsel liefert Alternativ-Renders aus derselben Komponente; Timing/Animationen bleiben identisch, daher ohne Neuabnahme vergleichbar. *(NaturOparC · S7)*
 - **Remotion/MapLibre: deterministisch rendern** — Kamera nur mit `jumpTo()` (nie `flyTo`/`easeTo`), jede Kameraänderung hinter `delayRender()`/`continueRender()` auf das `idle`-Ereignis warten lassen; Worker-Dateien nach `public/maplibre/` vendoren, sonst laden Tiles still nicht. *(Mulhouse · S7)*
 - **Phasen statt Gesamtdauer** — jede Einblendung als `{enter, hold, exit}`, Länge = Summe der Phasen, Exit überlappt das nächste Enter (Crossfade). *(MulhouseTripScore · S7)*
 - **Final-Frame-first** — erst das Endbild entwerfen, dann die Animation dahin; handytauglich lesbar (große Schrift auf Platten). *(BROLL_GUIDELINES §6, §9 · S6)*
